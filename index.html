@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#15803d">
+  <meta name="description" content="NaijaRemoteHub — Learn remote skills, earn with referrals, grow your income.">
+  <title>NaijaRemoteHub | Learn. Earn. Grow.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <style>
+    :root{color-scheme:light}html{scroll-behavior:smooth}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .page{display:none}.page.active{display:block}.tab-active{background:#15803d;color:white}.tab-idle{background:#f3f4f6;color:#374151}
+    .shadow-soft{box-shadow:0 12px 35px rgba(15,23,42,.08)}.field{width:100%;border:1px solid #d1d5db;border-radius:.75rem;padding:.8rem .9rem;outline:none;background:white}
+    .field:focus{border-color:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,.12)}.btn{border-radius:.75rem;padding:.8rem 1rem;font-weight:700;transition:.15s}.btn:disabled{opacity:.55;cursor:not-allowed}
+    .btn-green{background:#15803d;color:white}.btn-green:hover{background:#166534}.btn-yellow{background:#facc15;color:#14532d}.btn-light{background:#f3f4f6;color:#1f2937}
+    .notice{display:none;border-radius:.75rem;padding:.75rem 1rem;font-size:.9rem;margin-top:.75rem}.notice.show{display:block}.notice.error{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}.notice.success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+    .pill{display:inline-flex;border-radius:999px;padding:.2rem .65rem;font-size:.72rem;font-weight:800}.locked{background:linear-gradient(135deg,#f8fafc,#e5e7eb)}
+    button,a,input,textarea,select{touch-action:manipulation}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="#" onclick="showPage('home');return false" class="flex items-center gap-2 min-w-0">
+      <span class="w-10 h-10 rounded-xl bg-green-700 text-white grid place-items-center font-black text-xl">N</span>
+      <span class="font-extrabold tracking-tight text-green-800 text-lg sm:text-xl">NaijaRemoteHub</span>
+    </a>
+    <nav class="flex items-center gap-1 sm:gap-2 text-sm">
+      <button class="px-2 py-2 rounded-lg hover:bg-green-50" onclick="showPage('home')">Home</button>
+      <button id="navLogin" class="px-2 py-2 rounded-lg hover:bg-green-50" onclick="openAuth('login')">Login</button>
+      <button id="navDashboard" class="hidden px-2 py-2 rounded-lg hover:bg-green-50" onclick="showPage('dashboard')">Dashboard</button>
+      <button id="navAdmin" class="hidden px-2 py-2 rounded-lg hover:bg-green-50" onclick="showPage('admin')">Admin</button>
+      <button id="navLogout" class="hidden px-2 py-2 rounded-lg text-red-700 hover:bg-red-50" onclick="logout()">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="home" class="page active">
+    <div class="bg-gradient-to-br from-green-800 via-green-700 to-green-600 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <span class="inline-block bg-white/15 text-yellow-300 rounded-full px-4 py-2 text-sm font-bold mb-5">Your digital skills journey starts here</span>
+          <h1 class="text-5xl sm:text-6xl font-black leading-tight">Learn. Earn.<br><span class="text-yellow-300">Grow.</span></h1>
+          <p class="text-lg sm:text-xl text-green-50 mt-5 max-w-xl">Learn remote skills, earn with referrals, grow your income.</p>
+          <div class="flex flex-wrap gap-3 mt-8">
+            <button class="btn btn-yellow" onclick="openAuth('signup')">Create Free Account</button>
+            <button class="btn bg-white text-green-800" onclick="document.getElementById('courseOffer').scrollIntoView({behavior:'smooth'})">Explore Membership</button>
+          </div>
+          <p class="text-sm text-green-100 mt-4">You can begin learning with a smartphone. A laptop can be useful as you progress.</p>
+        </div>
+        <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <p class="text-green-700 font-bold uppercase tracking-widest text-xs">Build practical skills</p>
+          <h2 class="text-2xl font-extrabold mt-2">A community for your next opportunity</h2>
+          <div class="grid grid-cols-2 gap-3 mt-6">
+            <div class="bg-green-50 rounded-2xl p-4"><div class="text-2xl">🎓</div><b class="block mt-2">Learn</b><span class="text-sm text-slate-600">Practical digital courses</span></div>
+            <div class="bg-yellow-50 rounded-2xl p-4"><div class="text-2xl">🤝</div><b class="block mt-2">Refer</b><span class="text-sm text-slate-600">Share your referral link</span></div>
+            <div class="bg-slate-100 rounded-2xl p-4"><div class="text-2xl">📊</div><b class="block mt-2">Track</b><span class="text-sm text-slate-600">View your dashboard</span></div>
+            <div class="bg-green-50 rounded-2xl p-4"><div class="text-2xl">🌱</div><b class="block mt-2">Grow</b><span class="text-sm text-slate-600">Keep building your skills</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-14">
+      <div id="courseOffer" class="max-w-3xl mx-auto bg-white rounded-3xl border border-green-100 shadow-soft overflow-hidden">
+        <div class="bg-green-800 text-white p-6 sm:p-8">
+          <div class="flex items-center justify-between gap-3"><span class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Starter membership</span><span class="pill bg-yellow-300 text-green-900">One-time payment</span></div>
+          <h2 class="text-3xl font-black mt-2">Starter Course</h2>
+          <div class="flex items-end gap-3 mt-3"><span class="text-4xl font-black">₦25,000</span><span class="line-through text-green-200 mb-1">₦50,000</span></div>
+          <p class="text-green-100 mt-2">One-time membership payment. No automatic monthly renewal.</p>
+        </div>
+        <div class="p-6 sm:p-8">
+          <h3 class="font-extrabold text-lg">Your membership includes</h3>
+          <div class="grid sm:grid-cols-2 gap-3 mt-4 text-sm">
+            <div>✅ Full Course access</div><div>✅ Personal Dashboard</div><div>✅ Your Referral Link</div><div>✅ Certificate (subject to course completion)</div><div>✅ Mentorship resources</div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3 mt-7">
+            <button class="btn btn-green flex-1" onclick="pay()">Pay with Paystack ₦25,000</button>
+            <button class="btn btn-light flex-1" onclick="openAuth('signup')">Create Free Account</button>
+          </div>
+          <p class="text-xs text-slate-500 mt-4">Payment access is activated only after the server securely verifies the Paystack transaction.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mt-16">
+        <div><h2 class="text-3xl font-black">How You Earn</h2><p class="text-slate-600 mt-2">Referral rewards are subject to verified membership payments and the programme terms.</p>
+          <div class="mt-6 space-y-3">
+            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 1 — Direct referral</span><b class="text-green-700">₦10,000</b></div>
+            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 2 — Indirect referral</span><b class="text-green-700">₦2,000</b></div>
+            <div class="bg-yellow-50 rounded-xl p-4"><b class="text-green-900">Example:</b> 10 eligible direct referrals × ₦10,000 = <b>₦100,000</b>.</div>
+          </div>
+        </div>
+        <div><h2 class="text-3xl font-black">Courses</h2><div class="grid sm:grid-cols-2 gap-3 mt-6">
+          <div class="bg-white rounded-xl p-4 shadow-soft">💻 <b class="block mt-2">Virtual Assistant Mastery</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">🌍 <b class="block mt-2">Freelancing & Upwork</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">🎥 <b class="block mt-2">Content Creation & TikTok</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">📱 <b class="block mt-2">WhatsApp Marketing</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">🎨 <b class="block mt-2">Canva Design</b></div>
+        </div></div>
+      </div>
+      <section class="mt-16"><h2 class="text-3xl font-black">Latest Announcements</h2><div id="homeAnnouncements" class="grid md:grid-cols-2 gap-4 mt-5"><p class="text-slate-500">Loading announcements…</p></div></section>
+    </div>
+  </section>
+
+  <section id="auth" class="page">
+    <div class="min-h-[75vh] flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-soft p-6 sm:p-8">
+        <div class="text-center"><div class="mx-auto w-14 h-14 bg-green-100 text-green-800 rounded-2xl grid place-items-center text-2xl font-black">N</div><h1 class="text-2xl font-black mt-4">Welcome to NaijaRemoteHub</h1><p class="text-slate-500 text-sm mt-1">Sign in or create your free account</p></div>
+        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl mt-6"><button id="loginTab" class="btn tab-active" onclick="switchAuth('login')">Login</button><button id="signupTab" class="btn tab-idle" onclick="switchAuth('signup')">Sign Up</button></div>
+        <form id="loginForm" class="mt-6 space-y-4" onsubmit="login(event)">
+          <div><label class="block text-sm font-bold mb-1" for="loginEmail">Email</label><input id="loginEmail" class="field" type="email" autocomplete="email" required></div>
+          <div><label class="block text-sm font-bold mb-1" for="loginPassword">Password</label><input id="loginPassword" class="field" type="password" autocomplete="current-password" required></div>
+          <button id="loginSubmit" class="btn btn-green w-full" type="submit">Login</button><div id="loginError" class="notice error"></div>
+        </form>
+        <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
+          <div><label class="block text-sm font-bold mb-1" for="signupName">Full Name</label><input id="signupName" class="field" autocomplete="name" required maxlength="100"></div>
+          <div><label class="block text-sm font-bold mb-1" for="signupEmail">Email</label><input id="signupEmail" class="field" type="email" autocomplete="email" required></div>
+          <div><label class="block text-sm font-bold mb-1" for="signupPassword">Password</label><input id="signupPassword" class="field" type="password" autocomplete="new-password" minlength="6" required><p class="text-xs text-slate-500 mt-1">At least 6 characters.</p></div>
+          <div><label class="block text-sm font-bold mb-1" for="signupReferral">Referral Code (optional)</label><input id="signupReferral" class="field" autocomplete="off" placeholder="Enter referral code"></div>
+          <button id="signupSubmit" class="btn btn-green w-full" type="submit">Create Free Account</button><div id="signupError" class="notice error"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="dashboard" class="page">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="text-green-700 font-bold text-sm">MEMBER AREA</p><h1 class="text-3xl font-black">Your Dashboard</h1><p id="memberGreeting" class="text-slate-500 mt-1"></p></div><span id="accountBadge" class="pill bg-slate-200 text-slate-700">FREE ACCOUNT</span></div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-7">
+        <div class="bg-green-800 text-white rounded-2xl p-6 shadow-soft"><p class="text-green-100 text-sm font-semibold">Wallet Balance</p><p id="walletBalance" class="text-3xl font-black mt-2">₦0</p></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Total Referrals</p><p id="referralCount" class="text-3xl font-black mt-2">0</p></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Your Referral Code</p><p id="myRefCode" class="text-2xl font-black text-green-700 mt-2 break-all">—</p></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6 mt-6">
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦25,000</button></div>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="font-extrabold text-lg">Request a Withdrawal</h2><p class="text-sm text-slate-500 mt-1">Minimum withdrawal: ₦5,000. Requests are reviewed by the administrator.</p>
+        <form id="withdrawForm" class="grid sm:grid-cols-2 gap-3 mt-4" onsubmit="requestWithdrawal(event)">
+          <div><label class="text-sm font-semibold block mb-1">Bank Name</label><input id="bankName" class="field" required maxlength="80"></div>
+          <div><label class="text-sm font-semibold block mb-1">Account Number</label><input id="accountNumber" class="field" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" minlength="10" required></div>
+          <div><label class="text-sm font-semibold block mb-1">Amount (₦)</label><input id="withdrawAmount" class="field" type="number" min="5000" step="1" required></div>
+          <div class="flex items-end"><button id="withdrawSubmit" class="btn btn-green w-full" type="submit">Request Withdrawal</button></div>
+        </form><div id="withdrawMessage" class="notice"></div>
+      </div>
+      <section class="mt-10"><div class="flex items-end justify-between gap-3"><div><h2 class="text-2xl font-black">My Courses / Learning Materials</h2><p class="text-sm text-slate-500 mt-1">Course resources published by the NaijaRemoteHub team.</p></div></div><div id="materialsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5"><p class="text-slate-500">Loading materials…</p></div></section>
+    </div>
+  </section>
+
+  <section id="admin" class="page">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <h1 class="text-3xl font-black">Admin Panel</h1><p class="text-slate-500 mt-1">Manage announcements, members, withdrawals and learning materials.</p>
+      <div class="grid lg:grid-cols-2 gap-6 mt-7">
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Announcement</h2><form id="announcementForm" class="space-y-3 mt-4" onsubmit="postAnnouncement(event)"><input id="announcementTitle" class="field" placeholder="Title" required maxlength="150"><textarea id="announcementMessage" class="field" rows="4" placeholder="Message" required maxlength="3000"></textarea><button class="btn btn-green w-full">Post Announcement</button><div id="announcementMessageBox" class="notice"></div></form></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Educational Material</h2>
+          <form id="materialForm" class="space-y-3 mt-4" onsubmit="postMaterial(event)">
+            <input id="materialTitle" class="field" placeholder='Material Title (e.g. "Virtual Assistant Module 1")' required maxlength="150">
+            <select id="materialCategory" class="field" required><option value="">Select Category</option><option>Virtual Assistant</option><option>Freelancing</option><option>Content Creation</option><option>WhatsApp Marketing</option><option>Canva Design</option><option>General</option></select>
+            <textarea id="materialDescription" class="field" rows="3" placeholder="Description" required maxlength="3000"></textarea>
+            <input id="materialVideo" class="field" type="url" placeholder="Video Link (optional)">
+            <input id="materialPdf" class="field" type="url" placeholder="PDF / Download Link (optional)">
+            <label class="flex items-center gap-3 text-sm font-semibold"><input id="materialFree" type="checkbox" class="w-5 h-5 accent-green-700"> Is Free? (free users can access this material)</label>
+            <button id="materialSubmit" class="btn btn-green w-full">Post Material</button><div id="materialMessage" class="notice"></div>
+          </form>
+        </div>
+      </div>
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">All Users</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[650px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Email</th><th class="p-2">Balance</th><th class="p-2">Membership</th></tr></thead><tbody id="usersTable"><tr><td class="p-2" colspan="4">Loading…</td></tr></tbody></table></div></section>
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Withdrawals</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[750px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Amount</th><th class="p-2">Bank</th><th class="p-2">Account</th><th class="p-2">Status</th></tr></thead><tbody id="withdrawalsTable"><tr><td class="p-2" colspan="5">Loading…</td></tr></tbody></table></div></section>
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Manage Materials</h2><div id="adminMaterials" class="space-y-3 mt-4">Loading…</div></section>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-slate-900 text-slate-300 mt-16"><div class="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between gap-3 text-sm"><p>© <span id="year"></span> NaijaRemoteHub. Learn. Earn. Grow.</p><p>Build skills. Create opportunities.</p></div></footer>
+
+<script>
+"use strict";
+
+/*
+  IMPORTANT SECURITY / DEPLOYMENT NOTES:
+  1) Never put a Paystack SECRET KEY in this file. Paystack verification and all
+     referral-credit calculations must run on a trusted server (Cloud Function).
+  2) This page creates payment_requests as pending. A verified Paystack webhook /
+     Cloud Function must validate the reference, amount (2500000 kobo), currency
+     (NGN), and customer, then set users/{uid}.is_paid=true and credit eligible
+     referral rewards exactly once. A browser callback is NOT proof of payment.
+  3) Firestore Security Rules are mandatory. Restrict admin writes to verified
+     admins; users must not edit is_admin, is_paid, balance, ref_code or payment
+     records. Withdrawal requests/deductions must be enforced transactionally by
+     trusted backend rules/functions. Client code alone cannot secure money.
+  4) Set your own admin account's is_admin=true from Firebase Console or a trusted
+     admin-only backend. Never allow users to promote themselves.
+*/
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
+  authDomain: "naijaremotehub-6f584.firebaseapp.com",
+  projectId: "naijaremotehub-6f584",
+  storageBucket: "naijaremotehub-6f584.firebasestorage.app",
+  messagingSenderId: "662711600492",
+  appId: "1:662711600492:web:a307027882c532269adf49",
+  measurementId: "G-GPWVV5WLEC"
+};
+const PAYSTACK_PUBLIC_KEY = "pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a";
+const MEMBERSHIP_FEE_NAIRA = 25000;
+const MEMBERSHIP_FEE_KOBO = MEMBERSHIP_FEE_NAIRA * 100;
+const MIN_WITHDRAWAL = 5000;
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
+
+let currentUser = null;
+let userData = null;
+let referralsUnsubscribe = null;
+let materialsUnsubscribe = null;
+let announcementsUnsubscribe = null;
+let adminUnsubscribers = [];
+
+document.getElementById("year").textContent = new Date().getFullYear();
+const urlParams = new URLSearchParams(window.location.search);
+const incomingReferral = (urlParams.get("ref") || "").trim();
+if (incomingReferral) document.getElementById("signupReferral").value = incomingReferral;
+
+function cleanEmail(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s/g, "");
+}
+function money(value) {
+  return new Intl.NumberFormat("en-NG", {style:"currency",currency:"NGN",maximumFractionDigits:0}).format(Number(value || 0));
+}
+function safeText(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function showNotice(id, message, type="error") {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = "notice show " + (type === "success" ? "success" : "error");
+}
+function clearNotice(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ""; el.className = "notice"; }
+}
+function setBusy(id, busy, busyText) {
+  const button = document.getElementById(id);
+  if (!button) return;
+  if (busy) {
+    button.dataset.originalText = button.textContent;
+    button.textContent = busyText || "Please wait…";
+    button.disabled = true;
+  } else {
+    button.textContent = button.dataset.originalText || button.textContent;
+    button.disabled = false;
+  }
+}
+function showPage(page) {
+  // Signed-in members never see the landing/auth screens: send them to their dashboard.
+  if ((page === "home" || page === "auth") && currentUser) page = "dashboard";
+  if ((page === "dashboard" || page === "admin") && !currentUser) {
+    openAuth("login");
+    return;
+  }
+  if (page === "admin" && !(userData && userData.is_admin === true)) {
+    showPage("dashboard");
+    return;
+  }
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  const target = document.getElementById(page);
+  if (target) target.classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function openAuth(mode="login") {
+  if (currentUser) { showPage("dashboard"); return; }
+  switchAuth(mode);
+  showPage("auth");
+}
+function switchAuth(mode) {
+  const isLogin = mode === "login";
+  document.getElementById("loginForm").classList.toggle("hidden", !isLogin);
+  document.getElementById("signupForm").classList.toggle("hidden", isLogin);
+  document.getElementById("loginTab").className = "btn " + (isLogin ? "tab-active" : "tab-idle");
+  document.getElementById("signupTab").className = "btn " + (!isLogin ? "tab-active" : "tab-idle");
+  clearNotice("loginError"); clearNotice("signupError");
+}
+function updateNavigation() {
+  const signedIn = !!currentUser;
+  document.getElementById("navLogin").classList.toggle("hidden", signedIn);
+  document.getElementById("navLogout").classList.toggle("hidden", !signedIn);
+  document.getElementById("navDashboard").classList.toggle("hidden", !signedIn);
+  document.getElementById("navAdmin").classList.toggle("hidden", !(signedIn && userData && userData.is_admin === true));
+}
+function makeReferralCode(fullName) {
+  const first = String(fullName || "member").trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, "") || "member";
+  return first + Math.random().toString(36).slice(2, 7);
+}
+async function findReferrer(code) {
+  if (!code) return null;
+  const snap = await db.collection("users").where("ref_code", "==", code).limit(1).get();
+  if (snap.empty) return null;
+  return snap.docs[0].id;
+}
+async function signup(event) {
+  event.preventDefault(); clearNotice("signupError");
+  const fullName = document.getElementById("signupName").value.trim();
+  const email = cleanEmail(document.getElementById("signupEmail").value);
+  const password = document.getElementById("signupPassword").value;
+  const referralCode = document.getElementById("signupReferral").value.trim();
+  if (!fullName) return showNotice("signupError", "Please enter your full name.");
+  if (password.length < 6) return showNotice("signupError", "Password must be at least 6 characters.");
+  setBusy("signupSubmit", true, "Creating account…");
+  try {
+    let referredBy = null;
+    if (referralCode) {
+      referredBy = await findReferrer(referralCode);
+      if (!referredBy) throw new Error("That referral code was not found. Check the code or leave the field blank.");
+    }
+    const credential = await auth.createUserWithEmailAndPassword(email, password);
+    const refCode = makeReferralCode(fullName);
+    const profile = {
+      full_name: fullName, email, ref_code: refCode, referred_by: referredBy,
+      balance: 0, is_admin: false, is_paid: false, createdAt: serverTimestamp()
+    };
+    await db.collection("users").doc(credential.user.uid).set(profile);
+    document.getElementById("signupForm").reset();
+    await loadCurrentProfile(credential.user);
+    showPage("dashboard");
+  } catch (error) {
+    showNotice("signupError", friendlyError(error));
+  } finally { setBusy("signupSubmit", false); }
+}
+async function login(event) {
+  event.preventDefault(); clearNotice("loginError");
+  const email = cleanEmail(document.getElementById("loginEmail").value);
+  const password = document.getElementById("loginPassword").value;
+  setBusy("loginSubmit", true, "Signing in…");
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    document.getElementById("loginForm").reset();
+  } catch (error) {
+    showNotice("loginError", friendlyError(error));
+  } finally { setBusy("loginSubmit", false); }
+}
+function friendlyError(error) {
+  const code = error && error.code;
+  const messages = {
+    "auth/invalid-email":"Please enter a valid email address.",
+    "auth/user-not-found":"No account was found with that email.",
+    "auth/wrong-password":"Incorrect email or password.",
+    "auth/invalid-credential":"Incorrect email or password.",
+    "auth/email-already-in-use":"An account already exists with this email. Please log in.",
+    "auth/weak-password":"Choose a stronger password (at least 6 characters).",
+    "auth/too-many-requests":"Too many attempts. Please wait and try again.",
+    "permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.",
+    "unavailable":"Service temporarily unavailable. Please try again."
+  };
+  return messages[code] || (error && error.message) || "Something went wrong. Please try again.";
+}
+async function logout() {
+  try { await auth.signOut(); }
+  catch (error) { alert(friendlyError(error)); }
+}
+auth.onAuthStateChanged(async user => {
+  currentUser = user || null;
+  userData = null;
+  stopLiveListeners();
+  if (currentUser) {
+    try {
+      await loadCurrentProfile(currentUser);
+      updateNavigation();
+      // Stay on Admin only if this user is an admin; otherwise always land on the dashboard.
+      const onAdmin = document.getElementById("admin").classList.contains("active");
+      if (!(onAdmin && userData && userData.is_admin === true)) showPage("dashboard");
+    } catch (error) {
+      console.error(error);
+      updateNavigation();
+      showPage("dashboard");
+      if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules.");
+    }
+  } else {
+    updateNavigation();
+    // Signed out: hide member areas and show the login form again (but keep the landing page on first visit).
+    if (!document.getElementById("home").classList.contains("active")) openAuth("login");
+  }
+});
+async function loadCurrentProfile(user) {
+  const ref = db.collection("users").doc(user.uid);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    // Repairs a missing profile for an authenticated account without granting privileges.
+    const name = user.displayName || (user.email ? user.email.split("@")[0] : "Member");
+    const profile = {full_name:name,email:cleanEmail(user.email),ref_code:makeReferralCode(name),referred_by:null,balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()};
+    await ref.set(profile);
+    userData = {...profile};
+  } else userData = snap.data() || {};
+  renderDashboard();
+  startLiveListeners();
+  updateNavigation();
+}
+function renderDashboard() {
+  if (!currentUser || !userData) return;
+  document.getElementById("memberGreeting").textContent = (userData.full_name || "Member") + " · " + (userData.email || currentUser.email || "");
+  document.getElementById("walletBalance").textContent = money(userData.balance);
+  document.getElementById("myRefCode").textContent = userData.ref_code || "—";
+  document.getElementById("accountBadge").textContent = userData.is_paid === true ? "PAID MEMBER" : "FREE ACCOUNT";
+  document.getElementById("accountBadge").className = "pill " + (userData.is_paid === true ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-700");
+  document.getElementById("membershipText").textContent = userData.is_paid === true ? "Your one-time membership payment has been verified." : "You are using a free account. Upgrade once to unlock paid learning materials.";
+  document.getElementById("upgradeButton").classList.toggle("hidden", userData.is_paid === true);
+  const link = new URL(window.location.href);
+  link.search = ""; link.hash = ""; link.searchParams.set("ref", userData.ref_code || "");
+  document.getElementById("referralLink").value = link.toString();
+}
+async function copyReferral() {
+  const value = document.getElementById("referralLink").value;
+  try { await navigator.clipboard.writeText(value); alert("Referral link copied."); }
+  catch (_) { const input=document.getElementById("referralLink"); input.select(); document.execCommand("copy"); alert("Referral link copied."); }
+}
+function shareWhatsApp() {
+  const link = document.getElementById("referralLink").value;
+  const message = "Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: " + link;
+  window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener");
+}
+function pay() {
+  if (!currentUser || !userData) { openAuth("login"); return; }
+  if (userData.is_paid === true) { alert("Your membership is already active."); return; }
+  if (!window.PaystackPop) { alert("Payment service did not load. Refresh the page and try again."); return; }
+  if (!PAYSTACK_PUBLIC_KEY || !PAYSTACK_PUBLIC_KEY.startsWith("pk_")) { alert("Paystack public key is not configured."); return; }
+  const reference = "NRH_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+  const requestRef = db.collection("payment_requests").doc(reference);
+  requestRef.set({
+    uid:currentUser.uid,email:cleanEmail(currentUser.email),amount:MEMBERSHIP_FEE_KOBO,
+    currency:"NGN",reference,status:"initiated",createdAt:serverTimestamp()
+  }).then(() => {
+    const handler = PaystackPop.setup({
+      key:PAYSTACK_PUBLIC_KEY,
+      email:cleanEmail(currentUser.email),
+      amount:MEMBERSHIP_FEE_KOBO,
+      currency:"NGN",
+      ref:reference,
+      metadata:{custom_fields:[{display_name:"Firebase User ID",variable_name:"firebase_uid",value:currentUser.uid}]},
+      callback:function(response) {
+        requestRef.set({status:"awaiting_server_verification",paystack_reference:response.reference,callbackAt:serverTimestamp()},{merge:true})
+          .then(() => alert("Payment response received. Your payment is awaiting secure verification. Your account will update automatically after verification."))
+          .catch(error => alert("Payment response received, but we could not update its status. Contact support with reference: " + response.reference));
+      },
+      onClose:function() {
+        // Keep the request record for webhook reconciliation; do not mark the user paid.
+      }
+    });
+    handler.openIframe();
+  }).catch(error => alert("Could not start payment: " + friendlyError(error)));
+}
+
+function startLiveListeners() {
+  if (!currentUser) return;
+  if (referralsUnsubscribe) referralsUnsubscribe();
+  referralsUnsubscribe = db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(snapshot => {
+    document.getElementById("referralCount").textContent = snapshot.size;
+  }, error => console.warn("Referral count:",error));
+  if (materialsUnsubscribe) materialsUnsubscribe();
+  materialsUnsubscribe = db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot => {
+    renderMaterials(snapshot.docs);
+  }, error => {
+    document.getElementById("materialsGrid").innerHTML = '<p class="text-red-600">Unable to load learning materials. Check Firestore rules and the materials index.</p>';
+    console.error(error);
+  });
+  if (announcementsUnsubscribe) announcementsUnsubscribe();
+  announcementsUnsubscribe = db.collection("announcements").orderBy("createdAt","desc").limit(8).onSnapshot(snapshot => {
+    renderAnnouncements(snapshot.docs);
+  }, error => console.warn("Announcements:",error));
+  if (userData && userData.is_admin === true) loadAdminData();
+}
+function stopLiveListeners() {
+  [referralsUnsubscribe,materialsUnsubscribe,announcementsUnsubscribe,...adminUnsubscribers].forEach(fn=>{if(typeof fn==="function")fn();});
+  referralsUnsubscribe=null;materialsUnsubscribe=null;announcementsUnsubscribe=null;adminUnsubscribers=[];
+}
+function renderAnnouncements(docs) {
+  const container = document.getElementById("homeAnnouncements");
+  if (!docs.length) { container.innerHTML='<p class="text-slate-500">No announcements yet. Please check back soon.</p>'; return; }
+  container.innerHTML = docs.map(doc => {
+    const item=doc.data()||{};
+    return `<article class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-wider text-green-700">Announcement</p><h3 class="font-extrabold text-lg mt-2">${safeText(item.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap">${safeText(item.message)}</p></article>`;
+  }).join("");
+}
+function renderMaterials(docs) {
+  const container=document.getElementById("materialsGrid");
+  if (!docs.length) {container.innerHTML='<p class="text-slate-500">No learning materials have been published yet.</p>';return;}
+  container.innerHTML=docs.map(doc=>{
+    const m=doc.data()||{}, free=m.is_free===true, unlocked=free||(userData&&userData.is_paid===true);
+    const actions=unlocked
+      ? `${m.video_url?`<a class="btn btn-green text-center block" href="${safeUrl(m.video_url)}" target="_blank" rel="noopener noreferrer">▶ Watch Video</a>`:""} ${m.pdf_url?`<a class="btn btn-light text-center block" href="${safeUrl(m.pdf_url)}" target="_blank" rel="noopener noreferrer">↓ Download PDF</a>`:""}`
+      : `<div class="locked rounded-xl p-4 text-center"><p class="font-bold text-slate-700">🔒 Upgrade to ₦25,000 to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`;
+    return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-50 text-green-800">${safeText(m.category||"General")}</span><span class="pill ${free?"bg-yellow-100 text-yellow-800":"bg-slate-100 text-slate-700"}">${free?"FREE":"PAID"}</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(m.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(m.description)}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5">${actions}</div></article>`;
+  }).join("");
+}
+function safeUrl(value) {
+  try { const u=new URL(String(value)); return ["https:","http:"].includes(u.protocol)?safeText(u.href):"#"; }
+  catch(_){return "#";}
+}
+async function requestWithdrawal(event) {
+  event.preventDefault();
+  const messageId="withdrawMessage";clearNotice(messageId);
+  if (!currentUser || !userData) return showNotice(messageId,"Please log in first.");
+  const bank=document.getElementById("bankName").value.trim();
+  const account=document.getElementById("accountNumber").value.trim();
+  const amount=Number(document.getElementById("withdrawAmount").value);
+  const balance=Number(userData.balance||0);
+  if (!bank || !/^\d{10}$/.test(account)) return showNotice(messageId,"Enter a bank name and a valid 10-digit account number.");
+  if (!Number.isSafeInteger(amount) || amount<MIN_WITHDRAWAL) return showNotice(messageId,"Minimum withdrawal is ₦5,000.");
+  if (amount>balance) return showNotice(messageId,"Insufficient wallet balance.");
+  setBusy("withdrawSubmit",true,"Submitting…");
+  try {
+    // Atomic client transaction prevents ordinary race conditions, but Firestore
+    // Rules / a trusted function must enforce this operation against tampering.
+    const userRef=db.collection("users").doc(currentUser.uid);
+    const withdrawalRef=db.collection("withdrawals").doc();
+    await db.runTransaction(async tx=>{
+      const snap=await tx.get(userRef);
+      if(!snap.exists)throw new Error("Member profile not found.");
+      const latest=Number((snap.data()||{}).balance||0);
+      if(amount>latest)throw new Error("Insufficient wallet balance.");
+      tx.update(userRef,{balance:latest-amount});
+      tx.set(withdrawalRef,{
+        uid:currentUser.uid,name:userData.full_name||"",email:currentUser.email||"",
+        amount,bank,account,status:"pending",createdAt:serverTimestamp()
+      });
+    });
+    document.getElementById("withdrawForm").reset();
+    showNotice(messageId,"Withdrawal request submitted. Your wallet has been debited and the request is pending review.","success");
+    await loadCurrentProfile(currentUser);
+  } catch(error) { showNotice(messageId,friendlyError(error)); }
+  finally { setBusy("withdrawSubmit",false); }
+}
+
+async function postAnnouncement(event) {
+  event.preventDefault();clearNotice("announcementMessageBox");
+  try {
+    await db.collection("announcements").add({
+      title:document.getElementById("announcementTitle").value.trim(),
+      message:document.getElementById("announcementMessage").value.trim(),
+      createdAt:serverTimestamp(),createdBy:currentUser.uid
+    });
+    document.getElementById("announcementForm").reset();
+    showNotice("announcementMessageBox","Announcement published successfully.","success");
+  } catch(error) { showNotice("announcementMessageBox",friendlyError(error)); }
+}
+async function postMaterial(event) {
+  event.preventDefault();clearNotice("materialMessage");
+  const video=document.getElementById("materialVideo").value.trim();
+  const pdf=document.getElementById("materialPdf").value.trim();
+  if ((video && !isHttpUrl(video)) || (pdf && !isHttpUrl(pdf))) return showNotice("materialMessage","Please enter valid http or https links.");
+  setBusy("materialSubmit",true,"Publishing…");
+  try {
+    await db.collection("materials").add({
+      title:document.getElementById("materialTitle").value.trim(),
+      category:document.getElementById("materialCategory").value,
+      description:document.getElementById("materialDescription").value.trim(),
+      video_url:video,pdf_url:pdf,is_free:document.getElementById("materialFree").checked,
+      createdAt:serverTimestamp(),createdBy:currentUser.uid
+    });
+    document.getElementById("materialForm").reset();
+    showNotice("materialMessage","Educational material published successfully.","success");
+  } catch(error) { showNotice("materialMessage",friendlyError(error)); }
+  finally { setBusy("materialSubmit",false); }
+}
+function isHttpUrl(value) {
+  try { return ["http:","https:"].includes(new URL(value).protocol); } catch(_){return false;}
+}
+function loadAdminData() {
+  if (!(userData && userData.is_admin===true)) return;
+  adminUnsubscribers.forEach(fn=>fn());adminUnsubscribers=[];
+  const usersSub=db.collection("users").orderBy("createdAt","desc").limit(500).onSnapshot(snapshot=>{
+    const body=document.getElementById("usersTable");
+    if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="4">No users found.</td></tr>';return;}
+    body.innerHTML=snapshot.docs.map(doc=>{
+      const u=doc.data()||{};
+      return `<tr class="border-b"><td class="p-2">${safeText(u.full_name)}</td><td class="p-2">${safeText(u.email)}</td><td class="p-2">${money(u.balance)}</td><td class="p-2">${u.is_paid===true?"PAID":"FREE"}</td></tr>`;
+    }).join("");
+  },err=>console.error(err));
+  const withdrawalSub=db.collection("withdrawals").orderBy("createdAt","desc").limit(300).onSnapshot(snapshot=>{
+    const body=document.getElementById("withdrawalsTable");
+    if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="5">No withdrawal requests.</td></tr>';return;}
+    body.innerHTML=snapshot.docs.map(doc=>{
+      const w=doc.data()||{};
+      return `<tr class="border-b"><td class="p-2">${safeText(w.name)}</td><td class="p-2">${money(w.amount)}</td><td class="p-2">${safeText(w.bank)}</td><td class="p-2">${safeText(w.account)}</td><td class="p-2"><span class="pill bg-yellow-100 text-yellow-800">${safeText(w.status||"pending")}</span></td></tr>`;
+    }).join("");
+  },err=>console.error(err));
+  const materialSub=db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot=>{
+    const container=document.getElementById("adminMaterials");
+    if(snapshot.empty){container.innerHTML='<p class="text-slate-500">No materials published.</p>';return;}
+    container.innerHTML=snapshot.docs.map(doc=>{
+      const m=doc.data()||{};
+      return `<div class="border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><b>${safeText(m.title)}</b><p class="text-sm text-slate-500">${safeText(m.category)} · ${m.is_free===true?"Free":"Paid"}</p></div><button class="btn bg-red-50 text-red-700" onclick="deleteMaterial('${doc.id}')">Delete</button></div>`;
+    }).join("");
+  },err=>console.error(err));
+  adminUnsubscribers=[usersSub,withdrawalSub,materialSub];
+}
+async function deleteMaterial(id) {
+  if (!(userData && userData.is_admin===true)) return alert("Admin access required.");
+  if (!confirm("Delete this learning material permanently?")) return;
+  try { await db.collection("materials").doc(id).delete(); }
+  catch(error) { alert("Could not delete material: "+friendlyError(error)); }
+}
+</script>
+</body>
+</html>
