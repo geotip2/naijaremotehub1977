@@ -1,20 +1,3 @@
-"use strict";
-
-async function loadCurrentProfile(user) {
-  const ref = db.collection("users").doc(user.uid);
-  const snap = await ref.get();
-  if (!snap.exists) {
-    // Repairs a missing profile for an authenticated account without granting privileges.
-    const name = user.displayName || (user.email ? user.email.split("@")[0] : "Member");
-    const profile = {full_name:name,email:cleanEmail(user.email),ref_code:makeReferralCode(name),referred_by:null,balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()};
-    await ref.set(profile);
-    userData = {...profile};
-  } else userData = snap.data() || {};
-  renderDashboard();
-  startLiveListeners();
-  updateNavigation();
-}
-
 function renderDashboard() {
   if (!currentUser || !userData) return;
   document.getElementById("memberGreeting").textContent = (userData.full_name || "Member") + " · " + (userData.email || currentUser.email || "");
@@ -32,6 +15,7 @@ function renderDashboard() {
 
 function startLiveListeners() {
   if (!currentUser) return;
+  if (window._listenersStarted) return; window._listenersStarted = true;
   if (referralsUnsubscribe) referralsUnsubscribe();
   referralsUnsubscribe = db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(snapshot => {
     document.getElementById("referralCount").textContent = snapshot.size;
@@ -55,6 +39,7 @@ function startLiveListeners() {
 function stopLiveListeners() {
   [referralsUnsubscribe,materialsUnsubscribe,announcementsUnsubscribe,...adminUnsubscribers].forEach(fn=>{if(typeof fn==="function")fn();});
   referralsUnsubscribe=null;materialsUnsubscribe=null;announcementsUnsubscribe=null;adminUnsubscribers=[];
+  window._listenersStarted = false;
 }
 
 function renderAnnouncements(docs) {
