@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#15803d">
+  <meta name="description" content="NaijaRemoteHub — Learn remote skills, earn with referrals, grow your income.">
+  <title>NaijaRemoteHub | Learn. Earn. Grow.</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800">
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2 min-w-0">
+      <span class="w-10 h-10 rounded-xl bg-green-700 text-white grid place-items-center font-black text-xl">N</span>
+      <span class="font-extrabold tracking-tight text-green-800 text-lg sm:text-xl">NaijaRemoteHub</span>
+    </a>
+    <nav class="flex items-center gap-1 sm:gap-2 text-sm">
+      <a href="index.html" class="px-2 py-2 rounded-lg hover:bg-green-50">Home</a>
+      <a id="navDashboard" href="dashboard.html" class="hidden px-2 py-2 rounded-lg hover:bg-green-50">Dashboard</a>
+      <a id="navAdmin" href="admin.html" class="hidden px-2 py-2 rounded-lg hover:bg-green-50">Admin</a>
+      <a id="navLogin" href="login.html" class="px-2 py-2 rounded-lg hover:bg-green-50">Login</a>
+      <button id="navLogout" class="hidden px-2 py-2 rounded-lg text-red-700 hover:bg-red-50" onclick="logout()">Logout</button>
+    </nav>
+  </div>
+</header>
+<main>
+<section id="home">
+    <div class="bg-gradient-to-br from-green-800 via-green-700 to-green-600 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <span class="inline-block bg-white/15 text-yellow-300 rounded-full px-4 py-2 text-sm font-bold mb-5">Your digital skills journey starts here</span>
+          <h1 class="text-5xl sm:text-6xl font-black leading-tight">Learn. Earn.<br><span class="text-yellow-300">Grow.</span></h1>
+          <p class="text-lg sm:text-xl text-green-50 mt-5 max-w-xl">Learn remote skills, earn with referrals, grow your income.</p>
+          <div class="flex flex-wrap gap-3 mt-8">
+            <button class="btn btn-yellow" onclick="window.location.href='signup.html'">Create Free Account</button>
+            <button class="btn bg-white text-green-800" onclick="document.getElementById('courseOffer').scrollIntoView({behavior:'smooth'})">Explore Membership</button>
+          </div>
+          <p class="text-sm text-green-100 mt-4">You can begin learning with a smartphone. A laptop can be useful as you progress.</p>
+        </div>
+        <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <p class="text-green-700 font-bold uppercase tracking-widest text-xs">Build practical skills</p>
+          <h2 class="text-2xl font-extrabold mt-2">A community for your next opportunity</h2>
+          <div class="grid grid-cols-2 gap-3 mt-6">
+            <div class="bg-green-50 rounded-2xl p-4"><div class="text-2xl">🎓</div><b class="block mt-2">Learn</b><span class="text-sm text-slate-600">Practical digital courses</span></div>
+            <div class="bg-yellow-50 rounded-2xl p-4"><div class="text-2xl">🤝</div><b class="block mt-2">Refer</b><span class="text-sm text-slate-600">Share your referral link</span></div>
+            <div class="bg-slate-100 rounded-2xl p-4"><div class="text-2xl">📊</div><b class="block mt-2">Track</b><span class="text-sm text-slate-600">View your dashboard</span></div>
+            <div class="bg-green-50 rounded-2xl p-4"><div class="text-2xl">🌱</div><b class="block mt-2">Grow</b><span class="text-sm text-slate-600">Keep building your skills</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-14">
+      <div id="courseOffer" class="max-w-3xl mx-auto bg-white rounded-3xl border border-green-100 shadow-soft overflow-hidden">
+        <div class="bg-green-800 text-white p-6 sm:p-8">
+          <div class="flex items-center justify-between gap-3"><span class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Starter membership</span><span class="pill bg-yellow-300 text-green-900">One-time payment</span></div>
+          <h2 class="text-3xl font-black mt-2">Starter Course</h2>
+          <div class="flex items-end gap-3 mt-3"><span class="text-4xl font-black">₦25,000</span><span class="line-through text-green-200 mb-1">₦50,000</span></div>
+          <p class="text-green-100 mt-2">One-time membership payment. No automatic monthly renewal.</p>
+        </div>
+        <div class="p-6 sm:p-8">
+          <h3 class="font-extrabold text-lg">Your membership includes</h3>
+          <div class="grid sm:grid-cols-2 gap-3 mt-4 text-sm">
+            <div>✅ Full Course access</div><div>✅ Personal Dashboard</div><div>✅ Your Referral Link</div><div>✅ Certificate (subject to course completion)</div><div>✅ Mentorship resources</div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3 mt-7">
+            <button class="btn btn-green flex-1" onclick="goToPayment()">Pay with Paystack ₦25,000</button>
+            <button class="btn btn-light flex-1" onclick="window.location.href='signup.html'">Create Free Account</button>
+          </div>
+          <p class="text-xs text-slate-500 mt-4">Payment access is activated only after the server securely verifies the Paystack transaction.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mt-16">
+        <div><h2 class="text-3xl font-black">How You Earn</h2><p class="text-slate-600 mt-2">Referral rewards are subject to verified membership payments and the programme terms.</p>
+          <div class="mt-6 space-y-3">
+            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 1 — Direct referral</span><b class="text-green-700">₦10,000</b></div>
+            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 2 — Indirect referral</span><b class="text-green-700">₦2,000</b></div>
+            <div class="bg-yellow-50 rounded-xl p-4"><b class="text-green-900">Example:</b> 10 eligible direct referrals × ₦10,000 = <b>₦100,000</b>.</div>
+          </div>
+        </div>
+        <div><h2 class="text-3xl font-black">Courses</h2><div class="grid sm:grid-cols-2 gap-3 mt-6">
+          <div class="bg-white rounded-xl p-4 shadow-soft">💻 <b class="block mt-2">Virtual Assistant Mastery</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">🌍 <b class="block mt-2">Freelancing & Upwork</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">🎥 <b class="block mt-2">Content Creation & TikTok</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">📱 <b class="block mt-2">WhatsApp Marketing</b></div>
+          <div class="bg-white rounded-xl p-4 shadow-soft">🎨 <b class="block mt-2">Canva Design</b></div>
+        </div></div>
+      </div>
+      <section class="mt-16"><h2 class="text-3xl font-black">Latest Announcements</h2><div id="homeAnnouncements" class="grid md:grid-cols-2 gap-4 mt-5"><p class="text-slate-500">Loading announcements…</p></div></section>
+    </div>
+  </section>
+</main>
+<footer class="bg-slate-900 text-slate-300 mt-16"><div class="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between gap-3 text-sm"><p>© <span id="year"></span> NaijaRemoteHub. Learn. Earn. Grow.</p><p>Build skills. Create opportunities.</p></div></footer>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/common.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/payments.js"></script>
+<script>startHomeAnnouncements(); auth.onAuthStateChanged(user => { currentUser = user || null; updateNavigation(); });</script>
+</body>
+</html>
