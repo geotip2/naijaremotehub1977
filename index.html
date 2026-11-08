@@ -258,6 +258,7 @@ window.openAuth = (mode) => {
   document.getElementById('authTitle').textContent = mode === 'login' ? 'Login' : 'Create Account';
   document.getElementById('authBtn').textContent = mode === 'login' ? 'Login' : 'Sign Up Free';
   document.getElementById('authName').classList.toggle('hidden', mode === 'login');
+  document.getElementById('authReferral').classList.toggle('hidden', mode === 'login');
   document.getElementById('tab-login').classList.toggle('active', mode === 'login');
   document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
   document.getElementById('authSwitch').textContent = mode === 'login' ? "No account? Sign Up" : "Have account? Login";
