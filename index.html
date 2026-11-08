@@ -297,26 +297,35 @@ window.shareReferral = () => {
 // ===== PAYSTACK ₦30,000 + 2-LEVEL COMMISSIONS =====
 // Paid = ₦30,000 | L1 = ₦9,000 (30%) | L2 = ₦4,500 (15%) | Company = ₦16,500 (55%)
 window.payWithPaystack = () => {
+  if window.payWithPaystack = () => {
+  alert("Button clicked - checking Paystack...");
   if (!currentUser || !userData) return alert("Login first");
   if (userData.is_paid) return alert("You are already a Paid Member");
-  let handler = PaystackPop.setup({
-    key: 'pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a',
-    email: currentUser.email,
-    amount: 3000000,
-    currency: 'NGN',
-    ref: 'NRH-' + Date.now(),
-    metadata: { custom_fields: [{ display_name: "User ID", variable_name: "user_id", value: currentUser.uid }] },
-    callback: async function(response){
-      try {
-        await updateDoc(doc(db, "users", currentUser.uid), { is_paid: true });
-        await payReferralCommissions();
-        alert("Payment successful! You are now PAID. Referral bonuses sent to your uplines.");
-        location.reload();
-      } catch(e){ alert("Payment ok but update failed: " + e.message); }
-    },
-    onClose: function(){ alert("Payment window closed"); }
-  });
-  handler.openIframe();
+  if (typeof PaystackPop === 'undefined') {
+    alert("Paystack did not load. Turn off AdBlock / use Chrome and reload.");
+    return;
+  }
+  try {
+    let handler = PaystackPop.setup({
+      key: 'pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a',
+      email: currentUser.email,
+      amount: 3000000,
+      currency: 'NGN',
+      ref: 'NRH-' + Date.now(),
+      callback: async function(response){
+        try {
+          await updateDoc(doc(db, "users", currentUser.uid), { is_paid: true });
+          await payReferralCommissions();
+          alert("Payment successful! You are now PAID.");
+          location.reload();
+        } catch(e){ alert("Payment ok but update failed: " + e.message); }
+      },
+      onClose: function(){ alert("Payment window closed"); }
+    });
+    handler.openIframe();
+  } catch(e) {
+    alert("Paystack error: " + e.message);
+  }
 };
 
 async function payReferralCommissions(){
