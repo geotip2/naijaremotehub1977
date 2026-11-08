@@ -61,5 +61,33 @@
 <script src="js/admin.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/payments.js"></script>
+  <!-- FIX DUPLICATE LOAD - blocks 2nd auth handler -->
+<script>
+(function() {
+  // Wait until loadCurrentProfile exists, then guard it
+  let tries = 0;
+  let check = setInterval(function() {
+    if (typeof window.loadCurrentProfile === 'function' || tries > 50) {
+      clearInterval(check);
+      if (typeof window.loadCurrentProfile !== 'function') return;
+      let original = window.loadCurrentProfile;
+      let lastCall = 0;
+      window.loadCurrentProfile = function() {
+        let now = Date.now();
+        // If called again within 5 seconds, it's the duplicate handler - block it
+        if (now - lastCall < 5000) {
+          console.log('Blocked duplicate loadCurrentProfile');
+          return;
+        }
+        lastCall = now;
+        return original.apply(this, arguments);
+      };
+      console.log('Duplicate load guard active');
+    }
+    tries++;
+  }, 100);
+})();
+</script>
+</body>
 </body>
 </html>
