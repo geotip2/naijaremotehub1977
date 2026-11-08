@@ -138,29 +138,40 @@ function friendlyError(error) {
 async function logout() {
   try { await auth.signOut(); }
   catch (error) { alert(friendlyError(error)); }
-}
+let authSettled = false;
 auth.onAuthStateChanged(async user => {
-  currentUser = user || null;
+  // Firebase fires NULL for 1 sec on refresh while checking - IGNORE it
+  if (!user && !authSettled) {
+    setTimeout(() => {
+      if (auth.currentUser) return; // was just a flash, ignore
+      authSettled = true;
+      currentUser = null;
+      userData = null;
+      stopLocalListeners();
+      updateNavigation();
+      if (document.getElementById("authModal")) openAuth("login");
+    }, 2500);
+    return;
+  }
+  authSettled = true;
+  currentUser = user;
   userData = null;
-  stopLiveListeners();
+  stopLocalListeners();
   if (currentUser) {
     try {
       await loadCurrentProfile(currentUser);
-      updateNavigation();
-      // Stay on Admin only if this user is an admin; otherwise always land on the dashboard.
-      const onAdmin = document.getElementById("admin").classList.contains("active");
-      if (!(onAdmin && userData && userData.is_admin === true)) showPage("dashboard");
+      const adminDiv = document.getElementById("admin");
+      if (adminDiv && userData && userData.is_admin === true) { showPage("dashboard"); }
     } catch (error) {
       console.error(error);
       updateNavigation();
-      showPage("dashboard");
-      if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules.");
+      if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules");
     }
   } else {
     updateNavigation();
-    // Signed out: hide member areas and show the login form again (but keep the landing page on first visit).
-    if (!document.getElementById("home").classList.contains("active")) openAuth("login");
+    if (document.getElementById("authModal")) openAuth("login");
   }
+});
 });
 async function loadCurrentProfile(user) {
   const ref = db.collection("users").doc(user.uid);
