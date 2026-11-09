@@ -3,450 +3,1874 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NaijaRemoteHub - Wallet & Points</title>
+<meta name="theme-color" content="#080d19">
+<title>NaijaRemoteHub - Member Dashboard</title>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
+
 <style>
-*{box-sizing:border-box;font-family:system-ui,Arial} body{margin:0;background:#0f172a;color:#fff;padding:16px}
-.card{background:#1e293b;border-radius:16px;padding:16px;margin-bottom:12px}
-h1{font-size:22px} h2{font-size:18px;margin:0 0 10px} h3{margin:14px 0 6px}
-input,select,button{width:100%;padding:12px;border-radius:10px;border:none;margin:6px 0;font-size:15px}
-input,select{background:#0f172a;color:#fff;border:1px solid #334155}
-button{background:#22c55e;color:#000;font-weight:700;cursor:pointer}
-button.blue{background:#3b82f6;color:#fff} button.red{background:#ef4444;color:#fff} button.gold{background:#facc15}
-button.smallBtn{width:auto;padding:6px 10px;font-size:12px;margin:2px}
-.flex{display:flex;gap:10px} .flex>div{flex:1;text-align:center}
-.big{font-size:26px;font-weight:800} .small{font-size:12px;color:#94a3b8}
-.tabs{display:flex;gap:8px;margin:12px 0} .tabs button{background:#334155;color:#fff}
-.tabs button.active{background:#22c55e;color:#000}
-.hidden{display:none} .tx{border-bottom:1px solid #334155;padding:8px 0;font-size:13px}
-.badge{background:#facc15;color:#000;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
-.userRow{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:10px;margin:8px 0}
-.userRow b{font-size:14px} .rowFlex{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.rowFlex input{width:120px;padding:8px}
+:root{
+ --bg:#080d19;--panel:#111a2c;--panel2:#172238;
+ --text:#edf2ff;--muted:#91a1bc;--green:#20d69a;
+ --blue:#5795ff;--red:#ff6174;--border:#26344c;
+ --gold:#ffc857;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Inter,Arial,sans-serif;font-size:14px;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.container{width:100%;max-width:1100px;margin:auto;padding:18px}
+.hidden{display:none!important}
+header{
+ display:flex;align-items:center;justify-content:space-between;
+ padding:17px 20px;border-bottom:1px solid var(--border);
+ background:#0b1221;position:sticky;top:0;z-index:10;
+}
+.logo{font-size:19px;font-weight:900;color:var(--green)}
+.logo span{color:white}
+.header-right{display:flex;align-items:center;gap:12px}
+.small{font-size:12px;color:var(--muted)}
+.card{
+ background:var(--panel);border:1px solid var(--border);
+ padding:18px;border-radius:14px;margin-bottom:15px;
+}
+h1,h2,h3{margin-top:0}
+h2{font-size:19px}
+h3{font-size:15px}
+.muted{color:var(--muted)}
+.green{color:var(--green)}
+.gold{color:var(--gold)}
+.red{color:var(--red)}
+.blue{color:var(--blue)}
+input,select{
+ width:100%;background:#0b1425;color:white;
+ border:1px solid var(--border);border-radius:9px;
+ padding:13px;margin:7px 0 13px;outline:none;
+}
+input:focus,select:focus{border-color:var(--green)}
+button{
+ border:0;border-radius:9px;padding:12px 16px;
+ background:var(--green);color:#06140f;font-weight:800;
+}
+button.secondary{background:var(--panel2);color:white;border:1px solid var(--border)}
+button.danger{background:#54212c;color:#ffb5bd}
+button.bluebtn{background:#244d89;color:white}
+button.goldbtn{background:#795a1b;color:white}
+button:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%}
+.flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.between{justify-content:space-between}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.stat{
+ background:#0b1425;border:1px solid var(--border);
+ padding:15px;border-radius:12px;min-width:0;
+}
+.stat strong{font-size:21px;display:block;margin-top:8px;overflow-wrap:anywhere}
+.stat small{color:var(--muted)}
+.badge{
+ display:inline-block;border-radius:30px;padding:6px 10px;
+ font-size:11px;font-weight:900;background:#243047;color:#c3d0e6;
+}
+.member{background:#124d3b;color:#69ffc6}
+.free{background:#403b2a;color:#ffda81}
+nav{
+ display:flex;gap:7px;overflow-x:auto;padding:12px 0;
+ margin-bottom:16px;
+}
+nav button{white-space:nowrap;background:#152138;color:#aabbd4}
+nav button.active{background:var(--green);color:#06140f}
+.tab{display:none}
+.tab.active{display:block}
+.auth-wrap{max-width:440px;margin:55px auto}
+.auth-wrap .card{padding:25px}
+.brand-text{font-size:28px;font-weight:900;text-align:center;color:var(--green)}
+.auth-sub{text-align:center;color:var(--muted);margin-bottom:24px}
+label{display:block;font-size:12px;color:#aebdd2;margin-top:5px}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{padding:11px;border-bottom:1px solid var(--border);text-align:left;font-size:12px}
+th{color:var(--muted)}
+.table-wrap{overflow-x:auto}
+.history-item{
+ padding:12px 0;border-bottom:1px solid var(--border);
+ display:flex;justify-content:space-between;gap:10px;
+}
+.history-item:last-child{border:0}
+.ref-link{word-break:break-all;background:#0b1425;padding:12px;border-radius:8px}
+.notice{
+ background:#1b2d35;border:1px solid #28594c;
+ padding:13px;border-radius:10px;color:#b8ffe3;
+ line-height:1.6;margin-bottom:15px;
+}
+.warning{
+ background:#392b17;border:1px solid #735523;
+ padding:12px;border-radius:9px;color:#ffe1a0;
+ line-height:1.6;margin-bottom:14px;
+}
+.user-row{
+ padding:13px 0;border-bottom:1px solid var(--border);
+ display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+.user-row:last-child{border:0}
+.user-actions{display:flex;gap:6px;flex-wrap:wrap}
+.user-actions button{padding:8px 10px;font-size:11px}
+hr{border:0;border-top:1px solid var(--border);margin:18px 0}
+footer{text-align:center;color:var(--muted);padding:25px}
+@media(max-width:600px){
+ .container{padding:12px}
+ .grid3{grid-template-columns:1fr}
+ .grid{grid-template-columns:1fr 1fr}
+ .stat strong{font-size:17px}
+ header{padding:13px}
+ .header-right .small{display:none}
+ .user-row{align-items:flex-start;flex-direction:column}
+}
 </style>
 </head>
+
 <body>
 
-<h1>🇳🇬 NaijaRemoteHub</h1>
-<p class="small">Points • Naira • Tasks • P2P • Admin</p>
+<header>
+ <div class="logo">Naija<span>RemoteHub</span></div>
+ <div class="header-right">
+  <span id="headerUser" class="small"></span>
+  <button class="secondary hidden" id="logoutBtn" onclick="logout()">Logout</button>
+ </div>
+</header>
 
-<div class="card" id="authCard">
-  <h2>Login / Sign Up</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login / Create Account</button>
-  <button class="blue" onclick="logout()">Logout</button>
-  <p id="userInfo" class="small"></p>
-</div>
+<!-- AUTH -->
+<section id="authSection" class="container">
+ <div class="auth-wrap">
+  <div class="card">
+   <div class="brand-text">NaijaRemoteHub</div>
+   <p class="auth-sub">Learn Remote Work. Earn While You Learn.</p>
 
-<div class="card">
-  <h2>💰 My Wallet</h2>
-  <div class="flex">
-    <div><div class="small">Naira Balance</div><div class="big" id="nairaBal">₦0</div></div>
-    <div><div class="small">Points Balance</div><div class="big" id="pointsBal">0 pts</div></div>
+   <div class="notice">
+    Create your account and explore NaijaRemoteHub.
+    Membership is a one-time payment of ₦30,000.
+   </div>
+
+   <h2 id="authTitle">Welcome Back</h2>
+   <form id="authForm">
+    <div id="nameField" class="hidden">
+     <label>Full Name</label>
+     <input id="fullName" placeholder="Your full name">
+    </div>
+
+    <label>Email Address</label>
+    <input id="email" type="email" required placeholder="you@example.com">
+
+    <label>Password</label>
+    <input id="password" type="password" required minlength="6" placeholder="Minimum 6 characters">
+
+    <div id="refField" class="hidden">
+     <label>Referral Code (Optional)</label>
+     <input id="referralCode" placeholder="Referral UID">
+    </div>
+
+    <button class="full" id="authSubmit" type="submit">Login</button>
+   </form>
+
+   <p class="small" style="text-align:center;margin-top:18px">
+    <span id="authToggleText">Don't have an account?</span>
+    <a href="#" id="authToggle" style="color:var(--green)">Create Account</a>
+   </p>
   </div>
-  <p class="small">Rate: <span id="rateText">Loading...</span></p>
-  <p class="small">Supply: <span id="supplyText">Loading...</span></p>
-  <p class="small" id="treasuryBar"></p>
-  <div class="tabs">
-    <button class="active" onclick="showTab('walletTab',this)">Wallet</button>
-    <button onclick="showTab('tasksTab',this)">Tasks</button>
-    <button onclick="showTab('adminTab',this)">Admin</button>
+ </div>
+</section>
+
+<!-- APP -->
+<section id="appSection" class="hidden">
+ <div class="container">
+
+  <div class="card flex between">
+   <div>
+    <h2 style="margin-bottom:5px">Welcome, <span id="welcomeName">Member</span></h2>
+    <div class="small" id="welcomeEmail"></div>
+   </div>
+   <div id="membershipBadge" class="badge free">FREE</div>
   </div>
 
-  <div id="walletTab">
-    <h3>Deposit Naira (Paystack)</h3>
-    <input id="depositAmt" type="number" placeholder="Amount in Naira e.g. 1000">
-    <button onclick="depositNaira()">Deposit with Paystack</button>
-    <h3>🔁 Swap Naira ↔ Points</h3>
-    <select id="swapDir"><option value="nairaToPoints">Naira → Points</option><option value="pointsToNaira">Points → Naira</option></select>
-    <input id="swapAmt" type="number" placeholder="Amount to swap">
-    <button class="gold" onclick="doSwap()">Swap Now</button>
-    <h3>👥 P2P Transfer</h3>
-    <input id="toEmail" placeholder="Receiver email">
-    <select id="transferCurrency"><option value="points">Points</option><option value="naira">Naira</option></select>
-    <input id="transferAmt" type="number" placeholder="Amount">
-    <button class="blue" onclick="doTransfer()">Send Transfer</button>
-    <h3>History</h3>
-    <div id="history"></div>
+  <div id="freeNotice" class="warning hidden">
+   You are currently a FREE user. You can browse your dashboard, but
+   earning tasks, transfers and swaps require membership.
+   <strong>Activate membership for ₦30,000 (one-time).</strong>
   </div>
 
-  <div id="tasksTab" class="hidden">
-    <h3>Available Tasks - Earn Points</h3>
-    <div id="taskList"></div>
-    <h3>Create Task (Admin / Client)</h3>
-    <input id="taskTitle" placeholder="Task title e.g. Design Logo">
-    <input id="taskPoints" type="number" placeholder="Points Reward e.g. 200">
-    <button onclick="createTask()">Create Task</button>
-  </div>
+  <nav>
+   <button class="active" data-tab="wallet">Wallet</button>
+   <button data-tab="tasks">Tasks</button>
+   <button data-tab="referrals">Referrals</button>
+   <button data-tab="admin" id="adminNav" class="hidden">Admin</button>
+  </nav>
 
-  <div id="adminTab" class="hidden">
-    <p class="small">Only admin email can use this. Set your admin email in code below.</p>
-    <h3>🏦 Mint Points (Create Supply)</h3>
-    <input id="mintAmt" type="number" placeholder="Amount to create e.g. 50000">
-    <input id="mintReason" placeholder="Reason e.g. Monthly pool">
-    <button onclick="mintPoints()">Mint to Treasury</button>
+  <!-- WALLET -->
+  <div class="tab active" id="wallet">
 
-    <h3>🔥 Burn Points (Reduce Circulation)</h3>
-    <select id="burnFrom">
-      <option value="treasury">From Treasury Only</option>
-      <option value="circulation_amount">From Circulation - Fixed Amount Total (split proportionally)</option>
-      <option value="circulation_percent">From Circulation - % From Every User</option>
+   <h2>My Wallet</h2>
+
+   <div class="grid3">
+    <div class="stat">
+     <small>Naira Balance</small>
+     <strong class="green" id="nairaBalance">₦0.00</strong>
+    </div>
+    <div class="stat">
+     <small>Points Balance</small>
+     <strong class="blue" id="pointsBalance">0</strong>
+    </div>
+    <div class="stat">
+     <small>Referral Earnings</small>
+     <strong class="gold" id="referralEarned">₦0.00</strong>
+    </div>
+   </div>
+
+   <div class="card">
+    <h3>Membership Activation</h3>
+    <p class="muted">One-time payment. No monthly renewal.</p>
+    <h2 class="green">₦30,000</h2>
+    <button class="full" onclick="activateWithPaystack()">Pay with Paystack</button>
+    <button class="full secondary" style="margin-top:9px" onclick="activateFromBalance()">Pay from Naira Wallet</button>
+    <p class="small">Membership unlocks tasks, transfers, swaps and earning features.</p>
+   </div>
+
+   <div class="card">
+    <h3>P2P Transfer</h3>
+    <p class="small">Transfer Naira or Points to another member using their email address.</p>
+    <label>Recipient Email</label>
+    <input id="transferEmail" type="email" placeholder="recipient@example.com">
+    <label>Currency</label>
+    <select id="transferCurrency">
+     <option value="naira">Naira (₦)</option>
+     <option value="points">Points</option>
     </select>
-    <input id="burnAmt" type="number" placeholder="If Treasury: amount e.g. 10000 | If %: 5 means 5% | If Amount: total to remove e.g. 5000">
-    <input id="burnReason" placeholder="Reason e.g. Reduce inflation">
-    <button class="red" onclick="burnPoints()">Burn Points</button>
-    <p class="small" id="burnPreview"></p>
+    <label>Amount</label>
+    <input id="transferAmount" type="number" min="1" placeholder="Enter amount">
+    <button class="full" onclick="transferFunds()">Transfer</button>
+   </div>
 
-    <h3>📢 Mass Distribution</h3>
-    <input id="massAmt" type="number" placeholder="Points per user e.g. 100">
-    <input id="massReason" placeholder="Reason e.g. Christmas bonus">
-    <button class="gold" onclick="massSend()">Send to ALL Users</button>
+   <div class="card">
+    <h3>Swap Naira and Points</h3>
+    <p class="muted">Admin-controlled exchange rate.</p>
+    <div class="notice" id="rateDisplay">Loading exchange rate...</div>
 
-    <h3>⚙️ Exchange Rate</h3>
-    <input id="rateNairaToPoints" type="number" placeholder="1 Naira = ? Points e.g. 10">
-    <input id="ratePointsToNaira" type="number" step="0.01" placeholder="1 Point = ? Naira e.g. 0.08">
-    <button class="blue" onclick="saveRate()">Save Rate</button>
+    <label>Swap Direction</label>
+    <select id="swapDirection">
+     <option value="nairaToPoints">Naira → Points</option>
+     <option value="pointsToNaira">Points → Naira</option>
+    </select>
+    <label>Amount</label>
+    <input id="swapAmount" type="number" min="1" placeholder="Enter amount">
+    <button class="full" onclick="swapFunds()">Exchange</button>
+   </div>
 
-    <h3>👥 All Users - Admin Control</h3>
-    <input id="adminSearch" placeholder="Search email..." oninput="renderUsers()">
-    <div id="adminUserList"></div>
-    <p class="small">Tip: Burn from 1 user = type amount in that user's row and tap Burn. Give = type amount and tap Give.</p>
+   <div class="card">
+    <div class="flex between">
+     <h3>Transaction History</h3>
+     <span class="small">Latest transactions</span>
+    </div>
+    <div id="historyList"><p class="muted">No transactions yet.</p></div>
+   </div>
+
   </div>
-</div>
+
+  <!-- TASKS -->
+  <div class="tab" id="tasks">
+   <h2>Available Tasks</h2>
+   <div class="notice">Complete eligible tasks to earn Points. Membership is required.</div>
+   <div id="tasksList"></div>
+  </div>
+
+  <!-- REFERRALS -->
+  <div class="tab" id="referrals">
+   <h2>My Referral Dashboard</h2>
+
+   <div class="card">
+    <h3>My Referral Link</h3>
+    <div class="ref-link" id="myReferralLink">Loading...</div>
+    <button class="full" style="margin-top:10px" onclick="copyReferral()">Copy Referral Link</button>
+   </div>
+
+   <div class="grid3">
+    <div class="stat">
+     <small>Level 1 Referrals</small>
+     <strong id="l1Count">0</strong>
+    </div>
+    <div class="stat">
+     <small>Level 2 Referrals</small>
+     <strong id="l2Count">0</strong>
+    </div>
+    <div class="stat">
+     <small>Total Referral Earned</small>
+     <strong id="refTotal">₦0</strong>
+    </div>
+   </div>
+
+   <div class="card">
+    <h3>Level 1 - Direct Referrals</h3>
+    <div id="l1List" class="muted">No direct referrals yet.</div>
+   </div>
+
+   <div class="card">
+    <h3>Level 2 - Indirect Referrals</h3>
+    <div id="l2List" class="muted">No indirect referrals yet.</div>
+   </div>
+
+  </div>
+
+  <!-- ADMIN -->
+  <div class="tab" id="admin">
+   <h2>Administration</h2>
+
+   <div class="warning">
+    Administrator access is intended for the account matching ADMIN_EMAIL.
+   </div>
+
+   <div class="grid">
+    <div class="stat">
+     <small>Total Supply</small>
+     <strong id="totalSupply">0</strong>
+    </div>
+    <div class="stat">
+     <small>Circulating Points</small>
+     <strong id="circulating">0</strong>
+    </div>
+    <div class="stat">
+     <small>Treasury Points</small>
+     <strong id="treasury">0</strong>
+    </div>
+    <div class="stat">
+     <small>Total Users</small>
+     <strong id="totalUsers">0</strong>
+    </div>
+   </div>
+
+   <div class="card">
+    <h3>Mint Points to Treasury</h3>
+    <label>Amount</label>
+    <input id="mintAmount" type="number" min="1" placeholder="Points to mint">
+    <button class="full" onclick="mintPoints()">Mint to Treasury</button>
+   </div>
+
+   <div class="card">
+    <h3>Mass Send from Treasury</h3>
+    <p class="small">Distributes equal amounts to every registered user. Treasury is deducted first.</p>
+    <label>Points per user</label>
+    <input id="massSendAmount" type="number" min="1" placeholder="Amount per user">
+    <button class="full" onclick="massSend()">Send to All Users</button>
+   </div>
+
+   <div class="card">
+    <h3>Burn Points</h3>
+    <p class="small">Burn from all users proportionally, burn a fixed total proportionally, or burn treasury holdings.</p>
+
+    <label>Burn Method</label>
+    <select id="burnMethod">
+     <option value="percentage">Burn percentage from all users</option>
+     <option value="fixed">Burn fixed total from all users</option>
+     <option value="treasury">Burn from Treasury</option>
+    </select>
+
+    <label>Amount / Percentage</label>
+    <input id="burnAmount" type="number" min="0.01" placeholder="Enter amount">
+    <button class="full danger" onclick="massBurn()">Execute Burn</button>
+   </div>
+
+   <div class="card">
+    <h3>Individual User Adjustment</h3>
+    <label>User UID</label>
+    <input id="adjustUid" placeholder="User UID">
+    <label>Action</label>
+    <select id="adjustAction">
+     <option value="give">Give Points</option>
+     <option value="burn">Burn Points</option>
+    </select>
+    <label>Amount</label>
+    <input id="adjustAmount" type="number" min="1" placeholder="Points">
+    <button class="full" onclick="adjustUser()">Execute</button>
+   </div>
+
+   <div class="card">
+    <h3>Exchange Rate Settings</h3>
+    <p class="small">Number of Points received for ₦1.</p>
+    <label>Points per ₦1</label>
+    <input id="exchangeRate" type="number" min="0.000001" step="any">
+    <button class="full" onclick="saveExchangeRate()">Save Exchange Rate</button>
+   </div>
+
+   <div class="card">
+    <h3>2-Level MLM Commission Settings</h3>
+    <p class="small">All future membership payments use the latest Firebase settings.</p>
+
+    <label>Level 1 - Naira Commission</label>
+    <input id="mlmL1Naira" type="number" min="0">
+
+    <label>Level 1 - Points Commission</label>
+    <input id="mlmL1Points" type="number" min="0">
+
+    <label>Level 2 - Naira Commission</label>
+    <input id="mlmL2Naira" type="number" min="0">
+
+    <label>Level 2 - Points Commission</label>
+    <input id="mlmL2Points" type="number" min="0">
+
+    <button class="full" onclick="saveMLM()">Save MLM Settings</button>
+   </div>
+
+   <div class="card">
+    <h3>All Registered Users</h3>
+    <input id="userSearch" placeholder="Search by email or name or UID..." oninput="renderUsers()">
+    <div id="usersList"></div>
+   </div>
+
+  </div>
+
+ </div>
+</section>
+
+<footer>NaijaRemoteHub © <span id="year"></span></footer>
 
 <script>
-// ============ CONFIG - PASTE YOURS HERE ============
-const firebaseConfig = {
-  apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
-  databaseURL: "PASTE_YOUR_DATABASE_URL",
-  projectId: "PASTE_YOUR_PROJECT_ID",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "PASTE_YOUR_SENDER_ID",
-  appId: "PASTE_YOUR_APP_ID"
+"use strict";
+
+/* =========================================================
+   CONFIGURATION
+   Replace all placeholders with your real credentials.
+========================================================= */
+
+const FIREBASE_CONFIG = {
+ apiKey: "YOUR_FIREBASE_API_KEY",
+ authDomain: "YOUR_PROJECT.firebaseapp.com",
+ databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+ projectId: "YOUR_PROJECT",
+ storageBucket: "YOUR_PROJECT.appspot.com",
+ messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+ appId: "YOUR_FIREBASE_APP_ID"
 };
-const PAYSTACK_PUBLIC_KEY = "PASTE_YOUR_PAYSTACK_PK_LIVE_KEY";
-const ADMIN_EMAIL = "PASTE_YOUR_ADMIN_EMAIL";
-// ===================================================
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-let currentUser = null;
-let myData = { nairaBalance:0, pointsBalance:0, email:"" };
-let rate = { nairaToPoints:10, pointsToNaira:0.08 };
-let supply = { totalSupply:0, treasury:0, circulating:0 };
-let allUsersCache = {};
+const PAYSTACK_PUBLIC_KEY = "YOUR_PAYSTACK_PUBLIC_KEY";
+const ADMIN_EMAIL = "YOUR_ADMIN_EMAIL@example.com";
 
-function showTab(id, btn){
-  ['walletTab','tasksTab','adminTab'].forEach(t=>document.getElementById(t).classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if(id==='adminTab') loadAdminUsers();
+const MEMBERSHIP_FEE = 30000;
+
+const DEFAULT_MLM = {
+ l1Naira:5000,
+ l2Naira:2000,
+ l1Points:1000,
+ l2Points:500
+};
+
+const DEFAULT_RATE = 1;
+
+const DEFAULT_TASKS = [
+ {id:"task1",title:"Learn Remote Work Basics",description:"Study the introductory remote work training.",pointsReward:100},
+ {id:"task2",title:"Explore Freelancing Platforms",description:"Learn about international freelancing platforms.",pointsReward:150},
+ {id:"task3",title:"Create Your Professional Profile",description:"Learn how to prepare a professional online profile.",pointsReward:200},
+ {id:"task4",title:"Learn Client Communication",description:"Study how to communicate with international clients.",pointsReward:150}
+];
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+let auth=null;
+let db=null;
+let currentUser=null;
+let currentProfile=null;
+let allUsers={};
+let appData={};
+let isSignup=false;
+let listeners=[];
+let busy=false;
+
+const $=id=>document.getElementById(id);
+
+function money(value){
+ return "₦"+Number(value||0).toLocaleString("en-NG",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-async function login(){
-  const e=document.getElementById('email').value, p=document.getElementById('password').value;
-  try{ await auth.signInWithEmailAndPassword(e,p); }
-  catch(err){ await auth.createUserWithEmailAndPassword(e,p); }
-}
-function logout(){ auth.signOut(); }
 
-auth.onAuthStateChanged(async user=>{
-  currentUser=user;
-  if(!user){ document.getElementById('userInfo').innerText="Not logged in"; return; }
-  document.getElementById('userInfo').innerText="Logged in as: "+user.email + (user.email===ADMIN_EMAIL?" • ADMIN":"");
-  const ref=db.ref('users/'+user.uid);
-  const snap=await ref.get();
-  if(!snap.exists()){
-    await ref.set({email:user.email, nairaBalance:0, pointsBalance:0, role:user.email===ADMIN_EMAIL?'admin':'user', createdAt:Date.now()});
+function number(value){
+ return Number(value||0).toLocaleString("en-NG");
+}
+
+function safe(value){
+ return String(value??"").replace(/[&<>"']/g,char=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+ })[char]);
+}
+
+function validAmount(value){
+ return Number.isFinite(Number(value)) && Number(value)>0;
+}
+
+function showError(error){
+ console.error(error);
+ alert(error?.message || String(error) || "An unexpected error occurred.");
+}
+
+function notify(message){
+ alert(message);
+}
+
+function lockButton(button,locked){
+ if(button)button.disabled=locked;
+}
+
+function setBusy(value){
+ busy=value;
+}
+
+function isAdmin(){
+ return !!currentUser &&
+ currentUser.email.toLowerCase()===ADMIN_EMAIL.toLowerCase();
+}
+
+function isMember(){
+ return currentProfile?.isMember===true;
+}
+
+function requireMember(){
+ if(!isMember()){
+  alert("Members only - Pay ₦30,000");
+  return false;
+ }
+ return true;
+}
+
+function requireAdmin(){
+ if(!isAdmin()){
+  alert("Administrator access required.");
+  return false;
+ }
+ return true;
+}
+
+function cleanListeners(){
+ listeners.forEach(fn=>{try{fn()}catch(e){}});
+ listeners=[];
+}
+
+/*
+ IMPORTANT:
+ Financial operations use a Firebase root transaction so balances,
+ supplies, membership commissions and transaction logs are committed
+ together rather than independently.
+
+ This requires appropriate Realtime Database permissions.
+*/
+
+async function rootTransaction(mutator){
+ if(!currentUser)throw new Error("Please login first.");
+
+ const result=await db.ref("/").transaction(root=>{
+  if(!root)return;
+  try{
+   mutator(root);
+  }catch(error){
+   return;
   }
-  ref.on('value', s=>{ myData=s.val()||myData; updateUI(); });
-  loadHistory(); loadTasks(); loadSettings(); loadAdminUsers();
+  return root;
+ },undefined,false);
+
+ if(!result.committed){
+  throw new Error("Transaction could not be completed. Check balances, permissions and account status.");
+ }
+
+ return result.snapshot.val();
+}
+
+function ensureStructure(root){
+ root.users=root.users||{};
+ root.settings=root.settings||{};
+ root.economy=root.economy||{
+  totalSupply:0,
+  circulating:0,
+  treasuryPoints:0
+ };
+ root.transactions=root.transactions||{};
+ root.settings.exchangeRate=root.settings.exchangeRate??DEFAULT_RATE;
+ root.settings.mlm=root.settings.mlm||{...DEFAULT_MLM};
+ root.settings.tasks=root.settings.tasks||DEFAULT_TASKS;
+
+ root.economy.totalSupply=Number(root.economy.totalSupply||0);
+ root.economy.circulating=Number(root.economy.circulating||0);
+ root.economy.treasuryPoints=Number(root.economy.treasuryPoints||0);
+}
+
+function logTransaction(root,record){
+ root.transactions=root.transactions||{};
+ const id=db.ref("transactions").push().key;
+ root.transactions[id]={
+  ...record,
+  id,
+  timestamp:Date.now()
+ };
+}
+
+function createProfile(root,user){
+ root.users=root.users||{};
+ if(root.users[user.uid])return root.users[user.uid];
+
+ const ref=String(user.referral||"").trim();
+ const referrer=ref && root.users[ref] ? root.users[ref] : null;
+
+ const profile={
+  uid:user.uid,
+  name:user.name||user.email.split("@")[0],
+  email:user.email,
+  nairaBalance:0,
+  pointsBalance:0,
+  role:user.email.toLowerCase()===ADMIN_EMAIL.toLowerCase()?"admin":"user",
+  isMember:false,
+  referralEarned:0,
+  referredBy:referrer?ref:null,
+  referredByEmail:referrer?referrer.email:null,
+  uplineL2:referrer?.referredBy||null,
+  createdAt:Date.now(),
+  completedTasks:{}
+ };
+
+ root.users[user.uid]=profile;
+
+ if(referrer){
+  root.downlineL1=root.downlineL1||{};
+  root.downlineL1[ref]=root.downlineL1[ref]||{};
+  root.downlineL1[ref][user.uid]={
+   email:user.email,
+   name:profile.name,
+   uid:user.uid,
+   joinedAt:Date.now()
+  };
+
+  if(referrer.referredBy){
+   const l2=referrer.referredBy;
+   root.downlineL2=root.downlineL2||{};
+   root.downlineL2[l2]=root.downlineL2[l2]||{};
+   root.downlineL2[l2][user.uid]={
+    email:user.email,
+    name:profile.name,
+    uid:user.uid,
+    joinedAt:Date.now()
+   };
+  }
+ }
+
+ return profile;
+}
+
+/* =========================================================
+   AUTHENTICATION
+========================================================= */
+
+function setAuthMode(signup){
+ isSignup=signup;
+
+ $("authTitle").textContent=signup?"Create Your Account":"Welcome Back";
+ $("authSubmit").textContent=signup?"Create Account":"Login";
+ $("nameField").classList.toggle("hidden",!signup);
+ $("refField").classList.toggle("hidden",!signup);
+ $("authToggleText").textContent=signup?"Already have an account?":"Don't have an account?";
+ $("authToggle").textContent=signup?"Login":"Create Account";
+}
+
+$("authToggle").addEventListener("click",event=>{
+ event.preventDefault();
+ setAuthMode(!isSignup);
 });
 
-function updateUI(){
-  document.getElementById('nairaBal').innerText="₦"+(myData.nairaBalance||0).toLocaleString();
-  document.getElementById('pointsBal').innerText=(myData.pointsBalance||0).toLocaleString()+" pts";
-  document.getElementById('rateText').innerText=`1 Naira = ${rate.nairaToPoints} pts | 1 Point = ₦${rate.pointsToNaira}`;
-  document.getElementById('supplyText').innerText=`Total ${supply.totalSupply.toLocaleString()} | Treasury ${supply.treasury.toLocaleString()} | Circulating ${supply.circulating.toLocaleString()}`;
-  const total = supply.totalSupply||1;
-  const circPct = Math.round((supply.circulating/total)*100);
-  document.getElementById('treasuryBar').innerText=`Circulating ${circPct}% | Treasury ${100-circPct}% of total supply`;
-}
-function loadSettings(){
-  db.ref('settings/exchangeRate').on('value', s=>{ if(s.val()) rate=s.val(); updateUI(); });
-  db.ref('pointSupply').on('value', s=>{ if(s.val()) supply=s.val(); updateUI(); });
-  db.ref('pointSupply').get().then(s=>{ if(!s.exists()) db.ref('pointSupply').set({totalSupply:0,treasury:0,circulating:0}); });
-  db.ref('settings/exchangeRate').get().then(s=>{ if(!s.exists()) db.ref('settings/exchangeRate').set(rate); });
-}
-async function logTx(data){
-  await db.ref('transactions').push({...data, createdAt:Date.now(), userEmail: currentUser.email});
-}
-function isAdmin(){ return currentUser && currentUser.email===ADMIN_EMAIL; }
-
-// --- PAYSTACK ---
-function depositNaira(){
-  const amt=Number(document.getElementById('depositAmt').value);
-  if(!amt || amt<100) return alert("Min ₦100");
-  let handler = PaystackPop.setup({
-    key: PAYSTACK_PUBLIC_KEY, email: currentUser.email, amount: amt*100, currency:"NGN",
-    callback: async function(res){
-      await db.ref('users/'+currentUser.uid+'/nairaBalance').transaction(v=>(v||0)+amt);
-      await logTx({type:'deposit', currency:'naira', amount:amt, reason:'Paystack deposit '+res.reference});
-      alert("Deposit successful ₦"+amt);
-    },
-    onClose: ()=>{}
-  });
-  handler.openIframe();
+function getReferralFromURL(){
+ const params=new URLSearchParams(location.search);
+ return params.get("ref")||"";
 }
 
-// --- SWAP ---
-async function doSwap(){
-  const dir=document.getElementById('swapDir').value, amt=Number(document.getElementById('swapAmt').value);
-  if(!amt) return alert("Enter amount");
-  const uid=currentUser.uid;
-  if(dir==='nairaToPoints'){
-    if((myData.nairaBalance||0)<amt) return alert("Not enough Naira");
-    const pts=amt*rate.nairaToPoints;
-    await db.ref('users/'+uid+'/nairaBalance').transaction(v=>(v||0)-amt);
-    await db.ref('users/'+uid+'/pointsBalance').transaction(v=>(v||0)+pts);
-    await db.ref('pointSupply/circulating').transaction(v=>(v||0)+pts);
-    await logTx({type:'swap', currency:'nairaToPoints', amount:amt, received:pts, rateUsed:rate.nairaToPoints, reason:'Swap Naira to Points'});
-    alert(`Swapped ₦${amt} → ${pts} pts`);
-  } else {
-    if((myData.pointsBalance||0)<amt) return alert("Not enough Points");
-    const naira=amt*rate.pointsToNaira;
-    await db.ref('users/'+uid+'/pointsBalance').transaction(v=>(v||0)-amt);
-    await db.ref('users/'+uid+'/nairaBalance').transaction(v=>(v||0)+naira);
-    await db.ref('pointSupply/circulating').transaction(v=>(v||0)-amt);
-    await logTx({type:'swap', currency:'pointsToNaira', amount:amt, received:naira, rateUsed:rate.pointsToNaira, reason:'Swap Points to Naira'});
-    alert(`Swapped ${amt} pts → ₦${naira}`);
+$("referralCode").value=getReferralFromURL();
+
+$("authForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+
+ if(busy)return;
+
+ const email=$("email").value.trim().toLowerCase();
+ const password=$("password").value;
+ const name=$("fullName").value.trim();
+ const referral=$("referralCode").value.trim();
+
+ if(!email || !password){
+  alert("Enter your email and password.");
+  return;
+ }
+
+ if(password.length<6){
+  alert("Password must contain at least 6 characters.");
+  return;
+ }
+
+ if(isSignup && !name){
+  alert("Enter your full name.");
+  return;
+ }
+
+ setBusy(true);
+ lockButton($("authSubmit"),true);
+
+ try{
+  let credential;
+
+  if(isSignup){
+   credential=await auth.createUserWithEmailAndPassword(email,password);
+  }else{
+   /*
+    Required behavior:
+    Attempt sign-in first.
+    If user-not-found, create the account.
+   */
+   try{
+    credential=await auth.signInWithEmailAndPassword(email,password);
+   }catch(error){
+    if(error.code==="auth/user-not-found"){
+     credential=await auth.createUserWithEmailAndPassword(email,password);
+    }else{
+     throw error;
+    }
+   }
   }
-}
 
-// --- P2P ---
-async function doTransfer(){
-  const toEmail=document.getElementById('toEmail').value.trim().toLowerCase();
-  const cur=document.getElementById('transferCurrency').value;
-  const amt=Number(document.getElementById('transferAmt').value);
-  if(!toEmail||!amt) return alert("Fill all");
-  const usersSnap=await db.ref('users').orderByChild('email').equalTo(toEmail).get();
-  if(!usersSnap.exists()) return alert("User not found");
-  const toUid=Object.keys(usersSnap.val())[0];
-  if(toUid===currentUser.uid) return alert("Can't send to yourself");
-  const field=cur==='points'?'pointsBalance':'nairaBalance';
-  if((myData[field]||0)<amt) return alert("Not enough balance");
-  await db.ref('users/'+currentUser.uid+'/'+field).transaction(v=>(v||0)-amt);
-  await db.ref('users/'+toUid+'/'+field).transaction(v=>(v||0)+amt);
-  await logTx({type:'transfer', currency:cur, amount:amt, to:toEmail, reason:'P2P transfer'});
-  alert("Sent!");
-}
+  currentUser=credential.user;
 
-// --- TASKS ---
-async function createTask(){
-  const title=document.getElementById('taskTitle').value;
-  const pts=Number(document.getElementById('taskPoints').value);
-  if(!title||!pts) return alert("Fill task");
-  await db.ref('tasks').push({title, pointsReward:pts, status:'open', createdBy:currentUser.email, createdAt:Date.now()});
-}
-function loadTasks(){
-  db.ref('tasks').on('value', s=>{
-    const el=document.getElementById('taskList'); el.innerHTML="";
-    const data=s.val()||{};
-    Object.entries(data).forEach(([id,t])=>{
-      el.innerHTML+=`<div class="card"><b>${t.title}</b> <span class="badge">${t.pointsReward} pts</span><br><small>${t.status} • by ${t.createdBy}</small><br>
-      ${t.status==='open'?`<button onclick="completeTask('${id}',${t.pointsReward})">Complete Task + Claim</button>`:`<button class="blue">Done by ${t.completedBy||''}</button>`}</div>`;
+  const existing=(await db.ref("users/"+currentUser.uid).once("value")).val();
+
+  if(!existing){
+   await rootTransaction(root=>{
+    ensureStructure(root);
+    createProfile(root,{
+     uid:currentUser.uid,
+     email,
+     name:name||email.split("@")[0],
+     referral
     });
-  });
-}
-async function completeTask(id, pts){
-  const ref=db.ref('tasks/'+id);
-  const snap=await ref.get();
-  if(snap.val().status!=='open') return alert("Already done");
-  await ref.update({status:'completed', completedBy:currentUser.email});
-  await db.ref('users/'+currentUser.uid+'/pointsBalance').transaction(v=>(v||0)+pts);
-  await db.ref('pointSupply/circulating').transaction(v=>(v||0)+pts);
-  await logTx({type:'task', currency:'points', amount:pts, reason:'Task completed: '+snap.val().title});
-  alert(`You earned ${pts} pts!`);
-}
+   });
+  }
 
-// --- ADMIN: MINT / BURN / MASS / RATE ---
-async function mintPoints(){
-  if(!isAdmin()) return alert("Admin only");
-  const amt=Number(document.getElementById('mintAmt').value);
-  const reason=document.getElementById('mintReason').value||"Mint";
-  if(!amt) return alert("Enter amount");
-  await db.ref('pointSupply/totalSupply').transaction(v=>(v||0)+amt);
-  await db.ref('pointSupply/treasury').transaction(v=>(v||0)+amt);
-  await logTx({type:'mint', currency:'points', amount:amt, reason});
-  alert(`Minted ${amt} to Treasury`);
-}
+  if(isSignup && existing){
+   alert("This account already exists. Please login.");
+  }
 
-async function burnPoints(){
-  if(!isAdmin()) return alert("Admin only");
-  const from=document.getElementById('burnFrom').value;
-  const amt=Number(document.getElementById('burnAmt').value);
-  const reason=document.getElementById('burnReason').value||"Burn";
-  if(!amt) return alert("Enter amount");
+ }catch(error){
+  showError(error);
+ }finally{
+  setBusy(false);
+  lockButton($("authSubmit"),false);
+ }
+});
 
-  if(from==='treasury'){
-    if(supply.treasury<amt) return alert(`Not enough in Treasury. You have ${supply.treasury}`);
-    await db.ref('pointSupply/treasury').transaction(v=>v-amt);
-    await db.ref('pointSupply/totalSupply').transaction(v=>v-amt);
-    await logTx({type:'burn', currency:'points', amount:amt, reason:reason+" | from Treasury"});
-    alert(`Burned ${amt} from Treasury. Total Supply now ${supply.totalSupply-amt}`);
+/* =========================================================
+   AUTH STATE
+========================================================= */
+
+authStateInitialize();
+
+function authStateInitialize(){
+ try{
+  firebase.initializeApp(FIREBASE_CONFIG);
+  auth=firebase.auth();
+  db=firebase.database();
+
+  auth.onAuthStateChanged(async user=>{
+   cleanListeners();
+   currentUser=user;
+
+   if(!user){
+    currentProfile=null;
+    $("authSection").classList.remove("hidden");
+    $("appSection").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
     return;
-  }
+   }
 
-  // --- PROPER PROPORTIONAL BURN FROM USERS ---
-  const snap=await db.ref('users').get();
-  const users=snap.val()||{};
-  const uids=Object.keys(users);
-  if(uids.length===0) return alert("No users");
-  let totalBurned=0;
+   try{
+    const snap=await db.ref("users/"+user.uid).once("value");
+    let profile=snap.val();
 
-  if(from==='circulation_percent'){
-    if(amt<=0||amt>100) return alert("Percent must be 1-100");
-    if(!confirm(`Burn ${amt}% from EVERY user? This cannot be undone.`)) return;
-    for(let uid of uids){
-      const bal=users[uid].pointsBalance||0;
-      if(bal<=0) continue;
-      const toBurn=Math.floor(bal * amt / 100);
-      if(toBurn<=0) continue;
-      await db.ref('users/'+uid+'/pointsBalance').transaction(v=>Math.max(0,(v||0)-toBurn));
-      totalBurned+=toBurn;
+    if(!profile){
+     await rootTransaction(root=>{
+      ensureStructure(root);
+      createProfile(root,{
+       uid:user.uid,
+       email:user.email||"",
+       name:user.email?.split("@")[0]||"User",
+       referral:""
+      });
+     });
+
+     profile=(await db.ref("users/"+user.uid).once("value")).val();
     }
-  }
 
-  if(from==='circulation_amount'){
-    // Burn total amount, split proportionally by balance
-    const totalCirculating = uids.reduce((sum,uid)=>sum+(users[uid].pointsBalance||0),0);
-    if(totalCirculating < amt) return alert(`Not enough circulating. Total in users wallets: ${totalCirculating}`);
-    if(!confirm(`Burn total ${amt} points split proportionally from all users?`)) return;
-    for(let uid of uids){
-      const bal=users[uid].pointsBalance||0;
-      if(bal<=0) continue;
-      const share = Math.floor(amt * bal / totalCirculating);
-      if(share<=0) continue;
-      await db.ref('users/'+uid+'/pointsBalance').transaction(v=>Math.max(0,(v||0)-share));
-      totalBurned+=share;
-    }
-  }
+    currentProfile=profile;
+    await startApplication();
 
-  await db.ref('pointSupply/circulating').transaction(v=>Math.max(0,(v||0)-totalBurned));
-  await db.ref('pointSupply/totalSupply').transaction(v=>Math.max(0,(v||0)-totalBurned));
-  await logTx({type:'burn', currency:'points', amount:totalBurned, reason:reason+` | from Circulation ${from} | requested ${amt}`});
-  alert(`Burned ${totalBurned} points from users. Circulation reduced.`);
-  loadAdminUsers();
+   }catch(error){
+    showError(error);
+   }
+  });
+
+ }catch(error){
+  console.error(error);
+  alert("Firebase initialization failed. Check your Firebase configuration: "+error.message);
+ }
 }
+
+async function logout(){
+ try{
+  cleanListeners();
+  await auth.signOut();
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   APPLICATION
+========================================================= */
+
+async function startApplication(){
+ $("authSection").classList.add("hidden");
+ $("appSection").classList.remove("hidden");
+ $("logoutBtn").classList.remove("hidden");
+
+ $("headerUser").textContent=currentUser.email;
+ $("welcomeEmail").textContent=currentUser.email;
+ $("welcomeName").textContent=currentProfile.name||"Member";
+
+ if(isAdmin()){
+  $("adminNav").classList.remove("hidden");
+ }else{
+  $("adminNav").classList.add("hidden");
+ }
+
+ listenToDatabase();
+ renderMembership();
+ renderReferralLink();
+}
+
+function listenToDatabase(){
+ const usersRef=db.ref("users");
+
+ const usersCallback=snapshot=>{
+  allUsers=snapshot.val()||{};
+  currentProfile=allUsers[currentUser.uid]||currentProfile;
+  renderDashboard();
+ };
+
+ usersRef.on("value",usersCallback);
+ listeners.push(()=>usersRef.off("value",usersCallback));
+
+ const rootRef=db.ref("/");
+ const rootCallback=snapshot=>{
+  appData=snapshot.val()||{};
+  ensureStructure(appData);
+  renderEconomy();
+  renderHistory();
+  renderTasks();
+  renderMLMSettings();
+  renderUsers();
+  renderRate();
+ };
+
+ rootRef.on("value",rootCallback);
+ listeners.push(()=>rootRef.off("value",rootCallback));
+}
+
+function renderDashboard(){
+ const p=currentProfile;
+ if(!p)return;
+
+ $("nairaBalance").textContent=money(p.nairaBalance);
+ $("pointsBalance").textContent=number(p.pointsBalance);
+ $("referralEarned").textContent=money(p.referralEarned);
+
+ renderMembership();
+ renderDownlines();
+}
+
+function renderMembership(){
+ if(!currentProfile)return;
+
+ const member=isMember();
+
+ $("membershipBadge").textContent=member?"MEMBER ✓":"FREE";
+ $("membershipBadge").className="badge "+(member?"member":"free");
+
+ $("freeNotice").classList.toggle("hidden",member);
+}
+
+function renderEconomy(){
+ const economy=appData.economy||{};
+
+ $("totalSupply").textContent=number(economy.totalSupply);
+ $("circulating").textContent=number(economy.circulating);
+ $("treasury").textContent=number(economy.treasuryPoints);
+ $("totalUsers").textContent=number(Object.keys(allUsers).length);
+}
+
+/* =========================================================
+   MEMBERSHIP
+========================================================= */
+
+async function activateFromBalance(){
+ if(isMember()){
+  alert("You are already a member.");
+  return;
+ }
+
+ if(!confirm("Pay ₦30,000 from your Naira wallet to activate permanent membership?"))return;
+
+ try{
+  await completeMembership("wallet",null);
+  alert("Membership activated successfully!");
+ }catch(error){
+  showError(error);
+ }
+}
+
+function activateWithPaystack(){
+ if(isMember()){
+  alert("You are already a member.");
+  return;
+ }
+
+ if(!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.includes("YOUR_")){
+  alert("Please configure your Paystack public key first.");
+  return;
+ }
+
+ if(!currentUser?.email){
+  alert("Please login first.");
+  return;
+ }
+
+ try{
+  const handler=PaystackPop.setup({
+   key:PAYSTACK_PUBLIC_KEY,
+   email:currentUser.email,
+   amount:MEMBERSHIP_FEE*100,
+   currency:"NGN",
+   ref:"NRH_"+currentUser.uid+"_"+Date.now(),
+
+   callback:async function(response){
+    try{
+     await completeMembership("paystack",response.reference);
+     alert("Payment received. Membership activated!");
+    }catch(error){
+     showError(error);
+    }
+   },
+
+   onClose:function(){
+    console.log("Paystack checkout closed.");
+   }
+  });
+
+  handler.openIframe();
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+async function completeMembership(method,reference){
+ await rootTransaction(root=>{
+  ensureStructure(root);
+
+  const user=root.users?.[currentUser.uid];
+
+  if(!user)throw new Error("User account not found.");
+  if(user.isMember)throw new Error("Membership has already been activated.");
+
+  if(method==="wallet"){
+   if(Number(user.nairaBalance||0)<MEMBERSHIP_FEE){
+    throw new Error("Insufficient Naira balance.");
+   }
+   user.nairaBalance-=MEMBERSHIP_FEE;
+  }
+
+  /*
+   Paystack callback is a browser-side notification.
+   A production payment system MUST verify the reference using a
+   trusted server before granting membership. Never treat this
+   client-side callback as proof of payment in a public deployment.
+  */
+
+  user.isMember=true;
+  user.membershipPaidAt=Date.now();
+  user.membershipPaymentMethod=method;
+  user.membershipReference=reference||null;
+
+  const settings=root.settings.mlm||DEFAULT_MLM;
+
+  const l1Uid=user.referredBy;
+  const l2Uid=user.uplineL2;
+
+  let totalNaira=0;
+
+  if(l1Uid && root.users[l1Uid]){
+   const referrer=root.users[l1Uid];
+
+   const naira=Number(settings.l1Naira||0);
+   const points=Number(settings.l1Points||0);
+
+   referrer.nairaBalance=Number(referrer.nairaBalance||0)+naira;
+   referrer.pointsBalance=Number(referrer.pointsBalance||0)+points;
+   referrer.referralEarned=Number(referrer.referralEarned||0)+naira;
+
+   root.economy.circulating+=points;
+   totalNaira+=naira;
+
+   logTransaction(root,{
+    uid:l1Uid,
+    type:"mlm_L1",
+    amount:naira,
+    currency:"NGN",
+    points,
+    from:currentUser.uid,
+    description:"Level 1 membership referral commission"
+   });
+  }
+
+  if(l2Uid && root.users[l2Uid]){
+   const referrer=root.users[l2Uid];
+
+   const naira=Number(settings.l2Naira||0);
+   const points=Number(settings.l2Points||0);
+
+   referrer.nairaBalance=Number(referrer.nairaBalance||0)+naira;
+   referrer.pointsBalance=Number(referrer.pointsBalance||0)+points;
+   referrer.referralEarned=Number(referrer.referralEarned||0)+naira;
+
+   root.economy.circulating+=points;
+   totalNaira+=naira;
+
+   logTransaction(root,{
+    uid:l2Uid,
+    type:"mlm_L2",
+    amount:naira,
+    currency:"NGN",
+    points,
+    from:currentUser.uid,
+    description:"Level 2 membership referral commission"
+   });
+  }
+
+  logTransaction(root,{
+   uid:currentUser.uid,
+   type:"membership",
+   amount:MEMBERSHIP_FEE,
+   currency:"NGN",
+   method,
+   reference:reference||null,
+   description:"One-time membership activation"
+  });
+
+  root.economy.companyMembershipRevenue=
+   Number(root.economy.companyMembershipRevenue||0)+MEMBERSHIP_FEE-totalNaira;
+ });
+}
+
+/* =========================================================
+   P2P TRANSFERS
+========================================================= */
+
+async function transferFunds(){
+ if(!requireMember())return;
+
+ const email=$("transferEmail").value.trim().toLowerCase();
+ const currency=$("transferCurrency").value;
+ const amount=Number($("transferAmount").value);
+
+ if(!email || !validAmount(amount)){
+  alert("Enter a valid recipient email and amount.");
+  return;
+ }
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   const sender=root.users[currentUser.uid];
+
+   const recipientEntry=Object.entries(root.users).find(
+    ([uid,user])=>user.email?.toLowerCase()===email
+   );
+
+   if(!recipientEntry)throw new Error("Recipient account not found.");
+
+   const [recipientUid,recipient]=recipientEntry;
+
+   if(recipientUid===currentUser.uid)throw new Error("You cannot transfer to yourself.");
+
+   if(currency==="naira"){
+    const balance=Number(sender.nairaBalance||0);
+    if(balance<amount)throw new Error("Insufficient Naira balance.");
+
+    sender.nairaBalance=balance-amount;
+    recipient.nairaBalance=Number(recipient.nairaBalance||0)+amount;
+   }else{
+    const balance=Number(sender.pointsBalance||0);
+    if(balance<amount)throw new Error("Insufficient Points.");
+
+    sender.pointsBalance=balance-amount;
+    recipient.pointsBalance=Number(recipient.pointsBalance||0)+amount;
+   }
+
+   logTransaction(root,{
+    uid:currentUser.uid,
+    type:"transfer_sent",
+    amount,
+    currency,
+    to:recipientUid,
+    description:"P2P transfer to "+email
+   });
+
+   logTransaction(root,{
+    uid:recipientUid,
+    type:"transfer_received",
+    amount,
+    currency,
+    from:currentUser.uid,
+    description:"P2P transfer received"
+   });
+  });
+
+  $("transferAmount").value="";
+  alert("Transfer completed successfully.");
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   NAIRA / POINTS SWAP
+========================================================= */
+
+function renderRate(){
+ const rate=Number(appData.settings?.exchangeRate||DEFAULT_RATE);
+
+ $("rateDisplay").textContent=
+  "₦1 = "+number(rate)+" Points";
+
+ if(isAdmin())$("exchangeRate").value=rate;
+}
+
+async function swapFunds(){
+ if(!requireMember())return;
+
+ const amount=Number($("swapAmount").value);
+ const direction=$("swapDirection").value;
+
+ if(!validAmount(amount)){
+  alert("Enter a valid amount.");
+  return;
+ }
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   const user=root.users[currentUser.uid];
+   const rate=Number(root.settings.exchangeRate||DEFAULT_RATE);
+
+   if(!validAmount(rate))throw new Error("Invalid exchange rate.");
+
+   if(direction==="nairaToPoints"){
+    const points=amount*rate;
+
+    if(user.nairaBalance<amount)throw new Error("Insufficient Naira balance.");
+
+    user.nairaBalance-=amount;
+    user.pointsBalance=Number(user.pointsBalance||0)+points;
+
+    root.economy.circulating+=points;
+
+    logTransaction(root,{
+     uid:currentUser.uid,
+     type:"swap",
+     amount,
+     currency:"NGN",
+     points,
+     direction,
+     description:"Naira converted to Points"
+    });
+
+   }else{
+    const naira=amount/rate;
+
+    if(user.pointsBalance<amount)throw new Error("Insufficient Points.");
+
+    user.pointsBalance-=amount;
+    user.nairaBalance=Number(user.nairaBalance||0)+naira;
+
+    root.economy.circulating-=amount;
+
+    logTransaction(root,{
+     uid:currentUser.uid,
+     type:"swap",
+     amount,
+     currency:"POINTS",
+     naira,
+     direction,
+     description:"Points converted to Naira"
+    });
+   }
+
+   if(root.economy.circulating<0)throw new Error("Invalid circulating supply.");
+  });
+
+  $("swapAmount").value="";
+  alert("Swap completed successfully.");
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   TASKS
+========================================================= */
+
+function renderTasks(){
+ const tasks=appData.settings?.tasks||DEFAULT_TASKS;
+ const completed=currentProfile?.completedTasks||{};
+
+ $("tasksList").innerHTML=tasks.map(task=>{
+  const done=!!completed[task.id];
+
+  return `
+   <div class="card">
+    <div class="flex between">
+     <h3>${safe(task.title)}</h3>
+     <span class="badge">${number(task.pointsReward)} Points</span>
+    </div>
+    <p class="muted">${safe(task.description||"Complete this learning task.")}</p>
+    <button class="full ${done?"secondary":""}" ${done?"disabled":""}
+     onclick="completeTask('${safe(task.id)}')">
+     ${done?"Completed ✓":"Complete Task"}
+    </button>
+   </div>
+  `;
+ }).join("")||"<p class='muted'>No tasks available.</p>";
+}
+
+async function completeTask(taskId){
+ if(!requireMember())return;
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   const user=root.users[currentUser.uid];
+   const tasks=root.settings.tasks||DEFAULT_TASKS;
+   const task=tasks.find(t=>t.id===taskId);
+
+   if(!task)throw new Error("Task not found.");
+   if(user.completedTasks?.[taskId])throw new Error("You have already completed this task.");
+
+   const reward=Number(task.pointsReward||0);
+
+   if(!validAmount(reward))throw new Error("Invalid task reward.");
+
+   user.completedTasks=user.completedTasks||{};
+   user.completedTasks[taskId]=Date.now();
+
+   user.pointsBalance=Number(user.pointsBalance||0)+reward;
+
+   root.economy.circulating+=reward;
+
+   logTransaction(root,{
+    uid:currentUser.uid,
+    type:"task_reward",
+    amount:reward,
+    currency:"POINTS",
+    description:"Completed task: "+task.title
+   });
+  });
+
+  alert("Task completed! Points have been credited.");
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   REFERRALS
+========================================================= */
+
+function renderReferralLink(){
+ if(!currentUser)return;
+
+ const link=location.origin+location.pathname+"?ref="+encodeURIComponent(currentUser.uid);
+ $("myReferralLink").textContent=link;
+}
+
+async function copyReferral(){
+ try{
+  const link=$("myReferralLink").textContent;
+  if(navigator.clipboard?.writeText){
+   await navigator.clipboard.writeText(link);
+  }else{
+   const temp=document.createElement("textarea");
+   temp.value=link;
+   document.body.appendChild(temp);
+   temp.select();
+   document.execCommand("copy");
+   temp.remove();
+  }
+  alert("Referral link copied!");
+ }catch(error){
+  showError(error);
+ }
+}
+
+function renderDownlines(){
+ if(!currentUser)return;
+
+ const l1=appData.downlineL1?.[currentUser.uid]||{};
+ const l2=appData.downlineL2?.[currentUser.uid]||{};
+
+ const entries1=Object.values(l1);
+ const entries2=Object.values(l2);
+
+ $("l1Count").textContent=number(entries1.length);
+ $("l2Count").textContent=number(entries2.length);
+ $("refTotal").textContent=money(currentProfile?.referralEarned);
+
+ $("l1List").innerHTML=entries1.length
+  ?entries1.map(u=>`<div class="history-item"><span>${safe(u.name||"Member")}</span><span>${safe(u.email)}</span></div>`).join("")
+  :"No direct referrals yet.";
+
+ $("l2List").innerHTML=entries2.length
+  ?entries2.map(u=>`<div class="history-item"><span>${safe(u.name||"Member")}</span><span>${safe(u.email)}</span></div>`).join("")
+  :"No indirect referrals yet.";
+}
+
+/* =========================================================
+   TRANSACTION HISTORY
+========================================================= */
+
+function renderHistory(){
+ if(!currentUser)return;
+
+ const transactions=Object.values(appData.transactions||{})
+  .filter(t=>t.uid===currentUser.uid)
+  .sort((a,b)=>Number(b.timestamp||0)-Number(a.timestamp||0))
+  .slice(0,50);
+
+ if(!transactions.length){
+  $("historyList").innerHTML="<p class='muted'>No transactions yet.</p>";
+  return;
+ }
+
+ $("historyList").innerHTML=transactions.map(t=>{
+  const isCredit=[
+   "transfer_received","task_reward","mlm_L1","mlm_L2",
+   "admin_give"
+  ].includes(t.type);
+
+  let amountText="";
+
+  if(t.currency==="POINTS"){
+   amountText=number(t.amount)+" Points";
+  }else if(t.currency==="NGN"){
+   amountText=money(t.amount);
+  }else if(t.points){
+   amountText=number(t.points)+" Points";
+  }else{
+   amountText=number(t.amount);
+  }
+
+  return `
+   <div class="history-item">
+    <div>
+     <strong>${safe((t.type||"transaction").replaceAll("_"," ").toUpperCase())}</strong>
+     <div class="small">${safe(t.description||"Transaction")}</div>
+     <div class="small">${new Date(t.timestamp||Date.now()).toLocaleString()}</div>
+    </div>
+    <strong class="${isCredit?"green":"blue"}">${safe(amountText)}</strong>
+   </div>
+  `;
+ }).join("");
+}
+
+/* =========================================================
+   ADMIN - EXCHANGE RATE
+========================================================= */
+
+async function saveExchangeRate(){
+ if(!requireAdmin())return;
+
+ const rate=Number($("exchangeRate").value);
+
+ if(!validAmount(rate)){
+  alert("Enter a valid exchange rate.");
+  return;
+ }
+
+ try{
+  await db.ref("settings/exchangeRate").set(rate);
+  alert("Exchange rate updated.");
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   ADMIN - MLM SETTINGS
+========================================================= */
+
+function renderMLMSettings(){
+ if(!isAdmin())return;
+
+ const settings=appData.settings?.mlm||DEFAULT_MLM;
+
+ $("mlmL1Naira").value=settings.l1Naira;
+ $("mlmL1Points").value=settings.l1Points;
+ $("mlmL2Naira").value=settings.l2Naira;
+ $("mlmL2Points").value=settings.l2Points;
+}
+
+async function saveMLM(){
+ if(!requireAdmin())return;
+
+ const settings={
+  l1Naira:Number($("mlmL1Naira").value),
+  l1Points:Number($("mlmL1Points").value),
+  l2Naira:Number($("mlmL2Naira").value),
+  l2Points:Number($("mlmL2Points").value)
+ };
+
+ if(Object.values(settings).some(v=>!Number.isFinite(v)||v<0)){
+  alert("All MLM commission values must be valid non-negative numbers.");
+  return;
+ }
+
+ if(settings.l1Naira+settings.l2Naira>MEMBERSHIP_FEE){
+  alert("Total Naira commissions cannot exceed ₦30,000.");
+  return;
+ }
+
+ try{
+  await db.ref("settings/mlm").set(settings);
+  alert("MLM commission settings updated successfully.");
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   ADMIN - MINT TO TREASURY
+========================================================= */
+
+async function mintPoints(){
+ if(!requireAdmin())return;
+
+ const amount=Number($("mintAmount").value);
+
+ if(!validAmount(amount)){
+  alert("Enter a valid mint amount.");
+  return;
+ }
+
+ if(!confirm("Mint "+number(amount)+" Points into the treasury?"))return;
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   root.economy.totalSupply+=amount;
+   root.economy.treasuryPoints+=amount;
+
+   logTransaction(root,{
+    uid:currentUser.uid,
+    type:"admin_mint",
+    amount,
+    currency:"POINTS",
+    description:"Points minted to treasury"
+   });
+  });
+
+  $("mintAmount").value="";
+  alert("Points minted successfully.");
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   ADMIN - MASS SEND
+========================================================= */
 
 async function massSend(){
-  if(!isAdmin()) return alert("Admin only");
-  const amt=Number(document.getElementById('massAmt').value);
-  const reason=document.getElementById('massReason').value||"Mass distribution";
-  if(!amt) return alert("Enter amount");
-  const snap=await db.ref('users').get();
-  const users=snap.val()||{};
-  const count=Object.keys(users).length;
-  const totalNeeded=amt*count;
-  if(supply.treasury < totalNeeded) return alert(`Need ${totalNeeded} in Treasury. Mint first. You have ${supply.treasury}`);
-  for(let uid of Object.keys(users)){
-    await db.ref('users/'+uid+'/pointsBalance').transaction(v=>(v||0)+amt);
-  }
-  await db.ref('pointSupply/treasury').transaction(v=>v-totalNeeded);
-  await db.ref('pointSupply/circulating').transaction(v=>v+totalNeeded);
-  await logTx({type:'mass', currency:'points', amount:totalNeeded, reason:reason+` | ${amt} to ${count} users`});
-  alert(`Sent ${amt} to ${count} users`);
-  loadAdminUsers();
-}
-async function saveRate(){
-  if(!isAdmin()) return alert("Admin only");
-  const a=Number(document.getElementById('rateNairaToPoints').value);
-  const b=Number(document.getElementById('ratePointsToNaira').value);
-  if(!a||!b) return alert("Fill both rates");
-  await db.ref('settings/exchangeRate').set({nairaToPoints:a, pointsToNaira:b});
-  alert("Rate saved");
-}
+ if(!requireAdmin())return;
 
-// --- ADMIN USER LIST ---
-async function loadAdminUsers(){
-  if(!currentUser) return;
-  const snap=await db.ref('users').get();
-  allUsersCache=snap.val()||{};
-  renderUsers();
-}
-function renderUsers(){
-  const el=document.getElementById('adminUserList');
-  if(!el) return;
-  const q=(document.getElementById('adminSearch').value||"").toLowerCase();
-  el.innerHTML="";
-  const entries=Object.entries(allUsersCache).filter(([uid,u])=>(u.email||"").toLowerCase().includes(q));
-  if(entries.length===0){ el.innerHTML="<p class='small'>No users found</p>"; return; }
-  entries.forEach(([uid,u])=>{
-    el.innerHTML+=`
-    <div class="userRow">
-      <b>${u.email}</b> <span class="small">${u.role||'user'}</span><br>
-      <span class="small">Naira: ₦${(u.nairaBalance||0).toLocaleString()} | Points: ${(u.pointsBalance||0).toLocaleString()} pts</span>
-      <div class="rowFlex">
-        <input id="amt-${uid}" type="number" placeholder="Amount">
-        <button class="smallBtn" onclick="adminGive('${uid}', '${u.email}')">Give Pts</button>
-        <button class="smallBtn red" onclick="adminBurnOne('${uid}', '${u.email}')">Burn Pts</button>
-        <button class="smallBtn blue" onclick="adminGiveNaira('${uid}')">Give ₦</button>
-      </div>
-    </div>`;
-  });
-}
-async function adminGive(uid, email){
-  if(!isAdmin()) return alert("Admin only");
-  const amt=Number(document.getElementById('amt-'+uid).value);
-  if(!amt) return alert("Enter amount in that user's row");
-  if(supply.treasury < amt) return alert(`Not enough in Treasury. Have ${supply.treasury}, need ${amt}. Mint first.`);
-  await db.ref('users/'+uid+'/pointsBalance').transaction(v=>(v||0)+amt);
-  await db.ref('pointSupply/treasury').transaction(v=>v-amt);
-  await db.ref('pointSupply/circulating').transaction(v=>v+amt);
-  await logTx({type:'issue', currency:'points', amount:amt, to:email, reason:'Admin give from Treasury'});
-  alert(`Gave ${amt} to ${email}`);
-  loadAdminUsers();
-}
-async function adminBurnOne(uid, email){
-  if(!isAdmin()) return alert("Admin only");
-  const amt=Number(document.getElementById('amt-'+uid).value);
-  if(!amt) return alert("Enter amount in that user's row");
-  const bal=allUsersCache[uid]?.pointsBalance||0;
-  if(bal<amt) return alert(`${email} only has ${bal} pts`);
-  if(!confirm(`Burn ${amt} from ${email}?`)) return;
-  await db.ref('users/'+uid+'/pointsBalance').transaction(v=>Math.max(0,(v||0)-amt));
-  await db.ref('pointSupply/circulating').transaction(v=>Math.max(0,(v||0)-amt));
-  await db.ref('pointSupply/totalSupply').transaction(v=>Math.max(0,(v||0)-amt));
-  await logTx({type:'burn', currency:'points', amount:amt, to:email, reason:'Admin burn from single user'});
-  alert(`Burned ${amt} from ${email}`);
-  loadAdminUsers();
-}
-async function adminGiveNaira(uid){
-  if(!isAdmin()) return alert("Admin only");
-  const amt=Number(document.getElementById('amt-'+uid).value);
-  if(!amt) return alert("Enter amount");
-  await db.ref('users/'+uid+'/nairaBalance').transaction(v=>(v||0)+amt);
-  await logTx({type:'issue', currency:'naira', amount:amt, reason:'Admin give Naira'});
-  alert(`Gave ₦${amt}`);
-  loadAdminUsers();
-}
+ const amount=Number($("massSendAmount").value);
 
-// --- HISTORY ---
-function loadHistory(){
-  db.ref('transactions').orderByChild('userEmail').equalTo(currentUser.email).limitToLast(20).on('value', s=>{
-    const el=document.getElementById('history'); el.innerHTML="";
-    const data=s.val()||{};
-    Object.values(data).reverse().forEach(t=>{
-      el.innerHTML+=`<div class="tx"><b>${t.type}</b> • ${t.currency} • ${t.amount} ${t.received?`→ ${t.received}`:''} ${t.to?`→ ${t.to}`:''}<br><span class="small">${t.reason||''}</span></div>`;
+ if(!validAmount(amount)){
+  alert("Enter a valid amount per user.");
+  return;
+ }
+
+ const count=Object.keys(allUsers).length;
+
+ if(count===0){
+  alert("There are no registered users.");
+  return;
+ }
+
+ const total=amount*count;
+
+ if(!confirm("Send "+number(amount)+" Points to each of "+count+" users?\nTotal required: "+number(total)+" Points."))return;
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   if(root.economy.treasuryPoints<total){
+    throw new Error("Insufficient treasury balance.");
+   }
+
+   root.economy.treasuryPoints-=total;
+   root.economy.circulating+=total;
+
+   Object.entries(root.users||{}).forEach(([uid,user])=>{
+    user.pointsBalance=Number(user.pointsBalance||0)+amount;
+
+    logTransaction(root,{
+     uid,
+     type:"admin_mass_send",
+     amount,
+     currency:"POINTS",
+     description:"Admin treasury distribution"
     });
+   });
   });
+
+  $("massSendAmount").value="";
+  alert("Mass distribution completed successfully.");
+
+ }catch(error){
+  showError(error);
+ }
 }
+
+/* =========================================================
+   ADMIN - REAL MASS BURN
+========================================================= */
+
+async function massBurn(){
+ if(!requireAdmin())return;
+
+ const method=$("burnMethod").value;
+ const amount=Number($("burnAmount").value);
+
+ if(!validAmount(amount)){
+  alert("Enter a valid burn amount.");
+  return;
+ }
+
+ const users=Object.values(allUsers);
+ const circulating=users.reduce((sum,u)=>sum+Number(u.pointsBalance||0),0);
+
+ let message="";
+
+ if(method==="percentage"){
+  if(amount>100){
+   alert("Percentage cannot exceed 100.");
+   return;
+  }
+  message="Burn "+amount+"% of every user's Points balance?";
+ }else if(method==="fixed"){
+  message="Burn a total of "+number(amount)+" Points proportionally from all users?";
+ }else{
+  message="Burn "+number(amount)+" Points from the treasury?";
+ }
+
+ if(!confirm(message+"\nThis operation permanently reduces total supply."))return;
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   const userEntries=Object.entries(root.users||{});
+
+   if(method==="treasury"){
+    if(root.economy.treasuryPoints<amount){
+     throw new Error("Insufficient treasury Points.");
+    }
+
+    root.economy.treasuryPoints-=amount;
+    root.economy.totalSupply-=amount;
+
+   }else if(method==="percentage"){
+    let totalBurned=0;
+
+    userEntries.forEach(([uid,user])=>{
+     const balance=Number(user.pointsBalance||0);
+     const deduction=balance*(amount/100);
+
+     user.pointsBalance=balance-deduction;
+     totalBurned+=deduction;
+
+     if(deduction>0){
+      logTransaction(root,{
+       uid,
+       type:"admin_mass_burn",
+       amount:deduction,
+       currency:"POINTS",
+       description:"Proportional percentage burn"
+      });
+     }
+    });
+
+    root.economy.circulating-=totalBurned;
+    root.economy.totalSupply-=totalBurned;
+
+   }else{
+    const totalBalance=userEntries.reduce(
+     (sum,[uid,user])=>sum+Number(user.pointsBalance||0),0
+    );
+
+    if(amount>totalBalance){
+     throw new Error("Burn amount exceeds total user balances.");
+    }
+
+    if(totalBalance<=0)throw new Error("There are no circulating Points to burn.");
+
+    let remaining=amount;
+    let totalBurned=0;
+
+    userEntries.forEach(([uid,user],index)=>{
+     const balance=Number(user.pointsBalance||0);
+
+     let deduction;
+
+     if(index===userEntries.length-1){
+      deduction=Math.min(balance,remaining);
+     }else{
+      deduction=Math.min(balance,amount*(balance/totalBalance));
+     }
+
+     deduction=Math.min(balance,deduction);
+     remaining-=deduction;
+     totalBurned+=deduction;
+
+     user.pointsBalance=balance-deduction;
+
+     if(deduction>0){
+      logTransaction(root,{
+       uid,
+       type:"admin_mass_burn",
+       amount:deduction,
+       currency:"POINTS",
+       description:"Proportional fixed-total burn"
+      });
+     }
+    });
+
+    /*
+     Floating-point rounding can leave a tiny remainder.
+     The transaction rejects any negative or unaccounted burn.
+    */
+    if(remaining>0.0000001){
+     throw new Error("Could not allocate the full burn amount.");
+    }
+
+    root.economy.circulating-=totalBurned;
+    root.economy.totalSupply-=totalBurned;
+   }
+
+   if(root.economy.totalSupply<0 || root.economy.circulating<0){
+    throw new Error("Invalid supply. Burn cancelled.");
+   }
+
+   logTransaction(root,{
+    uid:currentUser.uid,
+    type:"admin_burn",
+    amount,
+    currency:"POINTS",
+    method,
+    description:"Administrative supply burn"
+   });
+  });
+
+  $("burnAmount").value="";
+  alert("Burn completed. User balances and supply have been reduced.");
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   ADMIN - INDIVIDUAL GIVE / BURN
+========================================================= */
+
+async function adjustUser(){
+ if(!requireAdmin())return;
+
+ const uid=$("adjustUid").value.trim();
+ const action=$("adjustAction").value;
+ const amount=Number($("adjustAmount").value);
+
+ if(!uid||!validAmount(amount)){
+  alert("Enter a valid user UID and amount.");
+  return;
+ }
+
+ if(!confirm((action==="give"?"Give ":"Burn ")+number(amount)+" Points for "+uid+"?"))return;
+
+ try{
+  await rootTransaction(root=>{
+   ensureStructure(root);
+
+   const user=root.users[uid];
+
+   if(!user)throw new Error("User not found.");
+
+   if(action==="give"){
+    user.pointsBalance=Number(user.pointsBalance||0)+amount;
+    root.economy.circulating+=amount;
+
+    logTransaction(root,{
+     uid,
+     type:"admin_give",
+     amount,
+     currency:"POINTS",
+     description:"Points credited by administrator"
+    });
+
+   }else{
+    const balance=Number(user.pointsBalance||0);
+
+    if(balance<amount)throw new Error("User has insufficient Points.");
+
+    user.pointsBalance=balance-amount;
+    root.economy.circulating-=amount;
+    root.economy.totalSupply-=amount;
+
+    logTransaction(root,{
+     uid,
+     type:"admin_user_burn",
+     amount,
+     currency:"POINTS",
+     description:"Points burned by administrator"
+    });
+   }
+
+   if(root.economy.totalSupply<0 || root.economy.circulating<0){
+    throw new Error("Invalid supply.");
+   }
+  });
+
+  $("adjustAmount").value="";
+  alert("User adjustment completed.");
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+/* =========================================================
+   ADMIN - USER SEARCH
+========================================================= */
+
+function renderUsers(){
+ if(!isAdmin())return;
+
+ const search=($("userSearch").value||"").trim().toLowerCase();
+
+ const users=Object.entries(allUsers).filter(([uid,user])=>
+  uid.toLowerCase().includes(search)||
+  String(user.email||"").toLowerCase().includes(search)||
+  String(user.name||"").toLowerCase().includes(search)
+ );
+
+ $("usersList").innerHTML=users.map(([uid,user])=>`
+  <div class="user-row">
+   <div style="min-width:0">
+    <strong>${safe(user.name||"User")}</strong>
+    <div class="small">${safe(user.email)}</div>
+    <div class="small">UID: ${safe(uid)}</div>
+    <div class="flex" style="margin-top:7px">
+     <span class="badge ${user.isMember?"member":"free"}">
+      ${user.isMember?"MEMBER ✓":"FREE"}
+     </span>
+     <span class="small">₦${number(user.nairaBalance)} | ${number(user.pointsBalance)} Points</span>
+    </div>
+   </div>
+   <div class="user-actions">
+    <button class="bluebtn" onclick="quickGive('${safe(uid)}')">Give</button>
+    <button class="danger" onclick="quickBurn('${safe(uid)}')">Burn</button>
+   </div>
+  </div>
+ `).join("")||"<p class='muted'>No users found.</p>";
+}
+
+function quickGive(uid){
+ $("adjustUid").value=uid;
+ $("adjustAction").value="give";
+ $("adjustAmount").focus();
+ window.scrollTo({top:document.getElementById("admin").offsetTop,behavior:"smooth"});
+}
+
+function quickBurn(uid){
+ $("adjustUid").value=uid;
+ $("adjustAction").value="burn";
+ $("adjustAmount").focus();
+ window.scrollTo({top:document.getElementById("admin").offsetTop,behavior:"smooth"});
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+document.querySelectorAll("nav button").forEach(button=>{
+ button.addEventListener("click",()=>{
+  if(button.id==="adminNav"&&!isAdmin()){
+   alert("Administrator access required.");
+   return;
+  }
+
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+
+  button.classList.add("active");
+  $(button.dataset.tab).classList.add("active");
+ });
+});
+
+/* =========================================================
+   GLOBAL ERROR HANDLING
+========================================================= */
+
+window.addEventListener("unhandledrejection",event=>{
+ console.error("Unhandled error:",event.reason);
+ if(event.reason){
+  showError(event.reason);
+ }
+});
+
+window.addEventListener("error",event=>{
+ console.error(event.error||event.message);
+});
+
+$("year").textContent=new Date().getFullYear();
+
 </script>
 </body>
 </html>
