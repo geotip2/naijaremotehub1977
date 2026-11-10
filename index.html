@@ -167,6 +167,41 @@
   <section id="admin" class="page">
     <div class="max-w-6xl mx-auto px-4 py-10">
       <h1 class="text-3xl font-black">Admin Panel</h1><p class="text-slate-500 mt-1">Manage announcements, members, withdrawals and learning materials.</p>
+
+      <!-- MINT / BURN - NEW -->
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-7 border-2 border-amber-200">
+        <h2 class="text-xl font-extrabold">🪙 Mint &amp; Burn Points - Admin Only</h2>
+        <p class="text-sm text-slate-500 mt-1">Mint creates new points into Treasury. Burn destroys points forever.</p>
+        <div class="grid grid-cols-3 gap-3 mt-4 text-center">
+          <div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">Total Supply</p><b id="statSupply" class="text-lg">0</b></div>
+          <div class="bg-amber-50 rounded-xl p-3"><p class="text-xs text-slate-500">Treasury</p><b id="statTreasury" class="text-lg">0</b></div>
+          <div class="bg-green-50 rounded-xl p-3"><p class="text-xs text-slate-500">Circulating</p><b id="statCirculating" class="text-lg">0</b></div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 mt-5">
+          <div>
+            <label class="text-sm font-bold block mb-1">Mint to Treasury</label>
+            <input id="mintAmt" class="field" type="number" placeholder="e.g. 10000">
+            <button class="btn btn-green w-full mt-2" onclick="adminMint()">Mint to Treasury</button>
+          </div>
+          <div>
+            <label class="text-sm font-bold block mb-1">Burn from Treasury</label>
+            <input id="burnTreasuryAmt" class="field" type="number" placeholder="e.g. 5000">
+            <button class="btn w-full mt-2 bg-red-50 text-red-700" onclick="adminBurnTreasury()">Burn Treasury</button>
+          </div>
+        </div>
+        <div class="border-t mt-5 pt-4">
+          <label class="text-sm font-bold block mb-1">Burn % From ALL Users</label>
+          <input id="burnPct" class="field" type="number" placeholder="e.g. 10 for 10%">
+          <button class="btn w-full mt-2 bg-red-600 text-white" onclick="adminBurnAllPct()">Burn % From All Users</button>
+          <p class="text-xs text-slate-500 mt-2">Example: If a user has 1000 points and you burn 10%, they will have 900 left. Total Supply and Circulating will also drop.</p>
+        </div>
+        <div class="border-t mt-4 pt-4">
+          <label class="text-sm font-bold block mb-1">Burn Fixed Total - Split Proportional</label>
+          <input id="burnFixedAmt" class="field" type="number" placeholder="e.g. 5000 total to burn">
+          <button class="btn w-full mt-2 bg-red-100 text-red-800" onclick="adminBurnAllFixed()">Burn Fixed Total</button>
+        </div>
+      </section>
+
       <div class="grid lg:grid-cols-2 gap-6 mt-7">
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Announcement</h2><form id="announcementForm" class="space-y-3 mt-4" onsubmit="postAnnouncement(event)"><input id="announcementTitle" class="field" placeholder="Title" required maxlength="150"><textarea id="announcementMessage" class="field" rows="4" placeholder="Message" required maxlength="3000"></textarea><button class="btn btn-green w-full">Post Announcement</button><div id="announcementMessageBox" class="notice"></div></form></div>
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Educational Material</h2>
@@ -201,7 +236,7 @@
           <div id="taskSubmissionsAdmin" class="space-y-3 mt-4"><p class="text-slate-500 text-sm">Loading submissions…</p></div>
         </div>
       </section>
-      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">All Users</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[650px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Email</th><th class="p-2">Balance</th><th class="p-2">Membership</th></tr></thead><tbody id="usersTable"><tr><td class="p-2" colspan="4">Loading…</td></tr></tbody></table></div></section>
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">All Users</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[850px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Email</th><th class="p-2">Balance</th><th class="p-2">Points</th><th class="p-2">Membership</th><th class="p-2">Actions</th></tr></thead><tbody id="usersTable"><tr><td class="p-2" colspan="6">Loading…</td></tr></tbody></table></div></section>
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Withdrawals</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[750px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Amount</th><th class="p-2">Bank</th><th class="p-2">Account</th><th class="p-2">Status</th></tr></thead><tbody id="withdrawalsTable"><tr><td class="p-2" colspan="5">Loading…</td></tr></tbody></table></div></section>
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Manage Materials</h2><div id="adminMaterials" class="space-y-3 mt-4">Loading…</div></section>
     </div>
@@ -212,23 +247,6 @@
 
 <script>
 "use strict";
-
-/*
-  IMPORTANT SECURITY / DEPLOYMENT NOTES:
-  1) Never put a Paystack SECRET KEY in this file. Paystack verification and all
-     referral-credit calculations must run on a trusted server (for example, a Cloudflare Worker).
-  2) This page creates payment_requests as pending. A verified Paystack webhook /
-     Cloudflare Worker or other trusted server must validate the reference, amount (3000000 kobo), currency
-     (NGN), and customer, then set users/{uid}.is_paid=true and credit eligible
-     referral rewards exactly once. A browser callback is NOT proof of payment.
-  3) Firestore Security Rules are mandatory. Restrict admin writes to verified
-     admins; users must not edit is_admin, is_paid, balance, ref_code or payment
-     records. Withdrawal requests/deductions must be enforced transactionally by
-     trusted backend rules/functions. Client code alone cannot secure money.
-  4) Set your own admin account's is_admin=true from Firebase Console or a trusted
-     admin-only backend. Never allow users to promote themselves.
-*/
-
 const firebaseConfig = {
   apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
   authDomain: "naijaremotehub-6f584.firebaseapp.com",
@@ -263,58 +281,21 @@ const urlParams = new URLSearchParams(window.location.search);
 const incomingReferral = (urlParams.get("ref") || "").trim();
 if (incomingReferral) document.getElementById("signupReferral").value = incomingReferral;
 
-function cleanEmail(value) {
-  return String(value || "").trim().toLowerCase().replace(/\s/g, "");
-}
-function money(value) {
-  return new Intl.NumberFormat("en-NG", {style:"currency",currency:"NGN",maximumFractionDigits:0}).format(Number(value || 0));
-}
-function safeText(value) {
-  return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function showNotice(id, message, type="error") {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = message;
-  el.className = "notice show " + (type === "success" ? "success" : "error");
-}
-function clearNotice(id) {
-  const el = document.getElementById(id);
-  if (el) { el.textContent = ""; el.className = "notice"; }
-}
-function setBusy(id, busy, busyText) {
-  const button = document.getElementById(id);
-  if (!button) return;
-  if (busy) {
-    button.dataset.originalText = button.textContent;
-    button.textContent = busyText || "Please wait…";
-    button.disabled = true;
-  } else {
-    button.textContent = button.dataset.originalText || button.textContent;
-    button.disabled = false;
-  }
-}
+function cleanEmail(value) { return String(value || "").trim().toLowerCase().replace(/\s/g, ""); }
+function money(value) { return new Intl.NumberFormat("en-NG", {style:"currency",currency:"NGN",maximumFractionDigits:0}).format(Number(value || 0)); }
+function safeText(value) { return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function showNotice(id, message, type="error") { const el = document.getElementById(id); if (!el) return; el.textContent = message; el.className = "notice show " + (type === "success" ? "success" : "error"); }
+function clearNotice(id) { const el = document.getElementById(id); if (el) { el.textContent = ""; el.className = "notice"; } }
+function setBusy(id, busy, busyText) { const button = document.getElementById(id); if (!button) return; if (busy) { button.dataset.originalText = button.textContent; button.textContent = busyText || "Please wait…"; button.disabled = true; } else { button.textContent = button.dataset.originalText || button.textContent; button.disabled = false; } }
 function showPage(page) {
-  // Signed-in members never see the landing/auth screens: send them to their dashboard.
   if ((page === "home" || page === "auth") && currentUser) page = "dashboard";
-  if ((page === "dashboard" || page === "admin") && !currentUser) {
-    openAuth("login");
-    return;
-  }
-  if (page === "admin" && !(userData && userData.is_admin === true)) {
-    showPage("dashboard");
-    return;
-  }
+  if ((page === "dashboard" || page === "admin") && !currentUser) { openAuth("login"); return; }
+  if (page === "admin" && !(userData && userData.is_admin === true)) { showPage("dashboard"); return; }
   document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
-  const target = document.getElementById(page);
-  if (target) target.classList.add("active");
+  const target = document.getElementById(page); if (target) target.classList.add("active");
   window.scrollTo({top:0,behavior:"smooth"});
 }
-function openAuth(mode="login") {
-  if (currentUser) { showPage("dashboard"); return; }
-  switchAuth(mode);
-  showPage("auth");
-}
+function openAuth(mode="login") { if (currentUser) { showPage("dashboard"); return; } switchAuth(mode); showPage("auth"); }
 function switchAuth(mode) {
   const isLogin = mode === "login";
   document.getElementById("loginForm").classList.toggle("hidden", !isLogin);
@@ -330,16 +311,8 @@ function updateNavigation() {
   document.getElementById("navDashboard").classList.toggle("hidden", !signedIn);
   document.getElementById("navAdmin").classList.toggle("hidden", !(signedIn && userData && userData.is_admin === true));
 }
-function makeReferralCode(fullName) {
-  const first = String(fullName || "member").trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, "") || "member";
-  return first + Math.random().toString(36).slice(2, 7);
-}
-async function findReferrer(code) {
-  if (!code) return null;
-  const snap = await db.collection("users").where("ref_code", "==", code).limit(1).get();
-  if (snap.empty) return null;
-  return snap.docs[0].id;
-}
+function makeReferralCode(fullName) { const first = String(fullName || "member").trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, "") || "member"; return first + Math.random().toString(36).slice(2, 7); }
+async function findReferrer(code) { if (!code) return null; const snap = await db.collection("users").where("ref_code", "==", code).limit(1).get(); if (snap.empty) return null; return snap.docs[0].id; }
 async function signup(event) {
   event.preventDefault(); clearNotice("signupError");
   const fullName = document.getElementById("signupName").value.trim();
@@ -351,91 +324,43 @@ async function signup(event) {
   setBusy("signupSubmit", true, "Creating account…");
   try {
     let referredBy = null;
-    if (referralCode) {
-      referredBy = await findReferrer(referralCode);
-      if (!referredBy) throw new Error("That referral code was not found. Check the code or leave the field blank.");
-    }
+    if (referralCode) { referredBy = await findReferrer(referralCode); if (!referredBy) throw new Error("That referral code was not found. Check the code or leave the field blank."); }
     const credential = await auth.createUserWithEmailAndPassword(email, password);
     const refCode = makeReferralCode(fullName);
-    const profile = {
-      full_name: fullName, email, ref_code: refCode, referred_by: referredBy,
-      balance: 0, points_balance: 0, is_admin: false, is_paid: false, createdAt: serverTimestamp()
-    };
+    const profile = { full_name: fullName, email, ref_code: refCode, referred_by: referredBy, balance: 0, points_balance: 0, is_admin: false, is_paid: false, createdAt: serverTimestamp() };
     await db.collection("users").doc(credential.user.uid).set(profile);
     document.getElementById("signupForm").reset();
     await loadCurrentProfile(credential.user);
     showPage("dashboard");
-  } catch (error) {
-    showNotice("signupError", friendlyError(error));
-  } finally { setBusy("signupSubmit", false); }
+  } catch (error) { showNotice("signupError", friendlyError(error)); } finally { setBusy("signupSubmit", false); }
 }
 async function login(event) {
   event.preventDefault(); clearNotice("loginError");
   const email = cleanEmail(document.getElementById("loginEmail").value);
   const password = document.getElementById("loginPassword").value;
   setBusy("loginSubmit", true, "Signing in…");
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    document.getElementById("loginForm").reset();
-  } catch (error) {
-    showNotice("loginError", friendlyError(error));
-  } finally { setBusy("loginSubmit", false); }
+  try { await auth.signInWithEmailAndPassword(email, password); document.getElementById("loginForm").reset(); }
+  catch (error) { showNotice("loginError", friendlyError(error)); } finally { setBusy("loginSubmit", false); }
 }
 function friendlyError(error) {
   const code = error && error.code;
-  const messages = {
-    "auth/invalid-email":"Please enter a valid email address.",
-    "auth/user-not-found":"No account was found with that email.",
-    "auth/wrong-password":"Incorrect email or password.",
-    "auth/invalid-credential":"Incorrect email or password.",
-    "auth/email-already-in-use":"An account already exists with this email. Please log in.",
-    "auth/weak-password":"Choose a stronger password (at least 6 characters).",
-    "auth/too-many-requests":"Too many attempts. Please wait and try again.",
-    "permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.",
-    "unavailable":"Service temporarily unavailable. Please try again."
-  };
+  const messages = { "auth/invalid-email":"Please enter a valid email address.", "auth/user-not-found":"No account was found with that email.", "auth/wrong-password":"Incorrect email or password.", "auth/invalid-credential":"Incorrect email or password.", "auth/email-already-in-use":"An account already exists with this email. Please log in.", "auth/weak-password":"Choose a stronger password (at least 6 characters).", "auth/too-many-requests":"Too many attempts. Please wait and try again.", "permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.", "unavailable":"Service temporarily unavailable. Please try again." };
   return messages[code] || (error && error.message) || "Something went wrong. Please try again.";
 }
-async function logout() {
-  try { await auth.signOut(); }
-  catch (error) { alert(friendlyError(error)); }
-}
+async function logout() { try { await auth.signOut(); } catch (error) { alert(friendlyError(error)); } }
 auth.onAuthStateChanged(async user => {
-  currentUser = user || null;
-  userData = null;
-  stopLiveListeners();
+  currentUser = user || null; userData = null; stopLiveListeners();
   if (currentUser) {
-    try {
-      await loadCurrentProfile(currentUser);
-      updateNavigation();
-      // Stay on Admin only if this user is an admin; otherwise always land on the dashboard.
-      const onAdmin = document.getElementById("admin").classList.contains("active");
-      if (!(onAdmin && userData && userData.is_admin === true)) showPage("dashboard");
-    } catch (error) {
-      console.error(error);
-      updateNavigation();
-      showPage("dashboard");
-      if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules.");
-    }
-  } else {
-    updateNavigation();
-    // Signed out: hide member areas and show the login form again (but keep the landing page on first visit).
-    if (!document.getElementById("home").classList.contains("active")) openAuth("login");
-  }
+    try { await loadCurrentProfile(currentUser); updateNavigation(); const onAdmin = document.getElementById("admin").classList.contains("active"); if (!(onAdmin && userData && userData.is_admin === true)) showPage("dashboard"); }
+    catch (error) { console.error(error); updateNavigation(); showPage("dashboard"); if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules."); }
+  } else { updateNavigation(); if (!document.getElementById("home").classList.contains("active")) openAuth("login"); }
 });
 async function loadCurrentProfile(user) {
   const ref = db.collection("users").doc(user.uid);
   const snap = await ref.get();
-  if (!snap.exists) {
-    // Repairs a missing profile for an authenticated account without granting privileges.
-    const name = user.displayName || (user.email ? user.email.split("@")[0] : "Member");
-    const profile = {full_name:name,email:cleanEmail(user.email),ref_code:makeReferralCode(name),referred_by:null,balance:0,points_balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()};
-    await ref.set(profile);
-    userData = {...profile};
-  } else userData = snap.data() || {};
-  renderDashboard();
-  startLiveListeners();
-  updateNavigation();
+  if (!snap.exists) { const name = user.displayName || (user.email ? user.email.split("@")[0] : "Member"); const profile = {full_name:name,email:cleanEmail(user.email),ref_code:makeReferralCode(name),referred_by:null,balance:0,points_balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()}; await ref.set(profile); userData = {...profile}; }
+  else userData = snap.data() || {};
+  renderDashboard(); startLiveListeners(); updateNavigation();
 }
 function renderDashboard() {
   if (!currentUser || !userData) return;
@@ -447,20 +372,10 @@ function renderDashboard() {
   document.getElementById("accountBadge").className = "pill " + (userData.is_paid === true ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-700");
   document.getElementById("membershipText").textContent = userData.is_paid === true ? "Your one-time membership payment has been verified." : "You are using a free account. Upgrade once to unlock paid learning materials.";
   document.getElementById("upgradeButton").classList.toggle("hidden", userData.is_paid === true);
-  const link = new URL(window.location.href);
-  link.search = ""; link.hash = ""; link.searchParams.set("ref", userData.ref_code || "");
-  document.getElementById("referralLink").value = link.toString();
+  const link = new URL(window.location.href); link.search = ""; link.hash = ""; link.searchParams.set("ref", userData.ref_code || ""); document.getElementById("referralLink").value = link.toString();
 }
-async function copyReferral() {
-  const value = document.getElementById("referralLink").value;
-  try { await navigator.clipboard.writeText(value); alert("Referral link copied."); }
-  catch (_) { const input=document.getElementById("referralLink"); input.select(); document.execCommand("copy"); alert("Referral link copied."); }
-}
-function shareWhatsApp() {
-  const link = document.getElementById("referralLink").value;
-  const message = "Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: " + link;
-  window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener");
-}
+async function copyReferral() { const value = document.getElementById("referralLink").value; try { await navigator.clipboard.writeText(value); alert("Referral link copied."); } catch (_) { const input=document.getElementById("referralLink"); input.select(); document.execCommand("copy"); alert("Referral link copied."); } }
+function shareWhatsApp() { const link = document.getElementById("referralLink").value; const message = "Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: " + link; window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener"); }
 function pay() {
   if (!currentUser || !userData) { openAuth("login"); return; }
   if (userData.is_paid === true) { alert("Your membership is already active."); return; }
@@ -468,354 +383,285 @@ function pay() {
   if (!PAYSTACK_PUBLIC_KEY || !PAYSTACK_PUBLIC_KEY.startsWith("pk_")) { alert("Paystack public key is not configured."); return; }
   const reference = "NRH_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
   const requestRef = db.collection("payment_requests").doc(reference);
-  requestRef.set({
-    uid:currentUser.uid,email:cleanEmail(currentUser.email),amount:MEMBERSHIP_FEE_KOBO,
-    currency:"NGN",reference,status:"initiated",createdAt:serverTimestamp()
-  }).then(() => {
-    const handler = PaystackPop.setup({
-      key:PAYSTACK_PUBLIC_KEY,
-      email:cleanEmail(currentUser.email),
-      amount:MEMBERSHIP_FEE_KOBO,
-      currency:"NGN",
-      ref:reference,
-      metadata:{custom_fields:[{display_name:"Firebase User ID",variable_name:"firebase_uid",value:currentUser.uid}]},
-      callback:function(response) {
-        requestRef.set({status:"awaiting_server_verification",paystack_reference:response.reference,callbackAt:serverTimestamp()},{merge:true})
-          .then(() => alert("Payment response received. Your payment is awaiting secure verification. Your account will update automatically after verification."))
-          .catch(error => alert("Payment response received, but we could not update its status. Contact support with reference: " + response.reference));
-      },
-      onClose:function() {
-        // Keep the request record for webhook reconciliation; do not mark the user paid.
-      }
-    });
+  requestRef.set({ uid:currentUser.uid,email:cleanEmail(currentUser.email),amount:MEMBERSHIP_FEE_KOBO, currency:"NGN",reference,status:"initiated",createdAt:serverTimestamp() }).then(() => {
+    const handler = PaystackPop.setup({ key:PAYSTACK_PUBLIC_KEY, email:cleanEmail(currentUser.email), amount:MEMBERSHIP_FEE_KOBO, currency:"NGN", ref:reference, metadata:{custom_fields:[{display_name:"Firebase User ID",variable_name:"firebase_uid",value:currentUser.uid}]}, callback:function(response) { requestRef.set({status:"awaiting_server_verification",paystack_reference:response.reference,callbackAt:serverTimestamp()},{merge:true}).then(() => alert("Payment response received. Your payment is awaiting secure verification. Your account will update automatically after verification.")).catch(error => alert("Payment response received, but we could not update its status. Contact support with reference: " + response.reference)); }, onClose:function() {} });
     handler.openIframe();
   }).catch(error => alert("Could not start payment: " + friendlyError(error)));
 }
-
 function startLiveListeners() {
   if (!currentUser) return;
   if (referralsUnsubscribe) referralsUnsubscribe();
-  referralsUnsubscribe = db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(snapshot => {
-    document.getElementById("referralCount").textContent = snapshot.size;
-  }, error => console.warn("Referral count:",error));
+  referralsUnsubscribe = db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(snapshot => { document.getElementById("referralCount").textContent = snapshot.size; }, error => console.warn("Referral count:",error));
   if (materialsUnsubscribe) materialsUnsubscribe();
-  materialsUnsubscribe = db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot => {
-    renderMaterials(snapshot.docs);
-  }, error => {
-    document.getElementById("materialsGrid").innerHTML = '<p class="text-red-600">Unable to load learning materials. Check Firestore rules and the materials index.</p>';
-    console.error(error);
-  });
+  materialsUnsubscribe = db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot => { renderMaterials(snapshot.docs); }, error => { document.getElementById("materialsGrid").innerHTML = '<p class="text-red-600">Unable to load learning materials. Check Firestore rules and the materials index.</p>'; console.error(error); });
   if (announcementsUnsubscribe) announcementsUnsubscribe();
-  announcementsUnsubscribe = db.collection("announcements").orderBy("createdAt","desc").limit(8).onSnapshot(snapshot => {
-    renderAnnouncements(snapshot.docs);
-  }, error => console.warn("Announcements:",error));
-
+  announcementsUnsubscribe = db.collection("announcements").orderBy("createdAt","desc").limit(8).onSnapshot(snapshot => { renderAnnouncements(snapshot.docs); }, error => console.warn("Announcements:",error));
   if (tasksUnsubscribe) tasksUnsubscribe();
-  tasksUnsubscribe = db.collection("tasks").where("active","==",true).onSnapshot(snapshot => {
-    renderTasks(snapshot.docs);
-  }, error => {
-    document.getElementById("tasksGrid").innerHTML = '<p class="text-red-600">Unable to load tasks. Check Firestore rules.</p>';
-    console.error("Tasks:", error);
-  });
-
+  tasksUnsubscribe = db.collection("tasks").where("active","==",true).onSnapshot(snapshot => { renderTasks(snapshot.docs); }, error => { document.getElementById("tasksGrid").innerHTML = '<p class="text-red-600">Unable to load tasks. Check Firestore rules.</p>'; console.error("Tasks:", error); });
   if (myTaskSubmissionsUnsubscribe) myTaskSubmissionsUnsubscribe();
-  myTaskSubmissionsUnsubscribe = db.collection("task_submissions").where("uid","==",currentUser.uid).onSnapshot(snapshot => {
-    renderMyTaskSubmissions(snapshot.docs);
-  }, error => console.warn("My task submissions:",error));
-
+  myTaskSubmissionsUnsubscribe = db.collection("task_submissions").where("uid","==",currentUser.uid).onSnapshot(snapshot => { renderMyTaskSubmissions(snapshot.docs); }, error => console.warn("My task submissions:",error));
   if (userData && userData.is_admin === true) loadAdminData();
 }
-function stopLiveListeners() {
-  [referralsUnsubscribe,materialsUnsubscribe,announcementsUnsubscribe,tasksUnsubscribe,myTaskSubmissionsUnsubscribe,...adminUnsubscribers].forEach(fn=>{if(typeof fn==="function")fn();});
-  referralsUnsubscribe=null;materialsUnsubscribe=null;announcementsUnsubscribe=null;tasksUnsubscribe=null;myTaskSubmissionsUnsubscribe=null;adminUnsubscribers=[];
-}
+function stopLiveListeners() { [referralsUnsubscribe,materialsUnsubscribe,announcementsUnsubscribe,tasksUnsubscribe,myTaskSubmissionsUnsubscribe,...adminUnsubscribers].forEach(fn=>{if(typeof fn==="function")fn();}); referralsUnsubscribe=null;materialsUnsubscribe=null;announcementsUnsubscribe=null;tasksUnsubscribe=null;myTaskSubmissionsUnsubscribe=null;adminUnsubscribers=[]; }
 function renderTasks(docs) {
   const container = document.getElementById("tasksGrid");
-  if (!docs.length) {
-    container.innerHTML = '<p class="text-slate-500">There are no active tasks at the moment. Please check back later.</p>';
-    return;
-  }
-  container.innerHTML = docs.map(doc => {
-    const task = doc.data() || {};
-    const reward = Math.max(0, Number(task.points || 0));
-    return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col">
-      <div class="flex justify-between items-start gap-2"><span class="pill bg-green-100 text-green-800">Available task</span><span class="pill bg-amber-100 text-amber-900">${reward.toLocaleString("en-NG")} points</span></div>
-      <h3 class="font-extrabold text-lg mt-3">${safeText(task.title || "Task")}</h3>
-      <p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(task.description || "")}</p>
-      ${task.proof_hint ? `<p class="text-xs text-slate-500 mt-3"><b>Submission:</b> ${safeText(task.proof_hint)}</p>` : ""}
-      <button class="btn btn-green w-full mt-4" onclick="submitTask('${doc.id}')">Submit completed task</button>
-    </article>`;
-  }).join("");
+  if (!docs.length) { container.innerHTML = '<p class="text-slate-500">There are no active tasks at the moment. Please check back later.</p>'; return; }
+  container.innerHTML = docs.map(doc => { const task = doc.data() || {}; const reward = Math.max(0, Number(task.points || 0)); return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-100 text-green-800">Available task</span><span class="pill bg-amber-100 text-amber-900">${reward.toLocaleString("en-NG")} points</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(task.title || "Task")}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(task.description || "")}</p>${task.proof_hint ? `<p class="text-xs text-slate-500 mt-3"><b>Submission:</b> ${safeText(task.proof_hint)}</p>` : ""}<button class="btn btn-green w-full mt-4" onclick="submitTask('${doc.id}')">Submit completed task</button></article>`; }).join("");
 }
-
 function renderMyTaskSubmissions(docs) {
   const container = document.getElementById("myTaskSubmissions");
-  if (!docs.length) {
-    container.innerHTML = '<p class="text-slate-500 text-sm">You have not submitted any tasks yet.</p>';
-    return;
-  }
-  const ordered = docs.slice().sort((a,b) => {
-    const av = a.data().createdAt && a.data().createdAt.toMillis ? a.data().createdAt.toMillis() : 0;
-    const bv = b.data().createdAt && b.data().createdAt.toMillis ? b.data().createdAt.toMillis() : 0;
-    return bv-av;
-  });
-  container.innerHTML = ordered.map(doc => {
-    const item = doc.data() || {};
-    const status = String(item.status || "pending").toLowerCase();
-    const color = status === "approved" ? "bg-green-100 text-green-800" : status === "rejected" ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-900";
-    return `<div class="border border-slate-200 rounded-xl p-4 flex flex-wrap justify-between gap-3">
-      <div><b>${safeText(item.task_title || "Task submission")}</b><p class="text-xs text-slate-500 mt-1">${Number(item.points || 0).toLocaleString("en-NG")} points · ${item.createdAt && item.createdAt.toDate ? item.createdAt.toDate().toLocaleString() : "Just submitted"}</p></div>
-      <span class="pill ${color}">${safeText(status.toUpperCase())}</span>
-    </div>`;
-  }).join("");
+  if (!docs.length) { container.innerHTML = '<p class="text-slate-500 text-sm">You have not submitted any tasks yet.</p>'; return; }
+  const ordered = docs.slice().sort((a,b) => { const av = a.data().createdAt && a.data().createdAt.toMillis ? a.data().createdAt.toMillis() : 0; const bv = b.data().createdAt && b.data().createdAt.toMillis ? b.data().createdAt.toMillis() : 0; return bv-av; });
+  container.innerHTML = ordered.map(doc => { const item = doc.data() || {}; const status = String(item.status || "pending").toLowerCase(); const color = status === "approved" ? "bg-green-100 text-green-800" : status === "rejected" ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-900"; return `<div class="border border-slate-200 rounded-xl p-4 flex flex-wrap justify-between gap-3"><div><b>${safeText(item.task_title || "Task submission")}</b><p class="text-xs text-slate-500 mt-1">${Number(item.points || 0).toLocaleString("en-NG")} points · ${item.createdAt && item.createdAt.toDate ? item.createdAt.toDate().toLocaleString() : "Just submitted"}</p></div><span class="pill ${color}">${safeText(status.toUpperCase())}</span></div>`; }).join("");
 }
-
 async function submitTask(taskId) {
   if (!currentUser) return openAuth("login");
-  if (!userData || userData.is_paid !== true) {
-    alert("Please activate your membership before submitting tasks.");
-    return;
-  }
+  if (!userData || userData.is_paid !== true) { alert("Please activate your membership before submitting tasks."); return; }
   const taskRef = db.collection("tasks").doc(taskId);
   const submissionRef = db.collection("task_submissions").doc(currentUser.uid + "_" + taskId);
   try {
     const taskSnap = await taskRef.get();
     if (!taskSnap.exists || taskSnap.data().active !== true) throw new Error("This task is no longer available.");
     const existing = await submissionRef.get();
-    if (existing.exists) {
-      const previousStatus = String(existing.data().status || "pending");
-      throw new Error(previousStatus === "rejected"
-        ? "You have already submitted this task and it was rejected. Contact an administrator if you need a review."
-        : "You have already submitted this task. Check your submission status below.");
-    }
+    if (existing.exists) { const previousStatus = String(existing.data().status || "pending"); throw new Error(previousStatus === "rejected" ? "You have already submitted this task and it was rejected. Contact an administrator if you need a review." : "You have already submitted this task. Check your submission status below."); }
     const task = taskSnap.data() || {};
-    await submissionRef.set({
-      uid: currentUser.uid,
-      email: cleanEmail(currentUser.email),
-      full_name: userData.full_name || "",
-      task_id: taskId,
-      task_title: String(task.title || "Task"),
-      points: Math.max(0, Number(task.points || 0)),
-      status: "pending",
-      createdAt: serverTimestamp()
-    });
+    await submissionRef.set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), full_name: userData.full_name || "", task_id: taskId, task_title: String(task.title || "Task"), points: Math.max(0, Number(task.points || 0)), status: "pending", createdAt: serverTimestamp() });
     alert("Task submitted successfully. Your points will be credited after admin approval.");
-  } catch (error) {
-    alert(friendlyError(error));
-  }
+  } catch (error) { alert(friendlyError(error)); }
 }
-
 async function createTask(event) {
-  event.preventDefault();
-  if (!(userData && userData.is_admin === true)) return showNotice("taskMessage", "Admin access required.");
-  clearNotice("taskMessage");
-  const title = document.getElementById("taskTitle").value.trim();
-  const description = document.getElementById("taskDescription").value.trim();
-  const points = Number(document.getElementById("taskReward").value);
-  const proofHint = document.getElementById("taskProofHint").value.trim();
-  const active = document.getElementById("taskActive").checked;
-  if (!title || !description || !Number.isSafeInteger(points) || points < 1) {
-    return showNotice("taskMessage", "Enter a task title, instructions and a valid points reward.");
-  }
+  event.preventDefault(); if (!(userData && userData.is_admin === true)) return showNotice("taskMessage", "Admin access required."); clearNotice("taskMessage");
+  const title = document.getElementById("taskTitle").value.trim(); const description = document.getElementById("taskDescription").value.trim(); const points = Number(document.getElementById("taskReward").value); const proofHint = document.getElementById("taskProofHint").value.trim(); const active = document.getElementById("taskActive").checked;
+  if (!title || !description || !Number.isSafeInteger(points) || points < 1) { return showNotice("taskMessage", "Enter a task title, instructions and a valid points reward."); }
   setBusy("taskSubmit", true, "Creating…");
-  try {
-    await db.collection("tasks").add({
-      title, description, points, proof_hint: proofHint, active,
-      createdAt: serverTimestamp(), createdBy: currentUser.uid
-    });
-    document.getElementById("taskForm").reset();
-    document.getElementById("taskActive").checked = true;
-    showNotice("taskMessage", "Task created successfully.", "success");
-  } catch (error) {
-    showNotice("taskMessage", friendlyError(error));
-  } finally {
-    setBusy("taskSubmit", false);
-  }
+  try { await db.collection("tasks").add({ title, description, points, proof_hint: proofHint, active, createdAt: serverTimestamp(), createdBy: currentUser.uid }); document.getElementById("taskForm").reset(); document.getElementById("taskActive").checked = true; showNotice("taskMessage", "Task created successfully.", "success"); }
+  catch (error) { showNotice("taskMessage", friendlyError(error)); } finally { setBusy("taskSubmit", false); }
 }
-
-async function setTaskActive(taskId, active) {
-  if (!(userData && userData.is_admin === true)) return alert("Admin access required.");
-  try {
-    await db.collection("tasks").doc(taskId).update({active: !!active});
-  } catch (error) {
-    alert("Could not update task: " + friendlyError(error));
-  }
-}
-
+async function setTaskActive(taskId, active) { if (!(userData && userData.is_admin === true)) return alert("Admin access required."); try { await db.collection("tasks").doc(taskId).update({active: !!active}); } catch (error) { alert("Could not update task: " + friendlyError(error)); } }
 async function reviewTaskSubmission(submissionId, decision) {
-  if (!(userData && userData.is_admin === true)) return alert("Admin access required.");
-  if (!["approved","rejected"].includes(decision)) return;
+  if (!(userData && userData.is_admin === true)) return alert("Admin access required."); if (!["approved","rejected"].includes(decision)) return;
   const submissionRef = db.collection("task_submissions").doc(submissionId);
   try {
     await db.runTransaction(async tx => {
-      const submissionSnap = await tx.get(submissionRef);
-      if (!submissionSnap.exists) throw new Error("Submission not found.");
-      const submission = submissionSnap.data() || {};
-      if (submission.status !== "pending") throw new Error("This submission has already been reviewed.");
-      const memberRef = db.collection("users").doc(submission.uid);
-      const memberSnap = await tx.get(memberRef);
-      if (!memberSnap.exists) throw new Error("Member account not found.");
-      if (decision === "approved") {
-        const currentPoints = Number(memberSnap.data().points_balance || 0);
-        const reward = Number(submission.points || 0);
-        if (!Number.isSafeInteger(reward) || reward < 1) throw new Error("Invalid task reward.");
-        tx.update(memberRef, {points_balance: currentPoints + reward});
-      }
-      tx.update(submissionRef, {
-        status: decision,
-        reviewedAt: serverTimestamp(),
-        reviewedBy: currentUser.uid
-      });
+      const submissionSnap = await tx.get(submissionRef); if (!submissionSnap.exists) throw new Error("Submission not found."); const submission = submissionSnap.data() || {}; if (submission.status !== "pending") throw new Error("This submission has already been reviewed.");
+      const memberRef = db.collection("users").doc(submission.uid); const memberSnap = await tx.get(memberRef); if (!memberSnap.exists) throw new Error("Member account not found.");
+      if (decision === "approved") { const currentPoints = Number(memberSnap.data().points_balance || 0); const reward = Number(submission.points || 0); if (!Number.isSafeInteger(reward) || reward < 1) throw new Error("Invalid task reward."); tx.update(memberRef, {points_balance: currentPoints + reward}); }
+      tx.update(submissionRef, { status: decision, reviewedAt: serverTimestamp(), reviewedBy: currentUser.uid });
     });
     alert(decision === "approved" ? "Submission approved and points credited." : "Submission rejected. No points were credited.");
-  } catch (error) {
-    alert("Review failed: " + friendlyError(error));
+  } catch (error) { alert("Review failed: " + friendlyError(error)); }
+}
+
+// ===== MINT & BURN - ADMIN ONLY - FIRESTORE =====
+async function loadAdminStats(){
+  try {
+    const snap = await db.collection("pointSupply").doc("main").get();
+    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
+    const el1 = document.getElementById("statSupply"); if(el1) el1.textContent = Number(s.totalSupply||0).toLocaleString("en-NG");
+    const el2 = document.getElementById("statTreasury"); if(el2) el2.textContent = Number(s.treasury||0).toLocaleString("en-NG");
+    const el3 = document.getElementById("statCirculating"); if(el3) el3.textContent = Number(s.circulating||0).toLocaleString("en-NG");
+  } catch(e){ console.warn("pointSupply:", e); }
+}
+async function adminMint(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const amt = Number(document.getElementById("mintAmt").value);
+  if(!amt || amt<=0) return alert("Enter amount > 0");
+  if(!confirm("Mint " + amt + " points to Treasury?")) return;
+  const ref = db.collection("pointSupply").doc("main");
+  await db.runTransaction(async tx=>{
+    const snap = await tx.get(ref);
+    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
+    tx.set(ref, {totalSupply:(s.totalSupply||0)+amt, treasury:(s.treasury||0)+amt, circulating:s.circulating||0});
+  });
+  document.getElementById("mintAmt").value = "";
+  alert("Minted " + amt + " to Treasury"); loadAdminStats();
+}
+async function adminBurnTreasury(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const amt = Number(document.getElementById("burnTreasuryAmt").value);
+  if(!amt || amt<=0) return alert("Enter amount > 0");
+  if(!confirm("Burn " + amt + " from Treasury forever?")) return;
+  const ref = db.collection("pointSupply").doc("main");
+  let ok=false;
+  await db.runTransaction(async tx=>{
+    const snap = await tx.get(ref);
+    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
+    if((s.treasury||0) < amt) return;
+    tx.set(ref, {totalSupply:(s.totalSupply||0)-amt, treasury:(s.treasury||0)-amt, circulating:s.circulating||0});
+    ok=true;
+  });
+  if(!ok) return alert("Not enough in Treasury");
+  document.getElementById("burnTreasuryAmt").value = "";
+  alert("Burned " + amt + " from Treasury"); loadAdminStats();
+}
+async function adminBurnAllPct(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const pct = Number(document.getElementById("burnPct").value);
+  if(!pct || pct<=0 || pct>100) return alert("Enter % 1 to 100");
+  if(!confirm("Burn " + pct + "% from ALL users? Cannot undo!")) return;
+  const snap = await db.collection("users").get();
+  let totalBurned=0;
+  for(const doc of snap.docs){
+    const bal = Number(doc.data().points_balance||0);
+    const burn = Math.floor(bal * pct / 100);
+    if(burn<=0) continue;
+    totalBurned+=burn;
+    await db.collection("users").doc(doc.id).update({points_balance: bal - burn});
   }
+  const ref = db.collection("pointSupply").doc("main");
+  await db.runTransaction(async tx=>{
+    const sSnap = await tx.get(ref);
+    const s = sSnap.exists ? sSnap.data() : {totalSupply:0, treasury:0, circulating:0};
+    tx.set(ref, {totalSupply:Math.max(0,(s.totalSupply||0)-totalBurned), treasury:s.treasury||0, circulating:Math.max(0,(s.circulating||0)-totalBurned)});
+  });
+  document.getElementById("burnPct").value = "";
+  alert("Burned total " + totalBurned + " points from all users"); loadAdminStats();
+}
+async function adminBurnAllFixed(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const totalToBurn = Number(document.getElementById("burnFixedAmt").value);
+  if(!totalToBurn || totalToBurn<=0) return alert("Enter amount > 0");
+  if(!confirm("Burn total " + totalToBurn + " split across all users?")) return;
+  const snap = await db.collection("users").get();
+  let totalBal=0;
+  snap.docs.forEach(d=> totalBal += Number(d.data().points_balance||0));
+  if(totalBal < totalToBurn) return alert("Users only have " + totalBal + " total. Cannot burn " + totalToBurn);
+  let burnedSoFar=0;
+  for(const doc of snap.docs){
+    const bal = Number(doc.data().points_balance||0);
+    if(bal<=0) continue;
+    let share = Math.floor(totalToBurn * bal / totalBal);
+    if(share>bal) share=bal;
+    if(share<=0) continue;
+    burnedSoFar+=share;
+    await db.collection("users").doc(doc.id).update({points_balance: bal - share});
+  }
+  const ref = db.collection("pointSupply").doc("main");
+  await db.runTransaction(async tx=>{
+    const sSnap = await tx.get(ref);
+    const s = sSnap.exists ? sSnap.data() : {totalSupply:0, treasury:0, circulating:0};
+    tx.set(ref, {totalSupply:Math.max(0,(s.totalSupply||0)-burnedSoFar), treasury:s.treasury||0, circulating:Math.max(0,(s.circulating||0)-burnedSoFar)});
+  });
+  document.getElementById("burnFixedAmt").value = "";
+  alert("Burned " + burnedSoFar + " total"); loadAdminStats();
+}
+async function adminGiveUser(uid, email){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const amt = Number(prompt("Give how many points to " + email + "?"));
+  if(!amt || amt<=0) return;
+  const userRef = db.collection("users").doc(uid);
+  await db.runTransaction(async tx=>{
+    const snap = await tx.get(userRef);
+    const cur = snap.exists ? Number(snap.data().points_balance||0) : 0;
+    tx.update(userRef, {points_balance: cur + amt});
+  });
+  const ref = db.collection("pointSupply").doc("main");
+  await db.runTransaction(async tx=>{
+    const snap = await tx.get(ref);
+    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
+    tx.set(ref, {totalSupply:(s.totalSupply||0)+amt, treasury:s.treasury||0, circulating:(s.circulating||0)+amt});
+  });
+  alert("Gave " + amt + " to " + email); loadAdminStats();
+}
+async function adminBurnUser(uid, email){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const amt = Number(prompt("Burn how many points from " + email + "?"));
+  if(!amt || amt<=0) return;
+  if(!confirm("Burn " + amt + " from " + email + "?")) return;
+  const userRef = db.collection("users").doc(uid);
+  let ok=false;
+  await db.runTransaction(async tx=>{
+    const snap = await tx.get(userRef);
+    const cur = snap.exists ? Number(snap.data().points_balance||0) : 0;
+    if(cur < amt) return;
+    tx.update(userRef, {points_balance: cur - amt});
+    ok=true;
+  });
+  if(!ok) return alert("User does not have that many points");
+  const ref = db.collection("pointSupply").doc("main");
+  await db.runTransaction(async tx=>{
+    const snap = await tx.get(ref);
+    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
+    tx.set(ref, {totalSupply:Math.max(0,(s.totalSupply||0)-amt), treasury:s.treasury||0, circulating:Math.max(0,(s.circulating||0)-amt)});
+  });
+  alert("Burned " + amt + " from " + email); loadAdminStats();
 }
 
 function renderAnnouncements(docs) {
   const container = document.getElementById("homeAnnouncements");
   if (!docs.length) { container.innerHTML='<p class="text-slate-500">No announcements yet. Please check back soon.</p>'; return; }
-  container.innerHTML = docs.map(doc => {
-    const item=doc.data()||{};
-    return `<article class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-wider text-green-700">Announcement</p><h3 class="font-extrabold text-lg mt-2">${safeText(item.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap">${safeText(item.message)}</p></article>`;
-  }).join("");
+  container.innerHTML = docs.map(doc => { const item=doc.data()||{}; return `<article class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-wider text-green-700">Announcement</p><h3 class="font-extrabold text-lg mt-2">${safeText(item.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap">${safeText(item.message)}</p></article>`; }).join("");
 }
 function renderMaterials(docs) {
   const container=document.getElementById("materialsGrid");
   if (!docs.length) {container.innerHTML='<p class="text-slate-500">No learning materials have been published yet.</p>';return;}
-  container.innerHTML=docs.map(doc=>{
-    const m=doc.data()||{}, free=m.is_free===true, unlocked=free||(userData&&userData.is_paid===true);
-    const actions=unlocked
-      ? `${m.video_url?`<a class="btn btn-green text-center block" href="${safeUrl(m.video_url)}" target="_blank" rel="noopener noreferrer">▶ Watch Video</a>`:""} ${m.pdf_url?`<a class="btn btn-light text-center block" href="${safeUrl(m.pdf_url)}" target="_blank" rel="noopener noreferrer">↓ Download PDF</a>`:""}`
-      : `<div class="locked rounded-xl p-4 text-center"><p class="font-bold text-slate-700">🔒 Upgrade to ₦30,000 to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`;
-    return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-50 text-green-800">${safeText(m.category||"General")}</span><span class="pill ${free?"bg-yellow-100 text-yellow-800":"bg-slate-100 text-slate-700"}">${free?"FREE":"PAID"}</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(m.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(m.description)}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5">${actions}</div></article>`;
-  }).join("");
+  container.innerHTML=docs.map(doc=>{ const m=doc.data()||{}, free=m.is_free===true, unlocked=free||(userData&&userData.is_paid===true); const actions=unlocked ? `${m.video_url?`<a class="btn btn-green text-center block" href="${safeUrl(m.video_url)}" target="_blank" rel="noopener noreferrer">▶ Watch Video</a>`:""} ${m.pdf_url?`<a class="btn btn-light text-center block" href="${safeUrl(m.pdf_url)}" target="_blank" rel="noopener noreferrer">↓ Download PDF</a>`:""}` : `<div class="locked rounded-xl p-4 text-center"><p class="font-bold text-slate-700">🔒 Upgrade to ₦30,000 to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`; return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-50 text-green-800">${safeText(m.category||"General")}</span><span class="pill ${free?"bg-yellow-100 text-yellow-800":"bg-slate-100 text-slate-700"}">${free?"FREE":"PAID"}</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(m.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(m.description)}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5">${actions}</div></article>`; }).join("");
 }
-function safeUrl(value) {
-  try { const u=new URL(String(value)); return ["https:","http:"].includes(u.protocol)?safeText(u.href):"#"; }
-  catch(_){return "#";}
-}
+function safeUrl(value) { try { const u=new URL(String(value)); return ["https:","http:"].includes(u.protocol)?safeText(u.href):"#"; } catch(_){return "#";} }
 async function requestWithdrawal(event) {
-  event.preventDefault();
-  const messageId="withdrawMessage";clearNotice(messageId);
+  event.preventDefault(); const messageId="withdrawMessage";clearNotice(messageId);
   if (!currentUser || !userData) return showNotice(messageId,"Please log in first.");
-  const bank=document.getElementById("bankName").value.trim();
-  const account=document.getElementById("accountNumber").value.trim();
-  const amount=Number(document.getElementById("withdrawAmount").value);
-  const balance=Number(userData.balance||0);
+  const bank=document.getElementById("bankName").value.trim(); const account=document.getElementById("accountNumber").value.trim(); const amount=Number(document.getElementById("withdrawAmount").value); const balance=Number(userData.balance||0);
   if (!bank || !/^\d{10}$/.test(account)) return showNotice(messageId,"Enter a bank name and a valid 10-digit account number.");
   if (!Number.isSafeInteger(amount) || amount<MIN_WITHDRAWAL) return showNotice(messageId,"Minimum withdrawal is ₦5,000.");
   if (amount>balance) return showNotice(messageId,"Insufficient wallet balance.");
   setBusy("withdrawSubmit",true,"Submitting…");
   try {
-    // Atomic client transaction prevents ordinary race conditions, but Firestore
-    // Rules / a trusted function must enforce this operation against tampering.
-    const userRef=db.collection("users").doc(currentUser.uid);
-    const withdrawalRef=db.collection("withdrawals").doc();
-    await db.runTransaction(async tx=>{
-      const snap=await tx.get(userRef);
-      if(!snap.exists)throw new Error("Member profile not found.");
-      const latest=Number((snap.data()||{}).balance||0);
-      if(amount>latest)throw new Error("Insufficient wallet balance.");
-      tx.update(userRef,{balance:latest-amount});
-      tx.set(withdrawalRef,{
-        uid:currentUser.uid,name:userData.full_name||"",email:currentUser.email||"",
-        amount,bank,account,status:"pending",createdAt:serverTimestamp()
-      });
-    });
-    document.getElementById("withdrawForm").reset();
-    showNotice(messageId,"Withdrawal request submitted. Your wallet has been debited and the request is pending review.","success");
-    await loadCurrentProfile(currentUser);
-  } catch(error) { showNotice(messageId,friendlyError(error)); }
-  finally { setBusy("withdrawSubmit",false); }
+    const userRef=db.collection("users").doc(currentUser.uid); const withdrawalRef=db.collection("withdrawals").doc();
+    await db.runTransaction(async tx=>{ const snap=await tx.get(userRef); if(!snap.exists)throw new Error("Member profile not found."); const latest=Number((snap.data()||{}).balance||0); if(amount>latest)throw new Error("Insufficient wallet balance."); tx.update(userRef,{balance:latest-amount}); tx.set(withdrawalRef,{ uid:currentUser.uid,name:userData.full_name||"",email:currentUser.email||"", amount,bank,account,status:"pending",createdAt:serverTimestamp() }); });
+    document.getElementById("withdrawForm").reset(); showNotice(messageId,"Withdrawal request submitted. Your wallet has been debited and the request is pending review.","success"); await loadCurrentProfile(currentUser);
+  } catch(error) { showNotice(messageId,friendlyError(error)); } finally { setBusy("withdrawSubmit",false); }
 }
-
 async function postAnnouncement(event) {
   event.preventDefault();clearNotice("announcementMessageBox");
-  try {
-    await db.collection("announcements").add({
-      title:document.getElementById("announcementTitle").value.trim(),
-      message:document.getElementById("announcementMessage").value.trim(),
-      createdAt:serverTimestamp(),createdBy:currentUser.uid
-    });
-    document.getElementById("announcementForm").reset();
-    showNotice("announcementMessageBox","Announcement published successfully.","success");
-  } catch(error) { showNotice("announcementMessageBox",friendlyError(error)); }
+  try { await db.collection("announcements").add({ title:document.getElementById("announcementTitle").value.trim(), message:document.getElementById("announcementMessage").value.trim(), createdAt:serverTimestamp(),createdBy:currentUser.uid }); document.getElementById("announcementForm").reset(); showNotice("announcementMessageBox","Announcement published successfully.","success"); }
+  catch(error) { showNotice("announcementMessageBox",friendlyError(error)); }
 }
 async function postMaterial(event) {
   event.preventDefault();clearNotice("materialMessage");
-  const video=document.getElementById("materialVideo").value.trim();
-  const pdf=document.getElementById("materialPdf").value.trim();
+  const video=document.getElementById("materialVideo").value.trim(); const pdf=document.getElementById("materialPdf").value.trim();
   if ((video && !isHttpUrl(video)) || (pdf && !isHttpUrl(pdf))) return showNotice("materialMessage","Please enter valid http or https links.");
   setBusy("materialSubmit",true,"Publishing…");
-  try {
-    await db.collection("materials").add({
-      title:document.getElementById("materialTitle").value.trim(),
-      category:document.getElementById("materialCategory").value,
-      description:document.getElementById("materialDescription").value.trim(),
-      video_url:video,pdf_url:pdf,is_free:document.getElementById("materialFree").checked,
-      createdAt:serverTimestamp(),createdBy:currentUser.uid
-    });
-    document.getElementById("materialForm").reset();
-    showNotice("materialMessage","Educational material published successfully.","success");
-  } catch(error) { showNotice("materialMessage",friendlyError(error)); }
-  finally { setBusy("materialSubmit",false); }
+  try { await db.collection("materials").add({ title:document.getElementById("materialTitle").value.trim(), category:document.getElementById("materialCategory").value, description:document.getElementById("materialDescription").value.trim(), video_url:video,pdf_url:pdf,is_free:document.getElementById("materialFree").checked, createdAt:serverTimestamp(),createdBy:currentUser.uid }); document.getElementById("materialForm").reset(); showNotice("materialMessage","Educational material published successfully.","success"); }
+  catch(error) { showNotice("materialMessage",friendlyError(error)); } finally { setBusy("materialSubmit",false); }
 }
-function isHttpUrl(value) {
-  try { return ["http:","https:"].includes(new URL(value).protocol); } catch(_){return false;}
-}
+function isHttpUrl(value) { try { return ["http:","https:"].includes(new URL(value).protocol); } catch(_){return false;} }
 function loadAdminData() {
   if (!(userData && userData.is_admin===true)) return;
+  loadAdminStats();
   adminUnsubscribers.forEach(fn=>fn());adminUnsubscribers=[];
   const usersSub=db.collection("users").orderBy("createdAt","desc").limit(500).onSnapshot(snapshot=>{
     const body=document.getElementById("usersTable");
-    if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="4">No users found.</td></tr>';return;}
+    if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="6">No users found.</td></tr>';return;}
     body.innerHTML=snapshot.docs.map(doc=>{
       const u=doc.data()||{};
-      return `<tr class="border-b"><td class="p-2">${safeText(u.full_name)}</td><td class="p-2">${safeText(u.email)}</td><td class="p-2">${money(u.balance)}</td><td class="p-2">${u.is_paid===true?"PAID":"FREE"}</td></tr>`;
+      const escEmail = safeText(u.email||"");
+      return `<tr class="border-b"><td class="p-2">${safeText(u.full_name)}</td><td class="p-2">${escEmail}</td><td class="p-2">${money(u.balance)}</td><td class="p-2 font-bold">${Number(u.points_balance||0).toLocaleString("en-NG")}</td><td class="p-2">${u.is_paid===true?"PAID":"FREE"}</td><td class="p-2"><div class="flex gap-1"><button class="btn btn-green !py-1 !px-2 text-xs" onclick="adminGiveUser('${doc.id}','${escEmail}')">Give</button><button class="btn !py-1 !px-2 text-xs bg-red-50 text-red-700" onclick="adminBurnUser('${doc.id}','${escEmail}')">Burn</button></div></td></tr>`;
     }).join("");
   },err=>console.error(err));
   const withdrawalSub=db.collection("withdrawals").orderBy("createdAt","desc").limit(300).onSnapshot(snapshot=>{
     const body=document.getElementById("withdrawalsTable");
     if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="5">No withdrawal requests.</td></tr>';return;}
-    body.innerHTML=snapshot.docs.map(doc=>{
-      const w=doc.data()||{};
-      return `<tr class="border-b"><td class="p-2">${safeText(w.name)}</td><td class="p-2">${money(w.amount)}</td><td class="p-2">${safeText(w.bank)}</td><td class="p-2">${safeText(w.account)}</td><td class="p-2"><span class="pill bg-yellow-100 text-yellow-800">${safeText(w.status||"pending")}</span></td></tr>`;
-    }).join("");
+    body.innerHTML=snapshot.docs.map(doc=>{ const w=doc.data()||{}; return `<tr class="border-b"><td class="p-2">${safeText(w.name)}</td><td class="p-2">${money(w.amount)}</td><td class="p-2">${safeText(w.bank)}</td><td class="p-2">${safeText(w.account)}</td><td class="p-2"><span class="pill bg-yellow-100 text-yellow-800">${safeText(w.status||"pending")}</span></td></tr>`; }).join("");
   },err=>console.error(err));
   const materialSub=db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot=>{
     const container=document.getElementById("adminMaterials");
     if(snapshot.empty){container.innerHTML='<p class="text-slate-500">No materials published.</p>';return;}
-    container.innerHTML=snapshot.docs.map(doc=>{
-      const m=doc.data()||{};
-      return `<div class="border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><b>${safeText(m.title)}</b><p class="text-sm text-slate-500">${safeText(m.category)} · ${m.is_free===true?"Free":"Paid"}</p></div><button class="btn bg-red-50 text-red-700" onclick="deleteMaterial('${doc.id}')">Delete</button></div>`;
-    }).join("");
+    container.innerHTML=snapshot.docs.map(doc=>{ const m=doc.data()||{}; return `<div class="border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><b>${safeText(m.title)}</b><p class="text-sm text-slate-500">${safeText(m.category)} · ${m.is_free===true?"Free":"Paid"}</p></div><button class="btn bg-red-50 text-red-700" onclick="deleteMaterial('${doc.id}')">Delete</button></div>`; }).join("");
   },err=>console.error(err));
   const tasksSub=db.collection("tasks").orderBy("createdAt","desc").onSnapshot(snapshot=>{
     const container=document.getElementById("adminTasks");
     if(snapshot.empty){container.innerHTML='<p class="text-slate-500 text-sm">No tasks created yet.</p>';return;}
-    container.innerHTML=snapshot.docs.map(doc=>{
-      const t=doc.data()||{}, active=t.active===true;
-      return `<div class="border rounded-xl p-3 flex flex-wrap items-center justify-between gap-2"><div><b>${safeText(t.title)}</b><p class="text-xs text-slate-500">${Number(t.points||0).toLocaleString("en-NG")} points · ${active?"Published":"Hidden"}</p></div><button class="btn ${active?"bg-red-50 text-red-700":"btn-green"}" onclick="setTaskActive('${doc.id}',${!active})">${active?"Unpublish":"Publish"}</button></div>`;
-    }).join("");
+    container.innerHTML=snapshot.docs.map(doc=>{ const t=doc.data()||{}, active=t.active===true; return `<div class="border rounded-xl p-3 flex flex-wrap items-center justify-between gap-2"><div><b>${safeText(t.title)}</b><p class="text-xs text-slate-500">${Number(t.points||0).toLocaleString("en-NG")} points · ${active?"Published":"Hidden"}</p></div><button class="btn ${active?"bg-red-50 text-red-700":"btn-green"}" onclick="setTaskActive('${doc.id}',${!active})">${active?"Unpublish":"Publish"}</button></div>`; }).join("");
   },err=>console.error("Admin tasks:",err));
   const submissionsSub=db.collection("task_submissions").where("status","==","pending").onSnapshot(snapshot=>{
     const container=document.getElementById("taskSubmissionsAdmin");
     if(snapshot.empty){container.innerHTML='<p class="text-slate-500 text-sm">No pending task submissions.</p>';return;}
-    container.innerHTML=snapshot.docs.map(doc=>{
-      const s=doc.data()||{};
-      return `<div class="border rounded-xl p-4"><div class="flex flex-wrap justify-between gap-2"><b>${safeText(s.task_title||"Task")}</b><span class="pill bg-amber-100 text-amber-900">${Number(s.points||0).toLocaleString("en-NG")} points</span></div><p class="text-sm mt-2">${safeText(s.full_name||"Member")} · ${safeText(s.email||"")}</p><p class="text-xs text-slate-500 mt-1">Submitted: ${s.createdAt&&s.createdAt.toDate?s.createdAt.toDate().toLocaleString():"—"}</p><div class="grid grid-cols-2 gap-2 mt-3"><button class="btn btn-green" onclick="reviewTaskSubmission('${doc.id}','approved')">Approve & credit</button><button class="btn bg-red-50 text-red-700" onclick="reviewTaskSubmission('${doc.id}','rejected')">Reject</button></div></div>`;
-    }).join("");
+    container.innerHTML=snapshot.docs.map(doc=>{ const s=doc.data()||{}; return `<div class="border rounded-xl p-4"><div class="flex flex-wrap justify-between gap-2"><b>${safeText(s.task_title||"Task")}</b><span class="pill bg-amber-100 text-amber-900">${Number(s.points||0).toLocaleString("en-NG")} points</span></div><p class="text-sm mt-2">${safeText(s.full_name||"Member")} · ${safeText(s.email||"")}</p><p class="text-xs text-slate-500 mt-1">Submitted: ${s.createdAt&&s.createdAt.toDate?s.createdAt.toDate().toLocaleString():"—"}</p><div class="grid grid-cols-2 gap-2 mt-3"><button class="btn btn-green" onclick="reviewTaskSubmission('${doc.id}','approved')">Approve & credit</button><button class="btn bg-red-50 text-red-700" onclick="reviewTaskSubmission('${doc.id}','rejected')">Reject</button></div></div>`; }).join("");
   },err=>console.error("Pending task submissions:",err));
   adminUnsubscribers=[usersSub,withdrawalSub,materialSub,tasksSub,submissionsSub];
 }
-async function deleteMaterial(id) {
-  if (!(userData && userData.is_admin===true)) return alert("Admin access required.");
-  if (!confirm("Delete this learning material permanently?")) return;
-  try { await db.collection("materials").doc(id).delete(); }
-  catch(error) { alert("Could not delete material: "+friendlyError(error)); }
-}
+async function deleteMaterial(id) { if (!(userData && userData.is_admin===true)) return alert("Admin access required."); if (!confirm("Delete this learning material permanently?")) return; try { await db.collection("materials").doc(id).delete(); } catch(error) { alert("Could not delete material: "+friendlyError(error)); } }
 </script>
 </body>
 </html>
