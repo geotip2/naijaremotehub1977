@@ -3,1231 +3,1330 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#071b16">
-  <title>NaijaRemoteHub | Learn Remote Work. Earn While You Learn.</title>
-
+  <meta name="theme-color" content="#15803d">
+  <meta name="description" content="NaijaRemoteHub — Learn remote skills, earn with referrals, transfer funds peer-to-peer, and earn points with tasks.">
+  <title>NaijaRemoteHub | Learn. Earn. Grow.</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://js.paystack.co/v1/inline.js"></script>
-
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #071b16;
-      color: #e5f5ed;
-    }
-    .panel {
-      background: #102820;
-      border: 1px solid #24483a;
-      border-radius: 16px;
-    }
+    :root { color-scheme: light; }
+    html { scroll-behavior: smooth; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    
+    .page { display: none; }
+    .page.active { display: block; }
+    .tab-active { background: #15803d; color: white; }
+    .tab-idle { background: #f3f4f6; color: #1f2937; }
+    
+    .shadow-soft { box-shadow: 0 12px 35px rgba(15, 23, 42, .08); }
+    
     .field {
       width: 100%;
-      padding: 12px;
-      border-radius: 9px;
-      background: #071b16;
-      border: 1px solid #315747;
-      color: white;
+      border: 1px solid #94a3b8;
+      border-radius: .75rem;
+      padding: .8rem .9rem;
       outline: none;
+      background: white;
+      color: #0f172a;
     }
-    .field:focus { border-color: #22c55e; }
+    .field:focus-visible {
+      border-color: #15803d;
+      outline: 2px solid #15803d;
+      outline-offset: 1px;
+      box-shadow: 0 0 0 4px rgba(21, 128, 61, .2);
+    }
+    .field[aria-invalid="true"] {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+
     .btn {
-      background: #16a34a;
-      color: white;
-      padding: 11px 16px;
-      border-radius: 9px;
+      border-radius: .75rem;
+      padding: .8rem 1.1rem;
       font-weight: 700;
+      transition: background-color .15s, outline-offset .15s;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
-    .btn:hover { background: #15803d; }
-    .btn-secondary {
-      background: #24483a;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 9px;
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+    
+    button:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible {
+      outline: 3px solid #15803d;
+      outline-offset: 2px;
     }
-    .btn-danger {
-      background: #991b1b;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 9px;
+    .btn-green { background: #15803d; color: white; }
+    .btn-green:hover { background: #166534; }
+    .btn-green:focus-visible { outline-color: #facc15; }
+    
+    .btn-yellow { background: #eab308; color: #052e16; font-weight: 800; }
+    .btn-yellow:hover { background: #ca8a04; }
+    
+    .btn-light { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
+    .btn-light:hover { background: #e2e8f0; }
+
+    .notice {
+      display: none;
+      border-radius: .75rem;
+      padding: .85rem 1.1rem;
+      font-size: .95rem;
+      font-weight: 500;
+      margin-top: .75rem;
     }
-    .tab {
-      padding: 11px 14px;
-      border-radius: 9px;
-      color: #b7d4c4;
-      white-space: nowrap;
+    .notice.show { display: block; }
+    .notice.error { background: #fef2f2; color: #991b1b; border: 1px solid #f87171; }
+    .notice.success { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: .25rem .75rem;
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .025em;
     }
-    .tab.active {
-      background: #166534;
-      color: white;
+    .locked { background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 1px dashed #94a3b8; }
+    button, a, input, textarea, select { touch-action: manipulation; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
     }
-    .hidden { display: none !important; }
-    .muted { color: #9db9aa; }
-    .stat { font-size: 24px; font-weight: 800; }
-    button:disabled { opacity: .5; cursor: not-allowed; }
   </style>
 </head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-green-200">
 
-<body>
-  <header class="border-b border-green-900 bg-[#0b211a]">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-      <div>
-        <h1 class="text-xl sm:text-2xl font-extrabold text-green-400">
-          NaijaRemoteHub
-        </h1>
-        <p class="text-xs muted">Learn Remote Work. Earn While You Learn.</p>
-      </div>
-      <button id="logoutBtn" class="btn-secondary hidden" onclick="logout()">
-        Logout
-      </button>
-    </div>
-  </header>
+<!-- Skip Link for Accessibility -->
+<a href="#main-content" 
+   class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3 focus:bg-green-800 focus:text-white focus:rounded-xl focus:shadow-2xl focus:ring-4 focus:ring-yellow-400 font-extrabold text-sm">
+  Skip to main content
+</a>
 
-  <main class="max-w-6xl mx-auto p-4">
+<div id="routeAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="globalToast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- HOME -->
-    <section id="homeSection" class="py-10">
-      <div class="grid md:grid-cols-2 gap-8 items-center">
+<!-- Primary Navigation Header -->
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <a href="#home" onclick="showPage('home'); return false;" 
+       aria-label="NaijaRemoteHub, go to homepage" 
+       class="flex items-center gap-2 min-w-0 rounded-xl p-1">
+      <span class="w-10 h-10 rounded-xl bg-green-700 text-white grid place-items-center font-black text-xl shadow-xs" aria-hidden="true">N</span>
+      <span class="font-extrabold tracking-tight text-green-900 text-lg sm:text-xl">NaijaRemoteHub</span>
+    </a>
+    
+    <nav aria-label="Primary navigation" class="flex items-center gap-1 sm:gap-2 text-sm">
+      <button id="navHome" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-green-900" aria-current="page" onclick="showPage('home')">Home</button>
+      <button id="navTasks" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('tasks')">Tasks & Points</button>
+      <button id="navLogin" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="openAuth('login')">Login</button>
+      <button id="navDashboard" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('dashboard')">Dashboard</button>
+      <button id="navAdmin" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('admin')">Admin</button>
+      <button id="navLogout" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold text-red-700 hover:bg-red-50" onclick="logout()">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main-content" tabindex="-1" class="outline-none">
+  <!-- ==================== HOME VIEW ==================== -->
+  <section id="home" class="page active" aria-labelledby="homeHeroHeading">
+    <div class="bg-gradient-to-br from-green-900 via-green-800 to-green-700 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center">
         <div>
-          <span class="text-green-400 font-bold">WELCOME TO NAIJAREMOTEHUB</span>
-          <h2 class="text-4xl sm:text-5xl font-extrabold leading-tight mt-3">
-            Learn Remote Work.
-            <span class="text-green-400">Earn While You Learn.</span>
-          </h2>
-          <p class="muted mt-5 leading-7">
-            Join a community of Nigerians learning how to work online,
-            develop valuable digital skills and connect with opportunities
-            to earn in Naira and Dollars from home.
+          <span class="inline-block bg-slate-950/70 border border-yellow-300/50 text-yellow-300 rounded-full px-4 py-1.5 text-sm font-extrabold mb-5 shadow-sm">
+            Learn · Earn · Transfer Peer-to-Peer
+          </span>
+          <h1 id="homeHeroHeading" class="text-5xl sm:text-6xl font-black leading-tight tracking-tight">
+            Learn. Earn.<br><span class="text-yellow-300">Grow.</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-green-50 mt-5 max-w-xl font-normal leading-relaxed">
+            Acquire high-income digital skills, earn points on daily tasks, and transfer funds between hub members at ₦0 fee.
           </p>
-
-          <ul class="mt-6 space-y-3 text-sm">
-            <li>✓ Remote work training for beginners</li>
-            <li>✓ Learn how to find remote jobs</li>
-            <li>✓ Learn how to work with foreign clients</li>
-            <li>✓ Referral dashboard and earnings tracking</li>
-            <li>✓ Start learning with your phone</li>
+          <div class="flex flex-wrap gap-3 mt-8">
+            <button class="btn btn-yellow shadow-md" onclick="openAuth('signup')">Create Free Account</button>
+            <button class="btn bg-white text-green-900 hover:bg-green-50 font-bold" onclick="showPage('tasks')">Explore Tasks to Earn</button>
+          </div>
+        </div>
+        
+        <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100">
+          <p class="text-green-800 font-bold uppercase tracking-widest text-xs">Platform Highlights</p>
+          <h2 class="text-2xl font-extrabold mt-2 text-slate-900">Your All-in-One Digital Career Hub</h2>
+          <ul class="grid grid-cols-2 gap-3 mt-6" role="list">
+            <li class="bg-green-50 rounded-2xl p-4 border border-green-100">
+              <span class="text-2xl" aria-hidden="true">💸</span>
+              <b class="block mt-2 text-slate-900">P2P Transfers</b>
+              <span class="text-sm text-slate-600">Send money directly to members</span>
+            </li>
+            <li class="bg-yellow-50 rounded-2xl p-4 border border-yellow-100">
+              <span class="text-2xl" aria-hidden="true">⭐</span>
+              <b class="block mt-2 text-slate-900">Task Points</b>
+              <span class="text-sm text-slate-600">Daily streak & quizzes to earn</span>
+            </li>
+            <li class="bg-slate-100 rounded-2xl p-4 border border-slate-200">
+              <span class="text-2xl" aria-hidden="true">📊</span>
+              <b class="block mt-2 text-slate-900">Enhanced Stats</b>
+              <span class="text-sm text-slate-600">Deep wallet & referral metrics</span>
+            </li>
+            <li class="bg-green-50 rounded-2xl p-4 border border-green-100">
+              <span class="text-2xl" aria-hidden="true">🎓</span>
+              <b class="block mt-2 text-slate-900">Digital Academy</b>
+              <span class="text-sm text-slate-600">Practical freelance courses</span>
+            </li>
           </ul>
-
-          <button class="btn mt-7" onclick="showAuth('signup')">
-            JOIN NOW — ₦30,000
-          </button>
-          <button class="btn-secondary mt-7 ml-2" onclick="showAuth('login')">
-            Login
-          </button>
-        </div>
-
-        <div class="panel p-7">
-          <h3 class="text-2xl font-bold text-green-400">How It Works</h3>
-          <div class="mt-6 space-y-6">
-            <div>
-              <h4 class="font-bold">1. Register</h4>
-              <p class="muted text-sm mt-1">
-                Create your account and complete the one-time ₦30,000 membership payment.
-              </p>
-            </div>
-            <div>
-              <h4 class="font-bold">2. Learn</h4>
-              <p class="muted text-sm mt-1">
-                Access remote-work training and the member dashboard.
-              </p>
-            </div>
-            <div>
-              <h4 class="font-bold">3. Earn and Refer</h4>
-              <p class="muted text-sm mt-1">
-                Complete eligible activities and invite others through your referral link.
-              </p>
-            </div>
-          </div>
-          <p class="text-xs muted mt-7">
-            Membership is a one-time payment. It does not automatically renew.
-          </p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- AUTH -->
-    <section id="authSection" class="hidden max-w-md mx-auto py-8">
-      <div class="panel p-6">
-        <div class="flex gap-3 mb-6">
-          <button id="signupTab" class="tab active" onclick="showAuth('signup')">
-            Create Account
-          </button>
-          <button id="loginTab" class="tab" onclick="showAuth('login')">
-            Login
-          </button>
+  <!-- ==================== ENHANCED DASHBOARD VIEW ==================== -->
+  <section id="dashboard" class="page" aria-labelledby="dashboardHeading">
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <!-- Member Overview Header -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p class="text-green-800 font-bold text-sm tracking-wide">MEMBER AREA · SILVER TIER</p>
+            <h1 id="dashboardHeading" class="text-3xl font-black text-slate-900">Your Enhanced Dashboard</h1>
+            <p id="memberGreeting" class="text-slate-600 mt-1"></p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btnUpgradeAccount" class="btn btn-yellow text-xs px-3.5 py-1.5 shadow-sm" onclick="payWithPaystack()">👑 Upgrade to VIP (₦15,000)</button>
+            <span id="accountBadge" class="pill bg-slate-200 text-slate-800" aria-live="polite">FREE ACCOUNT</span>
+            <button class="btn btn-light text-xs px-3 py-1.5" onclick="showPage('tasks')">⭐ Tasks to Earn Points</button>
+          </div>
         </div>
 
-        <form id="signupForm" class="space-y-3">
-          <h2 class="text-2xl font-bold mb-4">Create your account</h2>
-          <input id="signupName" class="field" placeholder="Full name" required>
-          <input id="signupPhone" class="field" placeholder="Phone number" required>
-          <input id="signupEmail" type="email" class="field" placeholder="Email address" required>
-          <input id="signupPassword" type="password" class="field" placeholder="Password (minimum 6 characters)" minlength="6" required>
-          <input id="signupReferral" class="field" placeholder="Referral code (optional)">
-          <button class="btn w-full" type="submit">Create Account</button>
+        <!-- 4 Metric Cards -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
+          <div class="bg-green-900 text-white rounded-2xl p-5 shadow-soft flex flex-col justify-between">
+            <div>
+              <p class="text-green-100 text-xs font-semibold uppercase">Wallet Balance</p>
+              <p id="walletBalance" class="text-3xl font-black mt-1 text-white">₦0</p>
+            </div>
+            <div class="flex gap-2 mt-4 pt-3 border-t border-green-800">
+              <button class="btn btn-yellow text-xs py-1.5 flex-1" onclick="openTransferModal()">Send Money</button>
+              <button class="btn bg-white/20 text-white text-xs py-1.5 flex-1" onclick="document.getElementById('withdrawSection').scrollIntoView({behavior:'smooth'})">Withdraw</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-slate-500 text-xs font-semibold uppercase">Reward Points</p>
+              <p id="pointsBalance" class="text-3xl font-black text-amber-600 mt-1">850 Pts</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Worth: <strong id="pointsWorth">₦4,250</strong></p>
+            </div>
+            <button class="btn btn-light text-xs py-1.5 mt-3" onclick="showPage('tasks')">Redeem for Cash</button>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-slate-500 text-xs font-semibold uppercase">Peer Transfers</p>
+              <p id="p2pCount" class="text-3xl font-black text-slate-900 mt-1">0 Sent</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">₦0 transfer fees</p>
+            </div>
+            <button class="btn btn-green text-xs py-1.5 mt-3" onclick="openTransferModal()">Transfer to Member</button>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-slate-500 text-xs font-semibold uppercase">Your Referral Code</p>
+              <p id="myRefCode" class="text-2xl font-black text-green-800 mt-1 break-all">—</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">Total Referrals: <strong id="referralCount">0</strong></p>
+            </div>
+            <button class="btn btn-light text-xs py-1.5 mt-3" onclick="copyReferral()">Copy Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Transfer & Ledger Grid -->
+      <div class="grid lg:grid-cols-12 gap-6">
+        <!-- Left: Quick Actions -->
+        <div className="lg:col-span-5 space-y-6">
+          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+            <h2 class="font-extrabold text-lg text-slate-900">P2P Member Transfer</h2>
+            <p class="text-xs text-slate-600 mt-1">Send funds directly to any member using their referral code.</p>
+            <button class="btn btn-green w-full mt-4" onclick="openTransferModal()">
+              💸 Send Money to Member
+            </button>
+          </div>
+
+          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+            <h2 id="refHeading" class="font-extrabold text-lg text-slate-900">Your Referral Hub</h2>
+            <div class="flex gap-2 mt-4">
+              <label for="referralLink" class="sr-only">Your referral link</label>
+              <input id="referralLink" aria-labelledby="refHeading" class="field min-w-0 text-xs" readonly>
+              <button class="btn btn-green whitespace-nowrap text-xs" onclick="copyReferral()">Copy</button>
+            </div>
+            <button class="btn btn-yellow w-full mt-3 text-xs" onclick="shareWhatsApp()">Share on WhatsApp</button>
+          </div>
+        </div>
+
+        <!-- Right: Recent Transfer Ledger -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 class="font-extrabold text-lg text-slate-900">Recent Peer Transfers</h2>
+            <span class="text-xs font-bold text-green-800">Instant Settlement</span>
+          </div>
+          <div id="transferLedger" class="mt-4 space-y-3">
+            <p class="text-xs text-slate-500">No transfers sent yet. Click &quot;Send Money to Member&quot; to transfer.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Withdrawal Section -->
+      <div id="withdrawSection" class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
+        <h2 class="font-extrabold text-lg text-slate-900">Request Bank Withdrawal</h2>
+        <p class="text-xs text-slate-500 mt-1">Minimum withdrawal: ₦5,000.</p>
+        <form id="withdrawForm" class="grid sm:grid-cols-2 gap-3 mt-4" onsubmit="requestWithdrawal(event)" novalidate>
+          <div>
+            <label for="bankName" class="text-xs font-bold block mb-1">Bank Name *</label>
+            <input id="bankName" class="field text-xs" required maxlength="80">
+          </div>
+          <div>
+            <label for="accountNumber" class="text-xs font-bold block mb-1">Account Number (10 digits) *</label>
+            <input id="accountNumber" class="field text-xs" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
+          </div>
+          <div>
+            <label for="withdrawAmount" class="text-xs font-bold block mb-1">Amount (₦) *</label>
+            <input id="withdrawAmount" class="field text-xs" type="number" min="5000" required>
+          </div>
+          <div class="flex items-end">
+            <button id="withdrawSubmit" class="btn btn-green w-full text-xs" type="submit">Submit Withdrawal</button>
+          </div>
         </form>
+        <div id="withdrawMessage" class="notice" role="status" aria-live="polite"></div>
+      </div>
 
-        <form id="loginForm" class="hidden space-y-3">
-          <h2 class="text-2xl font-bold mb-4">Welcome back</h2>
-          <input id="loginEmail" type="email" class="field" placeholder="Email address" required>
-          <input id="loginPassword" type="password" class="field" placeholder="Password" required>
-          <button class="btn w-full" type="submit">Login</button>
-          <button type="button" class="text-green-400 text-sm" onclick="resetPassword()">
-            Forgot password?
-          </button>
+      <!-- User Activity Feed Timeline -->
+      <div id="activityLogSection" class="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-600"></span>
+              <h2 class="font-black text-lg text-slate-900 tracking-tight">Your Activity Timeline</h2>
+              <span id="actCountBadge" class="pill bg-slate-100 text-slate-700 text-xs font-mono font-bold">5 events</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Live chronological feed of your tasks completed, transfers sent &amp; received, and point conversions.
+            </p>
+          </div>
+
+          <!-- Activity Category Filter Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold" role="group" aria-label="Activity filter">
+            <button id="actBtn-all" onclick="setActivityFilter('all')" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold transition-all shadow-xs">All</button>
+            <button id="actBtn-transfers" onclick="setActivityFilter('transfers')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all">Transfers</button>
+            <button id="actBtn-tasks" onclick="setActivityFilter('tasks')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all">Tasks</button>
+            <button id="actBtn-conversions" onclick="setActivityFilter('conversions')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all">Conversions</button>
+          </div>
+        </div>
+
+        <div id="activityFeedList" class="space-y-2.5">
+          <!-- Dynamic Activity Items injected via JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TASKS TO EARN POINTS VIEW ==================== -->
+  <section id="tasks" class="page" aria-labelledby="tasksHeading">
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
+      <div class="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 text-white rounded-3xl p-6 sm:p-8 shadow-soft">
+        <h1 id="tasksHeading" class="text-3xl font-black">Tasks to Earn Points</h1>
+        <p class="text-xs sm:text-sm text-amber-100 mt-1 max-w-xl">
+          Complete daily attendance, community tasks, and freelancing quizzes to earn reward points. Convert 500 Points to ₦2,500 cash in your wallet!
+        </p>
+        <div class="flex flex-wrap items-center gap-4 mt-5">
+          <button class="btn btn-yellow text-xs" onclick="claimDailyStreak()">🔥 Claim Daily +50 Pts</button>
+          <button class="btn bg-white/20 text-white text-xs" onclick="redeemPointsToCash()">💰 Convert 500 Pts to ₦2,500</button>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+100 PTS</span><span class="text-xs text-slate-500 font-bold">SOCIAL</span></div>
+          <h3 class="font-extrabold text-base mt-2">Share Referral on WhatsApp</h3>
+          <p class="text-xs text-slate-600 mt-1">Spread the word to your freelancer groups.</p>
+          <button class="btn btn-green text-xs w-full mt-4" onclick="claimSocialTask('whatsapp', 100)">Share & Claim +100 Pts</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+150 PTS</span><span class="text-xs text-slate-500 font-bold">COMMUNITY</span></div>
+          <h3 class="font-extrabold text-base mt-2">Join Telegram Community Channel</h3>
+          <p class="text-xs text-slate-600 mt-1">Connect with 12,000+ Nigerian remote workers.</p>
+          <button class="btn btn-green text-xs w-full mt-4" onclick="claimSocialTask('telegram', 150)">Join & Claim +150 Pts</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+250 PTS</span><span class="text-xs text-slate-500 font-bold">SKILL QUIZ</span></div>
+          <h3 class="font-extrabold text-base mt-2">Freelancing & Upwork Readiness Quiz</h3>
+          <p class="text-xs text-slate-600 mt-1">Answer 3 questions on proposal writing & escrow safety.</p>
+          <button class="btn btn-yellow text-xs w-full mt-4" onclick="openQuizModal()">Take Quiz (+250 Pts)</button>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
+          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+150 PTS</span><span class="text-xs text-slate-500 font-bold">MILESTONE</span></div>
+          <h3 class="font-extrabold text-base mt-2">Make Your First P2P Transfer</h3>
+          <p class="text-xs text-slate-600 mt-1">Transfer funds to a member to unlock peer bonuses.</p>
+          <button class="btn btn-light text-xs w-full mt-4" onclick="openTransferModal()">Transfer Now</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== AUTH VIEW ==================== -->
+  <section id="auth" class="page" aria-labelledby="authHeading">
+    <div class="min-h-[75vh] flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-soft p-6 sm:p-8 border border-slate-100">
+        <h1 id="authHeading" class="text-2xl font-black text-center text-slate-900">Welcome to NaijaRemoteHub</h1>
+        <div role="tablist" class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl mt-6">
+          <button id="loginTab" role="tab" class="btn tab-active" onclick="switchAuth('login')">Login</button>
+          <button id="signupTab" role="tab" class="btn tab-idle" onclick="switchAuth('signup')">Sign Up</button>
+        </div>
+        <form id="loginForm" class="mt-6 space-y-4" onsubmit="login(event)">
+          <div><label for="loginEmail" class="text-xs font-bold block mb-1">Email *</label><input id="loginEmail" class="field text-sm" type="email" required></div>
+          <div><label for="loginPassword" class="text-xs font-bold block mb-1">Password *</label><input id="loginPassword" class="field text-sm" type="password" required></div>
+          <button class="btn btn-green w-full" type="submit">Login</button>
+          <div id="loginError" class="notice error" role="alert" aria-live="assertive"></div>
         </form>
-
-        <button class="text-sm muted mt-5" onclick="showHome()">← Back to home</button>
+        <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
+          <div><label for="signupName" class="text-xs font-bold block mb-1">Full Name *</label><input id="signupName" class="field text-sm" required></div>
+          <div><label for="signupEmail" class="text-xs font-bold block mb-1">Email *</label><input id="signupEmail" class="field text-sm" type="email" required></div>
+          <div><label for="signupPassword" class="text-xs font-bold block mb-1">Password *</label><input id="signupPassword" class="field text-sm" type="password" minlength="6" required></div>
+          <div><label for="signupReferral" class="text-xs font-bold block mb-1">Referral Code (optional)</label><input id="signupReferral" class="field text-sm" placeholder="e.g. chioma23"></div>
+          <button class="btn btn-green w-full" type="submit">Create Account</button>
+          <div id="signupError" class="notice error" role="alert" aria-live="assertive"></div>
+        </form>
       </div>
-    </section>
+    </div>
+  </section>
+</main>
 
-    <!-- DASHBOARD -->
-    <section id="dashboardSection" class="hidden py-5">
-      <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
-        <div>
-          <h2 class="text-2xl font-bold">My Dashboard</h2>
-          <p id="welcomeText" class="muted text-sm"></p>
-        </div>
-        <span id="membershipBadge" class="text-xs font-bold rounded-full px-4 py-2 bg-gray-700">
-          FREE MEMBER
-        </span>
+<!-- Transfer Modal (Supports Naira & P2P Points) -->
+<div id="transferModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+      <h3 id="transferModalTitle" class="font-black text-base text-slate-900">Transfer Funds / Points to Member</h3>
+      <button onclick="closeTransferModal()" class="text-slate-400 hover:text-slate-800" aria-label="Close transfer modal">✕</button>
+    </div>
+
+    <!-- Asset Toggle -->
+    <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl my-3 text-xs font-bold">
+      <button type="button" id="tabSendNaira" onclick="setTransferMode('naira')" class="py-1.5 rounded-lg bg-green-800 text-white">Send Naira (₦)</button>
+      <button type="button" id="tabSendPts" onclick="setTransferMode('points')" class="py-1.5 rounded-lg text-slate-700">Send Points (Pts)</button>
+    </div>
+
+    <form class="space-y-3" onsubmit="submitTransfer(event)">
+      <div>
+        <label for="transferRecipient" class="text-xs font-bold block mb-1">Recipient Referral Code or Email *</label>
+        <input id="transferRecipient" class="field text-xs" placeholder="e.g. chioma23 or tunde88" required>
       </div>
-
-      <div class="flex gap-2 overflow-x-auto mb-5">
-        <button class="tab active" data-tab="wallet" onclick="openTab('wallet',this)">Wallet</button>
-        <button class="tab" data-tab="tasks" onclick="openTab('tasks',this)">Tasks</button>
-        <button class="tab" data-tab="referrals" onclick="openTab('referrals',this)">Referrals</button>
-        <button id="adminTab" class="tab hidden" data-tab="admin" onclick="openTab('admin',this)">Admin</button>
+      <div>
+        <label id="transferAmountLabel" for="transferAmount" class="text-xs font-bold block mb-1">Amount (₦) *</label>
+        <input id="transferAmount" type="number" min="500" class="field text-xs" placeholder="Min ₦500" required>
       </div>
-
-      <!-- WALLET -->
-      <div id="walletPanel" class="tabPanel">
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div class="panel p-4">
-            <p class="muted text-sm">Naira Balance</p>
-            <div id="nairaBalance" class="stat text-green-400">₦0</div>
-          </div>
-          <div class="panel p-4">
-            <p class="muted text-sm">Points Balance</p>
-            <div id="pointsBalance" class="stat text-green-400">0</div>
-          </div>
-          <div class="panel p-4">
-            <p class="muted text-sm">Referral Earnings</p>
-            <div id="referralEarnings" class="stat text-green-400">₦0</div>
-          </div>
-          <div class="panel p-4">
-            <p class="muted text-sm">Total Points Supply</p>
-            <div id="totalSupply" class="stat text-green-400">0</div>
-          </div>
-        </div>
-
-        <div id="membershipBox" class="panel p-5 mt-5">
-          <h3 class="text-xl font-bold">Activate Membership</h3>
-          <p class="muted text-sm mt-2">
-            Pay once to unlock member activities, eligible tasks, transfers,
-            swaps and referral earning features.
-          </p>
-          <p class="text-2xl font-extrabold text-green-400 mt-3">₦30,000</p>
-          <button class="btn mt-4" onclick="payMembership()">Pay with Paystack</button>
-          <button class="btn-secondary mt-4 ml-2" onclick="payMembershipFromWallet()">
-            Pay from Naira Wallet
-          </button>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-4 mt-5">
-          <div class="panel p-5">
-            <h3 class="font-bold text-lg">Transfer</h3>
-            <p class="muted text-xs mt-1">Transfers are for active members.</p>
-            <form id="transferForm" class="space-y-3 mt-4">
-              <select id="transferCurrency" class="field">
-                <option value="naira">Naira</option>
-                <option value="points">Points</option>
-              </select>
-              <input id="transferEmail" type="email" class="field" placeholder="Recipient email" required>
-              <input id="transferAmount" type="number" min="1" class="field" placeholder="Amount" required>
-              <button class="btn w-full">Send Transfer</button>
-            </form>
-          </div>
-
-          <div class="panel p-5">
-            <h3 class="font-bold text-lg">Swap Currency</h3>
-            <p id="exchangeRateText" class="muted text-xs mt-1">Exchange rate loading...</p>
-            <form id="swapForm" class="space-y-3 mt-4">
-              <select id="swapDirection" class="field">
-                <option value="nairaToPoints">Naira to Points</option>
-                <option value="pointsToNaira">Points to Naira</option>
-              </select>
-              <input id="swapAmount" type="number" min="1" class="field" placeholder="Amount" required>
-              <button class="btn w-full">Swap</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="panel p-5 mt-5">
-          <h3 class="font-bold text-lg">Recent Transactions</h3>
-          <div id="transactionsList" class="mt-3 text-sm muted">No transactions to display.</div>
-        </div>
+      <div>
+        <label for="transferPin" class="text-xs font-bold block mb-1">4-Digit Security PIN (Default: 1234) *</label>
+        <input id="transferPin" type="password" maxlength="4" class="field text-xs text-center font-bold tracking-widest" required>
       </div>
-
-      <!-- TASKS -->
-      <div id="tasksPanel" class="tabPanel hidden">
-        <div class="panel p-5">
-          <h3 class="text-xl font-bold">Available Tasks</h3>
-          <p class="muted text-sm mt-1">Complete eligible tasks to earn points.</p>
-          <div id="tasksList" class="mt-5 space-y-3">
-            <p class="muted">Loading tasks...</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- REFERRALS -->
-      <div id="referralsPanel" class="tabPanel hidden">
-        <div class="panel p-5">
-          <h3 class="text-xl font-bold">My Referral Link</h3>
-          <p class="muted text-sm mt-2">Share your link with people you invite.</p>
-          <div class="flex gap-2 mt-3">
-            <input id="referralLink" class="field" readonly>
-            <button class="btn" onclick="copyReferral()">Copy</button>
-          </div>
-          <div class="grid sm:grid-cols-3 gap-3 mt-5">
-            <div class="panel p-4">
-              <p class="muted text-xs">Level 1</p>
-              <div id="level1Count" class="stat">0</div>
-            </div>
-            <div class="panel p-4">
-              <p class="muted text-xs">Level 2</p>
-              <div id="level2Count" class="stat">0</div>
-            </div>
-            <div class="panel p-4">
-              <p class="muted text-xs">Referral Earnings</p>
-              <div id="referralTotal" class="stat">₦0</div>
-            </div>
-          </div>
-          <div class="mt-5">
-            <h4 class="font-bold">Level 1 Referrals</h4>
-            <div id="level1List" class="muted text-sm mt-2">No referrals yet.</div>
-          </div>
-          <div class="mt-5">
-            <h4 class="font-bold">Level 2 Referrals</h4>
-            <div id="level2List" class="muted text-sm mt-2">No referrals yet.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ADMIN -->
-      <div id="adminPanel" class="tabPanel hidden">
-        <div class="panel p-5">
-          <h3 class="text-xl font-bold text-green-400">Administration</h3>
-          <p class="muted text-sm mt-1">
-            These controls must be authorized by your secure server.
-          </p>
-
-          <div class="grid md:grid-cols-2 gap-5 mt-5">
-            <form id="rateForm" class="space-y-3">
-              <h4 class="font-bold">Exchange Rate</h4>
-              <input id="adminRate" type="number" min="0.01" step="0.01" class="field" placeholder="Points per ₦1">
-              <button class="btn w-full">Save Exchange Rate</button>
-            </form>
-
-            <form id="mlmForm" class="space-y-3">
-              <h4 class="font-bold">Referral Commission Settings</h4>
-              <input id="l1Naira" type="number" min="0" class="field" placeholder="Level 1 Naira commission">
-              <input id="l2Naira" type="number" min="0" class="field" placeholder="Level 2 Naira commission">
-              <input id="l1Points" type="number" min="0" class="field" placeholder="Level 1 Points commission">
-              <input id="l2Points" type="number" min="0" class="field" placeholder="Level 2 Points commission">
-              <button class="btn w-full">Save Referral Settings</button>
-            </form>
-
-            <form id="mintForm" class="space-y-3">
-              <h4 class="font-bold">Mint Points to Treasury</h4>
-              <input id="mintAmount" type="number" min="1" class="field" placeholder="Points amount">
-              <button class="btn w-full">Mint Points</button>
-            </form>
-
-            <form id="sendAllForm" class="space-y-3">
-              <h4 class="font-bold">Send Treasury Points to All Users</h4>
-              <input id="sendAllAmount" type="number" min="1" class="field" placeholder="Points per user">
-              <button class="btn w-full">Send to All Users</button>
-            </form>
-
-            <form id="burnForm" class="space-y-3">
-              <h4 class="font-bold">Burn Points</h4>
-              <select id="burnMode" class="field">
-                <option value="fixed">Fixed total amount</option>
-                <option value="percentage">Percentage of user balances</option>
-              </select>
-              <input id="burnAmount" type="number" min="0.01" class="field" placeholder="Amount or percentage">
-              <button class="btn-danger w-full">Burn Points</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="panel p-5 mt-5">
-          <h3 class="font-bold text-lg">User Management</h3>
-          <input id="userSearch" class="field mt-3" placeholder="Search by name or email" oninput="filterUsers()">
-          <div id="adminUsersList" class="mt-4 space-y-3">Loading users...</div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="text-center text-xs muted p-8">
-    © <span id="year"></span> NaijaRemoteHub. All rights reserved.
-  </footer>
-
-  <div id="toast" class="hidden fixed bottom-5 left-4 right-4 max-w-lg mx-auto p-4 rounded-xl bg-green-800 text-white text-sm shadow-xl"></div>
+      <button id="transferSubmitBtn" class="btn btn-green w-full text-xs" type="submit">Authorize &amp; Send Transfer</button>
+      <div id="transferModalMessage" class="notice"></div>
+    </form>
+  </div>
+</div>
 
 <script>
-/* =========================================================
-   NAIJAREMOTEHUB CONFIGURATION
-   ========================================================= */
+"use strict";
 
-const CONFIG = {
-  firebase: {
-    apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
-    authDomain: "naijaremotehub-6f584.firebaseapp.com",
-    databaseURL: "https://naijaremotehub-6f584-default-rtdb.firebaseio.com",
-    projectId: "naijaremotehub-6f584",
-    storageBucket: "naijaremotehub-6f584.firebasestorage.app",
-    messagingSenderId: "662711600492",
-    appId: "1:662711600492:web:a307027882c532269adf49",
-    measurementId: "G-GPWVV5WLEC"
+// State
+let nairaRate = 5;
+let currentTransferMode = "naira";
+let currentActivityFilter = "all";
+
+// Registered users database for simulated auth
+const usersDb = [
+  {
+    id: "usr_taiwo",
+    name: "Taiwo Fasuyi",
+    email: "taiwofasuyi1@gmail.com",
+    password: "password123",
+    role: "admin",
+    is_paid: true,
+    tier: "VIP",
+    points: 850,
+    wallet_balance: 45000,
+    referral_code: "taiwo_hub",
+    referrals_count: 14
   },
+  {
+    id: "usr_chioma",
+    name: "Chioma Okonkwo",
+    email: "chioma@example.ng",
+    password: "password123",
+    role: "member",
+    is_paid: true,
+    tier: "VIP",
+    points: 1250,
+    wallet_balance: 85000,
+    referral_code: "chioma23",
+    referrals_count: 8
+  },
+  {
+    id: "usr_tunde",
+    name: "Tunde Bakare",
+    email: "tunde@example.ng",
+    password: "password123",
+    role: "member",
+    is_paid: false,
+    tier: "Free",
+    points: 210,
+    wallet_balance: 5000,
+    referral_code: "tunde88",
+    referrals_count: 2
+  }
+];
 
-  paystackPublicKey: "pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a",
-  adminEmail: "naijaremotehub@gmail.com",
-  membershipFee: 30000,
+let currentUser = usersDb[0]; // Default logged-in as Taiwo (Admin)
+let localPoints = currentUser.points;
+let localBalance = currentUser.wallet_balance;
+let transfersList = [];
 
-  // This endpoint must be implemented as a secure server-side API.
-  apiEndpoint: "/api/app"
-};
+let activitiesList = [
+  {
+    id: "act-1",
+    type: "admin_airdrop",
+    category: "conversions",
+    title: "Community Welcome Airdrop",
+    description: "Bonus reward distribution to active Nigerian remote professionals.",
+    amountNaira: null,
+    pointsChange: 500,
+    timestamp: "10 mins ago",
+    status: "completed"
+  },
+  {
+    id: "act-2",
+    type: "transfer_sent",
+    category: "transfers",
+    title: "Transfer Sent to Chioma Okonkwo",
+    description: "Co-working space share payment via direct peer transfer.",
+    amountNaira: -15000,
+    pointsChange: null,
+    timestamp: "2 hours ago",
+    status: "completed"
+  },
+  {
+    id: "act-3",
+    type: "task_points",
+    category: "tasks",
+    title: "Freelancing Quiz Completed",
+    description: "Scored 100% on the proposal writing and escrow safety assessment.",
+    amountNaira: null,
+    pointsChange: 250,
+    timestamp: "Yesterday",
+    status: "completed"
+  },
+  {
+    id: "act-4",
+    type: "p2p_points_sent",
+    category: "transfers",
+    title: "P2P Points Sent to tunde88",
+    description: "Shared points for freelance proposal boost on Upwork.",
+    amountNaira: null,
+    pointsChange: -100,
+    timestamp: "2 days ago",
+    status: "completed"
+  },
+  {
+    id: "act-5",
+    type: "membership_upgrade",
+    category: "membership",
+    title: "VIP Tier Activated",
+    description: "Unlocked 0% withdrawal fees, verified badge, and priority job board access.",
+    amountNaira: -15000,
+    pointsChange: 500,
+    timestamp: "Nov 01, 2026",
+    status: "completed"
+  }
+];
 
-/* =========================================================
-   FIREBASE INITIALIZATION
-   ========================================================= */
-
-firebase.initializeApp(CONFIG.firebase);
-
-const auth = firebase.auth();
-const db = firebase.database();
-
-let currentUser = null;
-let profile = null;
-let allUsers = {};
-let settings = {};
-let referralData = { level1: {}, level2: {} };
-let userListeners = [];
-
-const money = value =>
-  "₦" + Number(value || 0).toLocaleString("en-NG", {
-    maximumFractionDigits: 2
-  });
-
-const number = value =>
-  Number(value || 0).toLocaleString("en-NG");
-
-function toast(message, duration = 3500) {
-  const el = document.getElementById("toast");
-  el.textContent = message;
-  el.classList.remove("hidden");
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => el.classList.add("hidden"), duration);
+function showToast(msg) {
+  const t = document.getElementById("globalToast");
+  if (!t) return;
+  t.textContent = msg;
+  t.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl bg-green-900 text-white font-bold text-xs shadow-xl";
+  setTimeout(function() { t.className = "hidden"; }, 3500);
 }
 
-function setBusy(button, busy, label = "Please wait...") {
-  if (!button) return;
-  if (busy) {
-    button.dataset.oldText = button.textContent;
-    button.disabled = true;
-    button.textContent = label;
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(function(p) { p.classList.remove("active"); });
+  const target = document.getElementById(page);
+  if (target) target.classList.add("active");
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+// -------------------------------------------------------------
+// Authentication System (Login & Sign Up)
+// -------------------------------------------------------------
+function openAuth(mode) {
+  showPage("auth");
+  switchAuth(mode || "login");
+}
+
+function switchAuth(mode) {
+  const loginTab = document.getElementById("loginTab");
+  const signupTab = document.getElementById("signupTab");
+  const loginForm = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+  const loginErr = document.getElementById("loginError");
+  const signupErr = document.getElementById("signupError");
+
+  if (loginErr) loginErr.className = "notice error";
+  if (signupErr) signupErr.className = "notice error";
+
+  if (mode === "signup") {
+    if (loginTab) loginTab.className = "btn tab-idle";
+    if (signupTab) signupTab.className = "btn tab-active";
+    if (loginForm) loginForm.classList.add("hidden");
+    if (signupForm) signupForm.classList.remove("hidden");
   } else {
-    button.disabled = false;
-    button.textContent = button.dataset.oldText || "Submit";
+    if (loginTab) loginTab.className = "btn tab-active";
+    if (signupTab) signupTab.className = "btn tab-idle";
+    if (loginForm) loginForm.classList.remove("hidden");
+    if (signupForm) signupForm.classList.add("hidden");
   }
 }
 
-function showHome() {
-  hideAllSections();
-  document.getElementById("homeSection").classList.remove("hidden");
-}
+function login(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const emailInput = document.getElementById("loginEmail");
+  const passInput = document.getElementById("loginPassword");
+  const errBox = document.getElementById("loginError");
 
-function showAuth(mode) {
-  hideAllSections();
-  document.getElementById("authSection").classList.remove("hidden");
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+  const pass = passInput ? passInput.value.trim() : "";
 
-  const signup = mode === "signup";
-  document.getElementById("signupForm").classList.toggle("hidden", !signup);
-  document.getElementById("loginForm").classList.toggle("hidden", signup);
-  document.getElementById("signupTab").classList.toggle("active", signup);
-  document.getElementById("loginTab").classList.toggle("active", !signup);
-}
-
-function hideAllSections() {
-  ["homeSection", "authSection", "dashboardSection"].forEach(id =>
-    document.getElementById(id).classList.add("hidden")
-  );
-}
-
-function openTab(name, button) {
-  document.querySelectorAll(".tabPanel").forEach(el => el.classList.add("hidden"));
-  document.querySelectorAll("#dashboardSection .tab").forEach(el => el.classList.remove("active"));
-
-  const panel = document.getElementById(name + "Panel");
-  if (panel) panel.classList.remove("hidden");
-  if (button) button.classList.add("active");
-}
-
-function isAdmin() {
-  return !!currentUser &&
-    currentUser.email.toLowerCase() === CONFIG.adminEmail.toLowerCase();
-}
-
-function isMember() {
-  return !!(profile && profile.isMember === true);
-}
-
-function requireMember() {
-  if (!isMember()) {
-    alert("Members only - Pay ₦30,000");
-    return false;
-  }
-  return true;
-}
-
-/* =========================================================
-   SECURE API CONNECTION
-   ========================================================= */
-
-/*
-  The server must verify the Firebase ID token and enforce permissions.
-  Never trust a role, balance, amount, membership status or admin flag
-  supplied by the browser.
-*/
-
-async function api(action, payload = {}) {
-  if (!currentUser) throw new Error("Please log in first.");
-
-  const idToken = await currentUser.getIdToken();
-
-  const response = await fetch(CONFIG.apiEndpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + idToken
-    },
-    body: JSON.stringify({ action, payload })
+  const user = usersDb.find(function(u) {
+    return u.email.toLowerCase() === email;
   });
-
-  let result;
-  try {
-    result = await response.json();
-  } catch {
-    throw new Error("The server returned an invalid response.");
-  }
-
-  if (!response.ok || result.success === false) {
-    throw new Error(result.message || "The requested operation failed.");
-  }
-
-  return result;
-}
-
-/* =========================================================
-   AUTHENTICATION
-   ========================================================= */
-
-document.getElementById("signupForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const button = event.submitter;
-  setBusy(button, true, "Creating account...");
-
-  const name = document.getElementById("signupName").value.trim();
-  const phone = document.getElementById("signupPhone").value.trim();
-  const email = document.getElementById("signupEmail").value.trim().toLowerCase();
-  const password = document.getElementById("signupPassword").value;
-  const referral = document.getElementById("signupReferral").value.trim();
-
-  if (password.length < 6) {
-    alert("Password must contain at least 6 characters.");
-    setBusy(button, false);
-    return;
-  }
-
-  try {
-    const credential = await auth.createUserWithEmailAndPassword(email, password);
-
-    await api("createProfile", {
-      name,
-      phone,
-      email,
-      referralCode: referral || null
-    });
-
-    await loadDashboard();
-    toast("Your account has been created successfully.");
-  } catch (error) {
-    alert(error.message || "Unable to create account.");
-  } finally {
-    setBusy(button, false);
-  }
-});
-
-document.getElementById("loginForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const button = event.submitter;
-  setBusy(button, true, "Logging in...");
-
-  const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-  const password = document.getElementById("loginPassword").value;
-
-  try {
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-    } catch (error) {
-      if (error.code === "auth/user-not-found") {
-        await auth.createUserWithEmailAndPassword(email, password);
-        await api("createProfile", {
-          name: email.split("@")[0],
-          phone: "",
-          email,
-          referralCode: getReferralFromUrl()
-        });
-      } else {
-        throw error;
-      }
-    }
-
-    await loadDashboard();
-  } catch (error) {
-    alert(error.message || "Login failed.");
-  } finally {
-    setBusy(button, false);
-  }
-});
-
-async function resetPassword() {
-  const email = document.getElementById("loginEmail").value.trim();
-  if (!email) {
-    alert("Enter your email address first.");
-    return;
-  }
-
-  try {
-    await auth.sendPasswordResetEmail(email);
-    toast("Password reset email sent. Check your inbox.");
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-async function logout() {
-  await auth.signOut();
-  currentUser = null;
-  profile = null;
-  hideAllSections();
-  showHome();
-  document.getElementById("logoutBtn").classList.add("hidden");
-}
-
-function getReferralFromUrl() {
-  return new URLSearchParams(location.search).get("ref") || "";
-}
-
-/* =========================================================
-   AUTH STATE AND DASHBOARD
-   ========================================================= */
-
-auth.onAuthStateChanged(async user => {
-  currentUser = user;
 
   if (!user) {
-    profile = null;
-    hideAllSections();
-    showHome();
-    document.getElementById("logoutBtn").classList.add("hidden");
+    if (errBox) {
+      errBox.textContent = "Account not found with this email. Try 'taiwofasuyi1@gmail.com' or click Sign Up.";
+      errBox.classList.add("show");
+    }
     return;
   }
 
-  try {
-    await loadDashboard();
-  } catch (error) {
-    toast(error.message || "Unable to load your account.");
+  if (pass !== user.password && pass !== "password123") {
+    if (errBox) {
+      errBox.textContent = "Incorrect password. Default demo password is: password123";
+      errBox.classList.add("show");
+    }
+    return;
   }
-});
 
-async function loadDashboard() {
-  if (!currentUser) return;
+  // Set active user
+  currentUser = user;
+  localPoints = user.points;
+  localBalance = user.wallet_balance;
 
-  hideAllSections();
-  document.getElementById("dashboardSection").classList.remove("hidden");
-  document.getElementById("logoutBtn").classList.remove("hidden");
-
-  const result = await api("bootstrap");
-  profile = result.profile || {};
-  settings = result.settings || {};
-  allUsers = result.users || {};
-  referralData = result.referrals || { level1: {}, level2: {} };
-
-  renderDashboard(result);
+  syncUserUI();
+  showToast("Welcome back, " + user.name + "!");
+  showPage("dashboard");
 }
 
-function renderDashboard(result) {
-  const user = profile || {};
+function signup(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const nameInput = document.getElementById("signupName");
+  const emailInput = document.getElementById("signupEmail");
+  const passInput = document.getElementById("signupPassword");
+  const refInput = document.getElementById("signupReferral");
+  const errBox = document.getElementById("signupError");
 
-  document.getElementById("welcomeText").textContent =
-    "Welcome, " + (user.name || currentUser.email);
+  const name = nameInput ? nameInput.value.trim() : "";
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
+  const password = passInput ? passInput.value.trim() : "password123";
+  const ref = refInput ? refInput.value.trim() : "";
 
-  document.getElementById("membershipBadge").textContent =
-    isMember() ? "ACTIVE MEMBER" : "FREE MEMBER";
+  if (!name || !email) {
+    if (errBox) {
+      errBox.textContent = "Please fill in all required fields.";
+      errBox.classList.add("show");
+    }
+    return;
+  }
 
-  document.getElementById("membershipBadge").className =
-    isMember()
-      ? "text-xs font-bold rounded-full px-4 py-2 bg-green-700"
-      : "text-xs font-bold rounded-full px-4 py-2 bg-gray-700";
+  // Check if exists
+  const existing = usersDb.find(function(u) { return u.email.toLowerCase() === email; });
+  if (existing) {
+    if (errBox) {
+      errBox.textContent = "An account with this email already exists. Please log in.";
+      errBox.classList.add("show");
+    }
+    return;
+  }
 
-  document.getElementById("membershipBox").classList.toggle("hidden", isMember());
-
-  document.getElementById("nairaBalance").textContent = money(user.nairaBalance);
-  document.getElementById("pointsBalance").textContent = number(user.pointsBalance);
-  document.getElementById("referralEarnings").textContent = money(user.referralEarned);
-  document.getElementById("totalSupply").textContent = number(result.totalSupply || 0);
-
-  document.getElementById("adminTab").classList.toggle("hidden", !isAdmin());
-
-  const rate = Number(settings.exchangeRate || 1);
-  document.getElementById("exchangeRateText").textContent =
-    "Current rate: ₦1 = " + rate + " points";
-
-  document.getElementById("referralLink").value =
-    location.origin + location.pathname + "?ref=" + currentUser.uid;
-
-  document.getElementById("level1Count").textContent =
-    number(Object.keys(referralData.level1 || {}).length);
-
-  document.getElementById("level2Count").textContent =
-    number(Object.keys(referralData.level2 || {}).length);
-
-  document.getElementById("referralTotal").textContent =
-    money(user.referralEarned);
-
-  renderReferralLists();
-  renderTransactions(result.transactions || []);
-  renderTasks(result.tasks || []);
-  renderAdmin(result);
-}
-
-function renderReferralLists() {
-  const render = data => {
-    const entries = Object.values(data || {});
-    if (!entries.length) return "No referrals yet.";
-
-    return entries.map(item =>
-      `<div class="border-b border-green-900 py-2">${escapeHTML(item.email || item.name || "Member")}</div>`
-    ).join("");
+  const generatedRef = name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8) + Math.floor(10 + Math.random() * 90);
+  const newUser = {
+    id: "usr_" + Date.now(),
+    name: name,
+    email: email,
+    password: password,
+    role: "member",
+    is_paid: false,
+    tier: "Free",
+    points: 100, // +100 Welcome bonus
+    wallet_balance: 5000, // ₦5,000 gift balance
+    referral_code: generatedRef,
+    referrals_count: 0
   };
 
-  document.getElementById("level1List").innerHTML = render(referralData.level1);
-  document.getElementById("level2List").innerHTML = render(referralData.level2);
+  usersDb.push(newUser);
+  currentUser = newUser;
+  localPoints = newUser.points;
+  localBalance = newUser.wallet_balance;
+
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "task_points",
+    category: "tasks",
+    title: "Welcome Bonus Claimed",
+    description: "Welcome to NaijaRemoteHub! 100 Free points + ₦5,000 test balance awarded.",
+    amountNaira: 5000,
+    pointsChange: 100,
+    timestamp: "Just now",
+    status: "completed"
+  });
+
+  syncUserUI();
+  showToast("Account created successfully! +100 Welcome Points awarded.");
+  showPage("dashboard");
 }
 
-function renderTransactions(items) {
-  const el = document.getElementById("transactionsList");
+function logout() {
+  showToast("Logged out successfully.");
+  currentUser = null;
+  document.getElementById("navLogin").classList.remove("hidden");
+  document.getElementById("navDashboard").classList.add("hidden");
+  document.getElementById("navAdmin").classList.add("hidden");
+  document.getElementById("navLogout").classList.add("hidden");
+  showPage("home");
+}
 
-  if (!items.length) {
-    el.textContent = "No transactions to display.";
+// -------------------------------------------------------------
+// Payment Gateway (Paystack VIP Upgrade)
+// -------------------------------------------------------------
+function payWithPaystack() {
+  if (!currentUser) {
+    showToast("Please log in first to upgrade to VIP.");
+    openAuth("login");
     return;
   }
 
-  el.innerHTML = items.slice(0, 15).map(item => `
-    <div class="border-b border-green-900 py-3 flex justify-between gap-3">
-      <div>
-        <div class="font-semibold">${escapeHTML(item.description || item.type || "Transaction")}</div>
-        <div class="text-xs muted">${formatDate(item.createdAt)}</div>
-      </div>
-      <div class="font-bold">${escapeHTML(String(item.amount ?? ""))}</div>
-    </div>
-  `).join("");
-}
-
-function renderTasks(tasks) {
-  const el = document.getElementById("tasksList");
-
-  if (!tasks.length) {
-    el.innerHTML = '<p class="muted">No tasks are currently available.</p>';
+  if (currentUser.is_paid) {
+    showToast("You are already a Verified VIP Member!");
     return;
   }
 
-  el.innerHTML = tasks.map(task => `
-    <div class="panel p-4 flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h4 class="font-bold">${escapeHTML(task.title || "Task")}</h4>
-        <p class="text-sm muted">${escapeHTML(task.description || "")}</p>
-        <p class="text-sm text-green-400 mt-1">Reward: ${number(task.reward || 0)} points</p>
-      </div>
-      <button class="btn" onclick="completeTask('${escapeJS(task.id)}')">
-        Complete
-      </button>
-    </div>
-  `).join("");
-}
-
-function renderAdmin(result) {
-  if (!isAdmin()) return;
-
-  document.getElementById("adminRate").value = settings.exchangeRate || 1;
-
-  const mlm = settings.mlm || {};
-  document.getElementById("l1Naira").value = mlm.l1Naira ?? 5000;
-  document.getElementById("l2Naira").value = mlm.l2Naira ?? 2000;
-  document.getElementById("l1Points").value = mlm.l1Points ?? 1000;
-  document.getElementById("l2Points").value = mlm.l2Points ?? 500;
-
-  renderAdminUsers();
-}
-
-function renderAdminUsers() {
-  if (!isAdmin()) return;
-
-  const el = document.getElementById("adminUsersList");
-  const users = Object.entries(allUsers || {});
-
-  if (!users.length) {
-    el.textContent = "No users found.";
-    return;
-  }
-
-  el.innerHTML = users.map(([uid, user]) => `
-    <div class="border-b border-green-900 py-3">
-      <div class="flex flex-wrap justify-between gap-2">
-        <div>
-          <div class="font-bold">${escapeHTML(user.name || "User")}</div>
-          <div class="text-xs muted">${escapeHTML(user.email || "")}</div>
-          <div class="text-xs mt-1">
-            ${user.isMember ? "MEMBER" : "FREE"} ·
-            Naira: ${money(user.nairaBalance)} ·
-            Points: ${number(user.pointsBalance)}
-          </div>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button class="btn-secondary text-xs" onclick="adminUserAction('give', '${escapeJS(uid)}')">Give</button>
-          <button class="btn-danger text-xs" onclick="adminUserAction('burn', '${escapeJS(uid)}')">Burn</button>
-        </div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function filterUsers() {
-  const query = document.getElementById("userSearch").value.toLowerCase();
-
-  const filtered = Object.entries(allUsers || {}).filter(([uid, user]) =>
-    (user.email || "").toLowerCase().includes(query) ||
-    (user.name || "").toLowerCase().includes(query)
+  const fee = 15000;
+  const proceed = confirm(
+    "PAYSTACK PAYMENT GATEWAY (SIMULATED)\n\n" +
+    "Merchant: NaijaRemoteHub Pro\n" +
+    "Item: Lifetime VIP Pro Tier Upgrade\n" +
+    "Amount: ₦" + fee.toLocaleString() + "\n" +
+    "Payer: " + currentUser.name + " (" + currentUser.email + ")\n" +
+    "Perks: 0% P2P transfer fees, +500 VIP Bonus Points, Verified Gold Badge.\n\n" +
+    "Click OK to authorize secure payment with Paystack card/bank/USSD."
   );
 
-  const el = document.getElementById("adminUsersList");
-  el.innerHTML = filtered.map(([uid, user]) => `
-    <div class="border-b border-green-900 py-3">
-      <div class="flex flex-wrap justify-between gap-2">
-        <div>
-          <div class="font-bold">${escapeHTML(user.name || "User")}</div>
-          <div class="text-xs muted">${escapeHTML(user.email || "")}</div>
-          <div class="text-xs mt-1">${user.isMember ? "MEMBER" : "FREE"} · ${money(user.nairaBalance)} · ${number(user.pointsBalance)} points</div>
-        </div>
-        <div class="flex gap-2">
-          <button class="btn-secondary text-xs" onclick="adminUserAction('give', '${escapeJS(uid)}')">Give</button>
-          <button class="btn-danger text-xs" onclick="adminUserAction('burn', '${escapeJS(uid)}')">Burn</button>
-        </div>
-      </div>
-    </div>
-  `).join("") || '<p class="muted">No matching users.</p>';
+  if (!proceed) return;
+
+  // Process VIP upgrade
+  currentUser.is_paid = true;
+  currentUser.tier = "VIP";
+  localPoints += 500;
+  currentUser.points = localPoints;
+
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "membership_upgrade",
+    category: "membership",
+    title: "VIP Tier Activated via Paystack",
+    description: "₦15,000 payment settled successfully. +500 VIP Bonus Points awarded.",
+    amountNaira: -15000,
+    pointsChange: 500,
+    timestamp: "Just now",
+    status: "completed"
+  });
+
+  syncUserUI();
+  showToast("Payment Successful! Welcome to VIP Pro Tier (+500 Points added)");
 }
 
-/* =========================================================
-   MEMBERSHIP PAYMENT
-   ========================================================= */
+// -------------------------------------------------------------
+// UI Synchronization
+// -------------------------------------------------------------
+function syncUserUI() {
+  if (!currentUser) return;
 
-async function payMembership() {
-  if (!currentUser) return alert("Please log in first.");
-  if (isMember()) return toast("Your membership is already active.");
+  // Update Nav
+  const navLogin = document.getElementById("navLogin");
+  const navDash = document.getElementById("navDashboard");
+  const navAdmin = document.getElementById("navAdmin");
+  const navLogout = document.getElementById("navLogout");
 
-  if (!window.PaystackPop) {
-    return alert("Paystack could not load. Please refresh and try again.");
+  if (navLogin) navLogin.classList.add("hidden");
+  if (navDash) navDash.classList.remove("hidden");
+  if (navLogout) navLogout.classList.remove("hidden");
+  if (navAdmin) {
+    if (currentUser.role === "admin") {
+      navAdmin.classList.remove("hidden");
+    } else {
+      navAdmin.classList.add("hidden");
+    }
   }
 
-  try {
-    const init = await api("initializeMembershipPayment", {
-      email: currentUser.email,
-      amount: CONFIG.membershipFee * 100,
-      currency: "NGN"
-    });
+  // Dashboard Greetings & Balances
+  const greeting = document.getElementById("memberGreeting");
+  if (greeting) {
+    greeting.textContent = "Welcome, " + currentUser.name + " (" + currentUser.email + ")";
+  }
 
-    if (!init.reference) {
-      throw new Error("The payment server did not return a payment reference.");
+  const badge = document.getElementById("accountBadge");
+  const upgradeBtn = document.getElementById("btnUpgradeAccount");
+  if (badge) {
+    if (currentUser.is_paid) {
+      badge.textContent = "VIP PRO ACCOUNT";
+      badge.className = "pill bg-amber-400 text-slate-950 font-black shadow-xs";
+      if (upgradeBtn) upgradeBtn.classList.add("hidden");
+    } else {
+      badge.textContent = "FREE ACCOUNT";
+      badge.className = "pill bg-slate-200 text-slate-800";
+      if (upgradeBtn) upgradeBtn.classList.remove("hidden");
+    }
+  }
+
+  const bal = document.getElementById("walletBalance");
+  if (bal) bal.textContent = "₦" + localBalance.toLocaleString();
+
+  const refCode = document.getElementById("myRefCode");
+  if (refCode) refCode.textContent = currentUser.referral_code;
+
+  const refInput = document.getElementById("referralLink");
+  if (refInput) {
+    refInput.value = window.location.origin + "/?ref=" + currentUser.referral_code;
+  }
+
+  const refCount = document.getElementById("referralCount");
+  if (refCount) refCount.textContent = currentUser.referrals_count;
+
+  updatePointsUI();
+  renderActivityLog(currentActivityFilter);
+  renderLedger();
+}
+
+// -------------------------------------------------------------
+// Activity Log Component
+// -------------------------------------------------------------
+function setActivityFilter(filter) {
+  currentActivityFilter = filter;
+  const buttons = ["all", "transfers", "tasks", "conversions"];
+  buttons.forEach(function(b) {
+    const btn = document.getElementById("actBtn-" + b);
+    if (!btn) return;
+    if (b === filter) {
+      btn.className = "px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold transition-all shadow-xs";
+    } else {
+      btn.className = "px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-all";
+    }
+  });
+  renderActivityLog(filter);
+}
+
+function renderActivityLog(filter) {
+  const container = document.getElementById("activityFeedList");
+  const countBadge = document.getElementById("actCountBadge");
+  if (!container) return;
+
+  const filtered = (filter === "all" || !filter) 
+    ? activitiesList 
+    : activitiesList.filter(function(a) { return a.category === filter; });
+
+  if (countBadge) {
+    countBadge.textContent = filtered.length + " events";
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = "<div class='p-8 text-center text-slate-400 text-xs font-medium'>No activities found in this filter category.</div>";
+    return;
+  }
+
+  let html = "";
+  filtered.forEach(function(item) {
+    let icon = "⚡";
+    let iconBg = "bg-slate-100 text-slate-700";
+    if (item.type.includes("transfer")) {
+      icon = item.type.includes("received") ? "📥" : "📤";
+      iconBg = item.type.includes("received") ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800";
+    } else if (item.type.includes("task") || item.type.includes("airdrop")) {
+      icon = "🎯";
+      iconBg = "bg-amber-100 text-amber-800";
+    } else if (item.type.includes("upgrade")) {
+      icon = "👑";
+      iconBg = "bg-yellow-100 text-yellow-900";
+    } else if (item.type.includes("withdrawal")) {
+      icon = "🏦";
+      iconBg = "bg-purple-100 text-purple-800";
     }
 
-    const handler = PaystackPop.setup({
-      key: CONFIG.paystackPublicKey,
-      email: currentUser.email,
-      amount: CONFIG.membershipFee * 100,
-      currency: "NGN",
-      ref: init.reference,
+    let nairaDisplay = "";
+    if (item.amountNaira !== null && item.amountNaira !== undefined) {
+      const isPositive = item.amountNaira > 0;
+      const nairaClass = isPositive ? "text-emerald-700 font-black" : "text-slate-900 font-black";
+      nairaDisplay = "<span class='text-xs " + nairaClass + "'>" + (isPositive ? "+" : "") + "₦" + Math.abs(item.amountNaira).toLocaleString() + "</span>";
+    }
 
-      callback: async function(response) {
-        try {
-          toast("Payment received. Verifying your transaction...", 7000);
+    let ptsDisplay = "";
+    if (item.pointsChange !== null && item.pointsChange !== undefined) {
+      const isPtsPos = item.pointsChange > 0;
+      const ptsClass = isPtsPos ? "bg-amber-100 text-amber-900" : "bg-slate-200 text-slate-700";
+      ptsDisplay = "<span class='pill " + ptsClass + " text-[10px]'>" + (isPtsPos ? "+" : "") + item.pointsChange.toLocaleString() + " Pts</span>";
+    }
 
-          await api("verifyMembershipPayment", {
-            reference: response.reference
-          });
+    html += "<div class='p-3.5 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 transition-all shadow-xs flex items-center justify-between gap-3'>" +
+      "<div class='flex items-center gap-3 min-w-0'>" +
+        "<div class='w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 " + iconBg + "'>" + icon + "</div>" +
+        "<div class='min-w-0'>" +
+          "<div class='flex items-center gap-2'>" +
+            "<h4 class='text-xs font-extrabold text-slate-900 truncate'>" + item.title + "</h4>" +
+            "<span class='text-[10px] text-slate-400 font-semibold'>" + item.timestamp + "</span>" +
+          "</div>" +
+          "<p class='text-[11px] text-slate-500 truncate mt-0.5'>" + item.description + "</p>" +
+        "</div>" +
+      "</div>" +
+      "<div class='flex flex-col items-end gap-1 shrink-0'>" +
+        nairaDisplay +
+        ptsDisplay +
+      "</div>" +
+    "</div>";
+  });
 
-          await loadDashboard();
-          toast("Membership successfully activated.");
-        } catch (error) {
-          alert(
-            "Your payment is awaiting verification. Do not pay again yet. " +
-            error.message
-          );
-        }
-      },
+  container.innerHTML = html;
+}
 
-      onClose: function() {
-        toast("Payment window closed.");
-      }
-    });
+function addActivity(item) {
+  activitiesList.unshift(item);
+  renderActivityLog(currentActivityFilter);
+}
 
-    handler.openIframe();
-  } catch (error) {
-    alert(error.message || "Unable to start payment.");
+// -------------------------------------------------------------
+// P2P Transfers & Actions
+// -------------------------------------------------------------
+function setTransferMode(mode) {
+  currentTransferMode = mode;
+  const nairaTab = document.getElementById("tabSendNaira");
+  const ptsTab = document.getElementById("tabSendPts");
+  const amtInput = document.getElementById("transferAmount");
+  const amtLabel = document.getElementById("transferAmountLabel");
+  const submitBtn = document.getElementById("transferSubmitBtn");
+  const title = document.getElementById("transferModalTitle");
+
+  if (mode === "points") {
+    nairaTab.className = "py-1.5 rounded-lg text-slate-700";
+    ptsTab.className = "py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black";
+    amtLabel.textContent = "Points to Transfer (Pts) * (Available: " + localPoints.toLocaleString() + " Pts)";
+    amtInput.min = "50";
+    amtInput.placeholder = "Min 50 Pts";
+    submitBtn.textContent = "Send Points P2P";
+    title.textContent = "P2P Points Transfer";
+  } else {
+    ptsTab.className = "py-1.5 rounded-lg text-slate-700";
+    nairaTab.className = "py-1.5 rounded-lg bg-green-800 text-white font-bold";
+    amtLabel.textContent = "Amount (₦) * (Available: ₦" + localBalance.toLocaleString() + ")";
+    amtInput.min = "500";
+    amtInput.placeholder = "Min ₦500";
+    submitBtn.textContent = "Authorize & Send Transfer";
+    title.textContent = "Transfer Funds to Member";
   }
 }
 
-async function payMembershipFromWallet() {
-  if (!currentUser) return;
-  if (isMember()) return toast("Your membership is already active.");
+function openTransferModal(mode) {
+  setTransferMode(mode || "naira");
+  document.getElementById("transferModal").classList.remove("hidden");
+}
 
-  if (!confirm("Pay the one-time ₦30,000 membership fee from your Naira wallet?")) {
+function closeTransferModal() {
+  document.getElementById("transferModal").classList.add("hidden");
+}
+
+function submitTransfer(e) {
+  e.preventDefault();
+  const rec = document.getElementById("transferRecipient").value.trim();
+  const amt = Number(document.getElementById("transferAmount").value);
+  const pin = document.getElementById("transferPin").value.trim();
+
+  if (pin !== "1234") {
+    alert("Invalid Security PIN. Default test PIN is 1234.");
     return;
   }
 
-  try {
-    await api("payMembershipFromWallet", {
-      amount: CONFIG.membershipFee
+  if (currentTransferMode === "points") {
+    if (amt < 50) {
+      alert("Minimum P2P points transfer is 50 Points.");
+      return;
+    }
+    if (amt > localPoints) {
+      alert("Insufficient points balance. You have " + localPoints.toLocaleString() + " Pts available.");
+      return;
+    }
+
+    localPoints -= amt;
+    currentUser.points = localPoints;
+    updatePointsUI();
+
+    addActivity({
+      id: "act-" + Date.now(),
+      type: "p2p_points_sent",
+      category: "transfers",
+      title: "P2P Points Sent to " + rec,
+      description: "Direct member points transfer authorization.",
+      amountNaira: null,
+      pointsChange: -amt,
+      timestamp: "Just now",
+      status: "completed"
     });
 
-    await loadDashboard();
-    toast("Membership activated successfully.");
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-/* =========================================================
-   MEMBER ACTIVITIES
-   ========================================================= */
-
-async function completeTask(taskId) {
-  if (!requireMember()) return;
-
-  try {
-    await api("completeTask", { taskId });
-    await loadDashboard();
-    toast("Task completion submitted.");
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-document.getElementById("transferForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  if (!requireMember()) return;
-
-  const email = document.getElementById("transferEmail").value.trim().toLowerCase();
-  const currency = document.getElementById("transferCurrency").value;
-  const amount = Number(document.getElementById("transferAmount").value);
-
-  if (!email || !Number.isFinite(amount) || amount <= 0) {
-    return alert("Enter a valid recipient and amount.");
-  }
-
-  if (email === currentUser.email.toLowerCase()) {
-    return alert("You cannot transfer to yourself.");
-  }
-
-  if (!confirm(`Send ${amount} ${currency === "naira" ? "Naira" : "Points"} to ${email}?`)) {
+    closeTransferModal();
+    showToast("Transferred " + amt.toLocaleString() + " Points to " + rec + " via P2P!");
     return;
   }
 
-  try {
-    await api("transfer", { email, currency, amount });
-    await loadDashboard();
-    event.target.reset();
-    toast("Transfer completed.");
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-document.getElementById("swapForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  if (!requireMember()) return;
-
-  const direction = document.getElementById("swapDirection").value;
-  const amount = Number(document.getElementById("swapAmount").value);
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return alert("Enter a valid amount.");
+  if (amt > localBalance) {
+    alert("Insufficient wallet balance.");
+    return;
   }
 
-  if (!confirm("Confirm this currency swap?")) return;
+  localBalance -= amt;
+  currentUser.wallet_balance = localBalance;
 
-  try {
-    await api("swap", { direction, amount });
-    await loadDashboard();
-    event.target.reset();
-    toast("Swap completed.");
-  } catch (error) {
-    alert(error.message);
+  transfersList.unshift({
+    id: "TXN-" + Math.floor(100000 + Math.random() * 900000),
+    recipient: rec,
+    amount: amt,
+    time: new Date().toLocaleTimeString()
+  });
+
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "transfer_sent",
+    category: "transfers",
+    title: "Transfer Sent to " + rec,
+    description: "Instant peer member settlement via wallet.",
+    amountNaira: -amt,
+    pointsChange: null,
+    timestamp: "Just now",
+    status: "completed"
+  });
+
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+  renderLedger();
+  closeTransferModal();
+  showToast("Transfer of ₦" + amt.toLocaleString() + " to " + rec + " successful!");
+}
+
+function renderLedger() {
+  const container = document.getElementById("transferLedger");
+  if (!container) return;
+  if (!transfersList.length) {
+    container.innerHTML = "<p class='text-xs text-slate-500'>No transfers sent yet. Click &quot;Send Money to Member&quot; to transfer.</p>";
+    return;
   }
-});
+  let h = "";
+  transfersList.forEach(function(t) {
+    h += "<div class='p-3 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center'>" +
+      "<div>" +
+        "<p class='text-xs font-bold text-slate-900'>Sent to " + t.recipient + "</p>" +
+        "<p class='text-[10px] text-slate-500'>" + t.id + " · " + t.time + "</p>" +
+      "</div>" +
+      "<p class='text-xs font-black text-slate-900'>-₦" + t.amount.toLocaleString() + "</p>" +
+    "</div>";
+  });
+  container.innerHTML = h;
+}
 
-/* =========================================================
-   REFERRALS
-   ========================================================= */
+function requestWithdrawal(e) {
+  e.preventDefault();
+  const amtInput = document.getElementById("withdrawAmount");
+  const bankInput = document.getElementById("bankName");
+  const accInput = document.getElementById("accountNumber");
+  const msgBox = document.getElementById("withdrawMessage");
 
-async function copyReferral() {
-  const link = document.getElementById("referralLink").value;
+  const amt = Number(amtInput.value);
+  const bank = bankInput.value.trim();
+  const acc = accInput.value.trim();
 
-  try {
-    await navigator.clipboard.writeText(link);
-    toast("Referral link copied.");
-  } catch {
-    document.getElementById("referralLink").select();
-    document.execCommand("copy");
-    toast("Referral link copied.");
+  if (amt < 5000) {
+    if (msgBox) {
+      msgBox.textContent = "Minimum withdrawal amount is ₦5,000.";
+      msgBox.className = "notice error show";
+    }
+    return;
+  }
+
+  if (amt > localBalance) {
+    if (msgBox) {
+      msgBox.textContent = "Insufficient wallet balance for withdrawal.";
+      msgBox.className = "notice error show";
+    }
+    return;
+  }
+
+  localBalance -= amt;
+  currentUser.wallet_balance = localBalance;
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "withdrawal",
+    category: "conversions",
+    title: "Bank Withdrawal Requested",
+    description: "₦" + amt.toLocaleString() + " to " + bank + " (" + acc + ")",
+    amountNaira: -amt,
+    pointsChange: null,
+    timestamp: "Just now",
+    status: "pending"
+  });
+
+  if (msgBox) {
+    msgBox.textContent = "Withdrawal request of ₦" + amt.toLocaleString() + " submitted! Dispatches to " + bank + " in 15 mins.";
+    msgBox.className = "notice success show";
+  }
+  showToast("Withdrawal of ₦" + amt.toLocaleString() + " submitted!");
+}
+
+function claimDailyStreak() {
+  localPoints += 50;
+  currentUser.points = localPoints;
+  updatePointsUI();
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "task_points",
+    category: "tasks",
+    title: "Daily Attendance Claimed",
+    description: "Daily active streak check-in reward.",
+    amountNaira: null,
+    pointsChange: 50,
+    timestamp: "Just now",
+    status: "completed"
+  });
+  showToast("Daily Attendance Claimed! +50 Points added.");
+}
+
+function claimSocialTask(type, pts) {
+  localPoints += pts;
+  currentUser.points = localPoints;
+  updatePointsUI();
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "task_points",
+    category: "tasks",
+    title: "Community Task: " + type.toUpperCase(),
+    description: "Engagement task verified.",
+    amountNaira: null,
+    pointsChange: pts,
+    timestamp: "Just now",
+    status: "completed"
+  });
+  showToast("Task completed! +" + pts + " Points awarded.");
+}
+
+function buyPointsWithCash() {
+  const pts = Number(prompt("Enter amount of points to BUY with your Naira wallet balance (e.g. 200, 500, 1000):\nRate: 1 Point = ₦" + nairaRate, "200"));
+  if (!pts || pts < 100) {
+    if (pts) alert("Minimum purchase is 100 points.");
+    return;
+  }
+  const cost = pts * nairaRate;
+  if (cost > localBalance) {
+    alert("Insufficient wallet balance. You need ₦" + cost.toLocaleString() + " but have ₦" + localBalance.toLocaleString());
+    return;
+  }
+  localBalance -= cost;
+  localPoints += pts;
+  currentUser.wallet_balance = localBalance;
+  currentUser.points = localPoints;
+
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "points_bought",
+    category: "conversions",
+    title: "Points Purchased with Naira",
+    description: "Exchanged ₦" + cost.toLocaleString() + " for " + pts.toLocaleString() + " Points for special activities.",
+    amountNaira: -cost,
+    pointsChange: pts,
+    timestamp: "Just now",
+    status: "completed"
+  });
+
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+  updatePointsUI();
+  showToast("Bought +" + pts.toLocaleString() + " Points for ₦" + cost.toLocaleString() + " for special activities!");
+}
+
+function redeemPointsToCash() {
+  const pts = Number(prompt("Enter amount of points to REDEEM for wallet cash (Min 200 points):\nRate: 1 Point = ₦" + nairaRate, "500"));
+  if (!pts || pts < 200) {
+    if (pts) alert("Minimum redemption is 200 points.");
+    return;
+  }
+  if (pts > localPoints) {
+    alert("Insufficient points balance. You have " + localPoints.toLocaleString() + " points.");
+    return;
+  }
+  const cash = pts * nairaRate;
+  localPoints -= pts;
+  localBalance += cash;
+  currentUser.wallet_balance = localBalance;
+  currentUser.points = localPoints;
+
+  addActivity({
+    id: "act-" + Date.now(),
+    type: "points_redeemed",
+    category: "conversions",
+    title: "Points Redeemed to Wallet Cash",
+    description: "Converted " + pts.toLocaleString() + " Points to ₦" + cash.toLocaleString() + " instant wallet cash.",
+    amountNaira: cash,
+    pointsChange: -pts,
+    timestamp: "Just now",
+    status: "completed"
+  });
+
+  document.getElementById("walletBalance").textContent = "₦" + localBalance.toLocaleString();
+  updatePointsUI();
+  showToast("Redeemed " + pts.toLocaleString() + " Points for ₦" + cash.toLocaleString() + " wallet cash!");
+}
+
+function adminIssueBurnAction() {
+  const action = prompt("ADMIN ACTION: Type 'ISSUE' to grant points or 'BURN' to deduct points from a member:").toUpperCase();
+  if (action !== "ISSUE" && action !== "BURN") return;
+  const member = prompt("Enter Member Referral Code (e.g. chioma23, tunde88, or your code):");
+  if (!member) return;
+  const pts = Number(prompt("Enter points amount to " + action + ":", "150"));
+  if (!pts || pts <= 0) return;
+  const pin = prompt("Enter 4-digit Admin PIN (Default: 1234):");
+  if (pin !== "1234") {
+    alert("Unauthorized. Invalid admin PIN.");
+    return;
+  }
+  if (action === "ISSUE") {
+    localPoints += pts;
+    currentUser.points = localPoints;
+    addActivity({
+      id: "act-" + Date.now(),
+      type: "admin_airdrop",
+      category: "conversions",
+      title: "Admin Granted Points",
+      description: "Admin issued +" + pts + " Points to " + member,
+      amountNaira: null,
+      pointsChange: pts,
+      timestamp: "Just now",
+      status: "completed"
+    });
+    showToast("Admin issued +" + pts + " points to " + member);
+  } else {
+    localPoints = Math.max(0, localPoints - pts);
+    currentUser.points = localPoints;
+    addActivity({
+      id: "act-" + Date.now(),
+      type: "points_redeemed",
+      category: "conversions",
+      title: "Admin Burned Points",
+      description: "Admin deducted -" + pts + " Points from " + member,
+      amountNaira: null,
+      pointsChange: -pts,
+      timestamp: "Just now",
+      status: "completed"
+    });
+    showToast("Admin burned -" + pts + " points from " + member);
+  }
+  updatePointsUI();
+}
+
+function adminEditConversionRate() {
+  const newRate = Number(prompt("ADMIN CONFIG: Enter new exchange rate (Naira value per 1 Point):", String(nairaRate)));
+  if (!newRate || newRate <= 0) return;
+  const pin = prompt("Enter 4-digit Admin PIN (Default: 1234):");
+  if (pin !== "1234") {
+    alert("Unauthorized. Invalid admin PIN.");
+    return;
+  }
+  nairaRate = newRate;
+  updatePointsUI();
+  showToast("Admin updated exchange rate: 1 Point = ₦" + nairaRate + " NGN");
+}
+
+function updatePointsUI() {
+  const pb = document.getElementById("pointsBalance");
+  const pw = document.getElementById("pointsWorth");
+  if (pb) pb.textContent = localPoints.toLocaleString() + " Pts";
+  if (pw) pw.textContent = "₦" + (localPoints * nairaRate).toLocaleString();
+}
+
+function openQuizModal() {
+  const ans = prompt("Quiz Question: In Upwork, should you communicate outside the platform before a contract is funded?\nType: YES or NO");
+  if (ans && ans.trim().toUpperCase() === "NO") {
+    localPoints += 250;
+    currentUser.points = localPoints;
+    updatePointsUI();
+    addActivity({
+      id: "act-" + Date.now(),
+      type: "task_points",
+      category: "tasks",
+      title: "Upwork Readiness Quiz Completed",
+      description: "Correctly answered escrow communication guidelines.",
+      amountNaira: null,
+      pointsChange: 250,
+      timestamp: "Just now",
+      status: "completed"
+    });
+    showToast("Correct answer! +250 Points awarded for Freelance Quiz!");
+  } else if (ans) {
+    alert("Incorrect. Never communicate outside Upwork before a funded contract to protect your account.");
   }
 }
 
-/* =========================================================
-   ADMIN OPERATIONS
-   ========================================================= */
-
-async function adminAction(action, payload) {
-  if (!isAdmin()) throw new Error("Administrator access required.");
-
-  return api("admin:" + action, payload);
+function copyReferral() {
+  const ref = currentUser ? currentUser.referral_code : "taiwo_hub";
+  const url = window.location.origin + "/?ref=" + ref;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      showToast("Referral link copied to clipboard!");
+    }).catch(function() {
+      showToast("Referral link: " + url);
+    });
+  } else {
+    showToast("Referral link copied!");
+  }
 }
 
-document.getElementById("rateForm").addEventListener("submit", async event => {
-  event.preventDefault();
+function shareWhatsApp() {
+  const ref = currentUser ? currentUser.referral_code : "taiwo_hub";
+  const text = encodeURIComponent("Join me on NaijaRemoteHub to earn rewards and access verified remote gigs: " + window.location.origin + "/?ref=" + ref);
+  window.open("https://wa.me/?text=" + text, "_blank");
+}
 
-  const rate = Number(document.getElementById("adminRate").value);
-  if (!Number.isFinite(rate) || rate <= 0) return alert("Enter a valid rate.");
-
-  try {
-    await adminAction("setExchangeRate", { rate });
-    await loadDashboard();
-    toast("Exchange rate updated.");
-  } catch (error) {
-    alert(error.message);
-  }
+// Auto Initialize
+window.addEventListener("DOMContentLoaded", function() {
+  syncUserUI();
 });
-
-document.getElementById("mlmForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const values = {
-    l1Naira: Number(document.getElementById("l1Naira").value),
-    l2Naira: Number(document.getElementById("l2Naira").value),
-    l1Points: Number(document.getElementById("l1Points").value),
-    l2Points: Number(document.getElementById("l2Points").value)
-  };
-
-  if (Object.values(values).some(value => !Number.isFinite(value) || value < 0)) {
-    return alert("Enter valid commission values.");
-  }
-
-  if (values.l1Naira + values.l2Naira > CONFIG.membershipFee) {
-    return alert("Total Naira referral commissions cannot exceed ₦30,000.");
-  }
-
-  try {
-    await adminAction("setMLMSettings", values);
-    await loadDashboard();
-    toast("Referral commission settings updated.");
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-document.getElementById("mintForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const amount = Number(document.getElementById("mintAmount").value);
-  if (!Number.isSafeInteger(amount) || amount <= 0) {
-    return alert("Enter a valid whole-number amount.");
-  }
-
-  if (!confirm(`Mint ${number(amount)} points to the treasury?`)) return;
-
-  try {
-    await adminAction("mintPoints", { amount });
-    await loadDashboard();
-    event.target.reset();
-    toast("Points minted to treasury.");
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-document.getElementById("sendAllForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const amount = Number(document.getElementById("sendAllAmount").value);
-  if (!Number.isSafeInteger(amount) || amount <= 0) {
-    return alert("Enter a valid whole-number amount.");
-  }
-
-  if (!confirm(`Send ${number(amount)} points to every eligible user?`)) return;
-
-  try {
-    await adminAction("sendToAllUsers", { amount });
-    await loadDashboard();
-    event.target.reset();
-    toast("Treasury distribution completed.");
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-document.getElementById("burnForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const mode = document.getElementById("burnMode").value;
-  const amount = Number(document.getElementById("burnAmount").value);
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    return alert("Enter a valid burn amount.");
-  }
-
-  if (mode === "percentage" && amount > 100) {
-    return alert("Percentage cannot exceed 100.");
-  }
-
-  if (!confirm(
-    mode === "percentage"
-      ? `Burn ${amount}% of all user point balances? This cannot be undone.`
-      : `Burn a total of ${number(amount)} points proportionally? This cannot be undone.`
-  )) return;
-
-  try {
-    await adminAction("burnPoints", { mode, amount });
-    await loadDashboard();
-    event.target.reset();
-    toast("Burn operation completed.");
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-async function adminUserAction(action, uid) {
-  if (!isAdmin()) return alert("Administrator access required.");
-
-  const amountText = prompt(
-    action === "give"
-      ? "How many points should be given to this user?"
-      : "How many points should be burned from this user?"
-  );
-
-  if (amountText === null) return;
-
-  const amount = Number(amountText);
-  if (!Number.isSafeInteger(amount) || amount <= 0) {
-    return alert("Enter a valid whole-number amount.");
-  }
-
-  if (!confirm(`Confirm ${action} of ${number(amount)} points?`)) return;
-
-  try {
-    await adminAction(action + "UserPoints", { uid, amount });
-    await loadDashboard();
-    toast("User balance updated.");
-  } catch (error) {
-    alert(error.message);
-  }
+// Also run immediately in case DOM is already loaded
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  syncUserUI();
 }
-
-/* =========================================================
-   UTILITIES
-   ========================================================= */
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, character => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[character]);
-}
-
-function escapeJS(value) {
-  return String(value ?? "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-}
-
-function formatDate(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "" : date.toLocaleString("en-NG");
-}
-
-document.getElementById("year").textContent = new Date().getFullYear();
-
-/* Prefill referral code from a shared referral URL. */
-const referralFromUrl = getReferralFromUrl();
-if (referralFromUrl) {
-  document.getElementById("signupReferral").value = referralFromUrl;
-}
-
-/* Default landing view. */
-showHome();
-
-/* =========================================================
-   REQUIRED SERVER API ACTIONS
-
-   Your secure server endpoint at /api/app must implement:
-
-   createProfile
-   bootstrap
-   initializeMembershipPayment
-   verifyMembershipPayment
-   payMembershipFromWallet
-   completeTask
-   transfer
-   swap
-   admin:setExchangeRate
-   admin:setMLMSettings
-   admin:mintPoints
-   admin:sendToAllUsers
-   admin:burnPoints
-   admin:giveUserPoints
-   admin:burnUserPoints
-
-   The server must:
-   - Verify the Firebase ID token on every request.
-   - Check the admin email/role on the server, not just in this HTML.
-   - Verify Paystack transactions using the secret key stored in
-     the server environment before activating membership.
-   - Prevent duplicate Paystack reference processing.
-   - Perform balance changes using trusted server-side transactions.
-   - Calculate and credit referral commissions only after verified payment.
-   - Validate all amounts and prevent negative balances.
-   - Keep secret keys out of frontend code and GitHub.
-   ========================================================= */
 </script>
 </body>
 </html>
