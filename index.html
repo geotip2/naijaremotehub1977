@@ -71,7 +71,7 @@
         <div class="bg-green-800 text-white p-6 sm:p-8">
           <div class="flex items-center justify-between gap-3"><span class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Starter membership</span><span class="pill bg-yellow-300 text-green-900">One-time payment</span></div>
           <h2 class="text-3xl font-black mt-2">Starter Course</h2>
-          <div class="flex items-end gap-3 mt-3"><span class="text-4xl font-black">₦25,000</span><span class="line-through text-green-200 mb-1">₦50,000</span></div>
+          <div class="flex items-end gap-3 mt-3"><span class="text-4xl font-black">₦30,000</span><span class="line-through text-green-200 mb-1">₦60,000</span></div>
           <p class="text-green-100 mt-2">One-time membership payment. No automatic monthly renewal.</p>
         </div>
         <div class="p-6 sm:p-8">
@@ -80,7 +80,7 @@
             <div>✅ Full Course access</div><div>✅ Personal Dashboard</div><div>✅ Your Referral Link</div><div>✅ Certificate (subject to course completion)</div><div>✅ Mentorship resources</div>
           </div>
           <div class="flex flex-col sm:flex-row gap-3 mt-7">
-            <button class="btn btn-green flex-1" onclick="pay()">Pay with Paystack ₦25,000</button>
+            <button class="btn btn-green flex-1" onclick="pay()">Pay with Paystack ₦30,000</button>
             <button class="btn btn-light flex-1" onclick="openAuth('signup')">Create Free Account</button>
           </div>
           <p class="text-xs text-slate-500 mt-4">Payment access is activated only after the server securely verifies the Paystack transaction.</p>
@@ -90,9 +90,9 @@
       <div class="grid md:grid-cols-2 gap-8 mt-16">
         <div><h2 class="text-3xl font-black">How You Earn</h2><p class="text-slate-600 mt-2">Referral rewards are subject to verified membership payments and the programme terms.</p>
           <div class="mt-6 space-y-3">
-            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 1 — Direct referral</span><b class="text-green-700">₦10,000</b></div>
-            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 2 — Indirect referral</span><b class="text-green-700">₦2,000</b></div>
-            <div class="bg-yellow-50 rounded-xl p-4"><b class="text-green-900">Example:</b> 10 eligible direct referrals × ₦10,000 = <b>₦100,000</b>.</div>
+            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 1 — Direct referral</span><b class="text-green-700">₦9,000</b></div>
+            <div class="bg-white rounded-xl p-4 shadow-soft flex justify-between"><span>Level 2 — Indirect referral</span><b class="text-green-700">₦4,500</b></div>
+            <div class="bg-yellow-50 rounded-xl p-4"><b class="text-green-900">Example:</b> 10 eligible direct referrals × ₦9,000 = <b>₦90,000</b>.</div>
           </div>
         </div>
         <div><h2 class="text-3xl font-black">Courses</h2><div class="grid sm:grid-cols-2 gap-3 mt-6">
@@ -138,7 +138,7 @@
       </div>
       <div class="grid lg:grid-cols-2 gap-6 mt-6">
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦25,000</button></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
       </div>
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="font-extrabold text-lg">Request a Withdrawal</h2><p class="text-sm text-slate-500 mt-1">Minimum withdrawal: ₦5,000. Requests are reviewed by the administrator.</p>
         <form id="withdrawForm" class="grid sm:grid-cols-2 gap-3 mt-4" onsubmit="requestWithdrawal(event)">
@@ -184,9 +184,9 @@
 /*
   IMPORTANT SECURITY / DEPLOYMENT NOTES:
   1) Never put a Paystack SECRET KEY in this file. Paystack verification and all
-     referral-credit calculations must run on a trusted server (Cloud Function).
+     referral-credit calculations must run on a trusted server (for example, a Cloudflare Worker).
   2) This page creates payment_requests as pending. A verified Paystack webhook /
-     Cloud Function must validate the reference, amount (2500000 kobo), currency
+     Cloudflare Worker or other trusted server must validate the reference, amount (3000000 kobo), currency
      (NGN), and customer, then set users/{uid}.is_paid=true and credit eligible
      referral rewards exactly once. A browser callback is NOT proof of payment.
   3) Firestore Security Rules are mandatory. Restrict admin writes to verified
@@ -200,6 +200,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
   authDomain: "naijaremotehub-6f584.firebaseapp.com",
+  databaseURL: "https://naijaremotehub-6f584-default-rtdb.firebaseio.com",
   projectId: "naijaremotehub-6f584",
   storageBucket: "naijaremotehub-6f584.firebasestorage.app",
   messagingSenderId: "662711600492",
@@ -207,7 +208,7 @@ const firebaseConfig = {
   measurementId: "G-GPWVV5WLEC"
 };
 const PAYSTACK_PUBLIC_KEY = "pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a";
-const MEMBERSHIP_FEE_NAIRA = 25000;
+const MEMBERSHIP_FEE_NAIRA = 30000;
 const MEMBERSHIP_FEE_KOBO = MEMBERSHIP_FEE_NAIRA * 100;
 const MIN_WITHDRAWAL = 5000;
 
@@ -260,6 +261,8 @@ function setBusy(id, busy, busyText) {
   }
 }
 function showPage(page) {
+  // Signed-in members never see the landing/auth screens: send them to their dashboard.
+  if ((page === "home" || page === "auth") && currentUser) page = "dashboard";
   if ((page === "dashboard" || page === "admin") && !currentUser) {
     openAuth("login");
     return;
@@ -274,6 +277,7 @@ function showPage(page) {
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function openAuth(mode="login") {
+  if (currentUser) { showPage("dashboard"); return; }
   switchAuth(mode);
   showPage("auth");
 }
@@ -359,7 +363,7 @@ function friendlyError(error) {
   return messages[code] || (error && error.message) || "Something went wrong. Please try again.";
 }
 async function logout() {
-  try { await auth.signOut(); showPage("home"); }
+  try { await auth.signOut(); }
   catch (error) { alert(friendlyError(error)); }
 }
 auth.onAuthStateChanged(async user => {
@@ -370,16 +374,19 @@ auth.onAuthStateChanged(async user => {
     try {
       await loadCurrentProfile(currentUser);
       updateNavigation();
-      if (document.getElementById("admin").classList.contains("active") && !(userData && userData.is_admin)) showPage("dashboard");
-      else if (!document.getElementById("home").classList.contains("active") && !document.getElementById("auth").classList.contains("active")) showPage("dashboard");
+      // Stay on Admin only if this user is an admin; otherwise always land on the dashboard.
+      const onAdmin = document.getElementById("admin").classList.contains("active");
+      if (!(onAdmin && userData && userData.is_admin === true)) showPage("dashboard");
     } catch (error) {
       console.error(error);
       updateNavigation();
+      showPage("dashboard");
       if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules.");
     }
   } else {
     updateNavigation();
-    if (document.getElementById("dashboard").classList.contains("active") || document.getElementById("admin").classList.contains("active")) showPage("home");
+    // Signed out: hide member areas and show the login form again (but keep the landing page on first visit).
+    if (!document.getElementById("home").classList.contains("active")) openAuth("login");
   }
 });
 async function loadCurrentProfile(user) {
@@ -488,7 +495,7 @@ function renderMaterials(docs) {
     const m=doc.data()||{}, free=m.is_free===true, unlocked=free||(userData&&userData.is_paid===true);
     const actions=unlocked
       ? `${m.video_url?`<a class="btn btn-green text-center block" href="${safeUrl(m.video_url)}" target="_blank" rel="noopener noreferrer">▶ Watch Video</a>`:""} ${m.pdf_url?`<a class="btn btn-light text-center block" href="${safeUrl(m.pdf_url)}" target="_blank" rel="noopener noreferrer">↓ Download PDF</a>`:""}`
-      : `<div class="locked rounded-xl p-4 text-center"><p class="font-bold text-slate-700">🔒 Upgrade to ₦25,000 to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`;
+      : `<div class="locked rounded-xl p-4 text-center"><p class="font-bold text-slate-700">🔒 Upgrade to ₦30,000 to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`;
     return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-50 text-green-800">${safeText(m.category||"General")}</span><span class="pill ${free?"bg-yellow-100 text-yellow-800":"bg-slate-100 text-slate-700"}">${free?"FREE":"PAID"}</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(m.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(m.description)}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5">${actions}</div></article>`;
   }).join("");
 }
