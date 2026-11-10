@@ -1,477 +1,45 @@
 <!DOCTYPE html>
-<!--
-=====================================================================
- FIRESTORE SECURITY RULES  (Firebase console > Firestore > Rules > paste > Publish)
- ADMIN SETUP: Firestore > Start collection "admins" > Document ID = your Auth UID (any field).
-
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
-
-    match /admins/{uid} { allow read: if signedIn() && request.auth.uid == uid; allow write: if false; }
-
-    match /directory/{key} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if false;
-    }
-    match /users/{uid} {
-      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
-      allow create, update: if signedIn() && request.auth.uid == uid;
-      allow delete: if false;
-      match /ledger/{id} {
-        allow read, create: if signedIn() && request.auth.uid == uid;
-        allow update, delete: if false;
-      }
-      match /inbox/{id} {
-        allow create: if signedIn() && request.resource.data.from == request.auth.uid;
-        allow read, delete: if signedIn() && request.auth.uid == uid;
-        allow update: if false;
-      }
-    }
-    match /withdrawals/{id} {
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid && request.resource.data.status == 'pending';
-      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
-      allow update: if isAdmin();
-      allow delete: if false;
-    }
-    match /payments/{ref} {
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
-      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
-      allow update, delete: if false;
-    }
-    match /config/{doc} { allow read: if signedIn(); allow write: if isAdmin(); }
-  }
-}
-
- NOTE: this is a client-only build. A logged-in user with browser dev tools could edit
- their own wallet/points. Pay out withdrawals only after checking Paystack.
-=====================================================================
--->
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#15803d">
-  <meta name="description" content="NaijaRemoteHub — Learn remote skills, earn with referrals, transfer funds peer-to-peer, and earn points with tasks.">
-  <title>NaijaRemoteHub | Learn. Earn. Grow.</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-  <style>
-    :root { color-scheme: light; }
-    html { scroll-behavior: smooth; }
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .tab-active { background: #15803d; color: white; }
-    .tab-idle { background: #f3f4f6; color: #1f2937; }
-    .shadow-soft { box-shadow: 0 12px 35px rgba(15, 23, 42, .08); }
-    .field { width: 100%; border: 1px solid #94a3b8; border-radius: .75rem; padding: .8rem .9rem; outline: none; background: white; color: #0f172a; }
-    .field:focus-visible { border-color: #15803d; outline: 2px solid #15803d; outline-offset: 1px; box-shadow: 0 0 0 4px rgba(21,128,61,.2); }
-    .btn { border-radius: .75rem; padding: .8rem 1.1rem; font-weight: 700; transition: background-color .15s; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
-    .btn:disabled { opacity: .6; cursor: not-allowed; }
-    button:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible { outline: 3px solid #15803d; outline-offset: 2px; }
-    .btn-green { background: #15803d; color: white; } .btn-green:hover { background: #166534; }
-    .btn-green:focus-visible { outline-color: #facc15; }
-    .btn-yellow { background: #eab308; color: #052e16; font-weight: 800; } .btn-yellow:hover { background: #ca8a04; }
-    .btn-light { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; } .btn-light:hover { background: #e2e8f0; }
-    .btn-red { background: #b91c1c; color: white; } .btn-red:hover { background: #991b1b; }
-    .notice { display: none; border-radius: .75rem; padding: .85rem 1.1rem; font-size: .95rem; font-weight: 500; margin-top: .75rem; }
-    .notice.show { display: block; }
-    .notice.error { background: #fef2f2; color: #991b1b; border: 1px solid #f87171; }
-    .notice.success { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
-    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: .25rem .75rem; font-size: .75rem; font-weight: 800; letter-spacing: .025em; }
-    button, a, input, textarea, select { touch-action: manipulation; }
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NaijaRemoteHub</title>
+<style>
+:root{--g:#0a7d4b;--g2:#066139;--bg:#f4f7f5;--card:#fff;--tx:#1b2a22;--mu:#6b7a72;--bd:#dfe7e2;--rd:#c0392b;--am:#e8a317}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx)}
+header{background:var(--g);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+header h1{font-size:18px;margin:0}header button{background:#ffffff26;color:#fff;border:0;padding:6px 12px;border-radius:6px;cursor:pointer}
+nav{display:flex;gap:4px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--bd);padding:6px}
+nav button{border:0;background:none;padding:8px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;color:var(--mu);font-weight:600}
+nav button.on{background:var(--g);color:#fff}
+main{max-width:980px;margin:0 auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{font-size:24px;font-weight:700;color:var(--g)}.lbl{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:6px;margin:4px 0 10px;font:inherit}
+button.b{background:var(--g);color:#fff;border:0;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600}
+button.b:hover{background:var(--g2)}button.r{background:var(--rd)}button.s{padding:5px 10px;font-size:12px}button.o{background:#fff;color:var(--g);border:1px solid var(--g)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd)}th{color:var(--mu);font-size:12px;text-transform:uppercase}
+.tbl{overflow-x:auto}h2{margin:0 0 10px;font-size:17px}h3{margin:14px 0 8px;font-size:15px}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;background:#e6f4ec;color:var(--g)}.pill.w{background:#fdf3dc;color:#9a6b00}.pill.x{background:#fbe5e2;color:var(--rd)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:8px;display:none;z-index:99;max-width:90%}
+.auth{max-width:420px;margin:30px auto}.muted{color:var(--mu);font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+.warn{background:#fff6e0;border:1px solid #f0d28a;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px}
+.hide{display:none!important}a{color:var(--g)}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased selection:bg-green-200">
+<body>
+<header><h1>🇳🇬 NaijaRemoteHub</h1><div id="hdr"></div></header>
+<nav id="nav" class="hide"></nav>
+<main id="app"><p class="muted">Loading…</p></main>
+<div id="toast"></div>
 
-<a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3 focus:bg-green-800 focus:text-white focus:rounded-xl focus:shadow-2xl focus:ring-4 focus:ring-yellow-400 font-extrabold text-sm">Skip to main content</a>
-<div id="routeAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-<div id="globalToast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
-
-<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
-  <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-    <a href="#home" onclick="showPage('home'); return false;" aria-label="NaijaRemoteHub, go to homepage" class="flex items-center gap-2 min-w-0 rounded-xl p-1">
-      <span class="w-10 h-10 rounded-xl bg-green-700 text-white grid place-items-center font-black text-xl shadow-sm" aria-hidden="true">N</span>
-      <span class="font-extrabold tracking-tight text-green-900 text-lg sm:text-xl">NaijaRemoteHub</span>
-    </a>
-    <nav aria-label="Primary navigation" class="flex flex-wrap items-center gap-1 sm:gap-2 text-sm">
-      <button id="navHome" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('home')">Home</button>
-      <button id="navTasks" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('tasks')">Tasks &amp; Points</button>
-      <button id="navLogin" class="min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="openAuth('login')">Login</button>
-      <button id="navDashboard" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('dashboard')">Dashboard</button>
-      <button id="navAdmin" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold hover:bg-green-50 text-slate-700" onclick="showPage('admin')">Admin</button>
-      <button id="navLogout" class="hidden min-h-[44px] px-3 py-2 rounded-lg font-semibold text-red-700 hover:bg-red-50" onclick="logout()">Logout</button>
-    </nav>
-  </div>
-</header>
-
-<main id="main-content" tabindex="-1" class="outline-none">
-
-  <!-- HOME -->
-  <section id="home" class="page active" aria-labelledby="homeHeroHeading">
-    <div class="bg-gradient-to-br from-green-900 via-green-800 to-green-700 text-white">
-      <div class="max-w-6xl mx-auto px-4 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center">
-        <div>
-          <span class="inline-block bg-slate-950/70 border border-yellow-300/50 text-yellow-300 rounded-full px-4 py-1.5 text-sm font-extrabold mb-5 shadow-sm">Learn · Earn · Transfer Peer-to-Peer</span>
-          <h1 id="homeHeroHeading" class="text-5xl sm:text-6xl font-black leading-tight tracking-tight">Learn. Earn.<br><span class="text-yellow-300">Grow.</span></h1>
-          <p class="text-lg sm:text-xl text-green-50 mt-5 max-w-xl font-normal leading-relaxed">Acquire high-income digital skills, earn points on daily tasks, and transfer funds between hub members at ₦0 fee.</p>
-          <div class="flex flex-wrap gap-3 mt-8">
-            <button class="btn btn-yellow shadow-md" onclick="openAuth('signup')">Create Free Account</button>
-            <button class="btn bg-white text-green-900 hover:bg-green-50 font-bold" onclick="showPage('tasks')">Explore Tasks to Earn</button>
-          </div>
-        </div>
-        <div class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100">
-          <p class="text-green-800 font-bold uppercase tracking-widest text-xs">Platform Highlights</p>
-          <h2 class="text-2xl font-extrabold mt-2 text-slate-900">Your All-in-One Digital Career Hub</h2>
-          <ul class="grid grid-cols-2 gap-3 mt-6" role="list">
-            <li class="bg-green-50 rounded-2xl p-4 border border-green-100"><span class="text-2xl" aria-hidden="true">💸</span><b class="block mt-2 text-slate-900">P2P Transfers</b><span class="text-sm text-slate-600">Send money directly to members</span></li>
-            <li class="bg-yellow-50 rounded-2xl p-4 border border-yellow-100"><span class="text-2xl" aria-hidden="true">⭐</span><b class="block mt-2 text-slate-900">Task Points</b><span class="text-sm text-slate-600">Daily streak &amp; quizzes to earn</span></li>
-            <li class="bg-slate-100 rounded-2xl p-4 border border-slate-200"><span class="text-2xl" aria-hidden="true">📊</span><b class="block mt-2 text-slate-900">Enhanced Stats</b><span class="text-sm text-slate-600">Deep wallet &amp; referral metrics</span></li>
-            <li class="bg-green-50 rounded-2xl p-4 border border-green-100"><span class="text-2xl" aria-hidden="true">🎓</span><b class="block mt-2 text-slate-900">Digital Academy</b><span class="text-sm text-slate-600">Practical freelance courses</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="page" aria-labelledby="dashboardHeading">
-    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p class="text-green-800 font-bold text-sm tracking-wide">MEMBER AREA · SILVER TIER</p>
-            <h1 id="dashboardHeading" class="text-3xl font-black text-slate-900">Your Enhanced Dashboard</h1>
-            <p id="memberGreeting" class="text-slate-600 mt-1"></p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span id="accountBadge" class="pill bg-slate-200 text-slate-800">FREE ACCOUNT</span>
-            <button class="btn btn-yellow text-xs px-3 py-1.5" onclick="showPage('tasks')">⭐ Tasks to Earn Points</button>
-          </div>
-        </div>
-
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
-          <div class="bg-green-900 text-white rounded-2xl p-5 shadow-soft flex flex-col justify-between">
-            <div>
-              <p class="text-green-100 text-xs font-semibold uppercase">Wallet Balance</p>
-              <p id="walletBalance" class="text-3xl font-black mt-1 text-white">₦0</p>
-            </div>
-            <div class="flex gap-2 mt-4 pt-3 border-t border-green-800">
-              <button class="btn btn-yellow text-xs py-1.5 flex-1" onclick="openTransferModal()">Send Money</button>
-              <button class="btn bg-white/20 text-white text-xs py-1.5 flex-1" onclick="document.getElementById('withdrawSection').scrollIntoView({behavior:'smooth'})">Withdraw</button>
-            </div>
-          </div>
-          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
-            <div>
-              <p class="text-slate-500 text-xs font-semibold uppercase">Reward Points</p>
-              <p id="pointsBalance" class="text-3xl font-black text-amber-600 mt-1">0 Pts</p>
-              <p class="text-[11px] text-slate-500 mt-0.5">Worth: <strong id="pointsWorth">₦0</strong></p>
-            </div>
-            <button class="btn btn-light text-xs py-1.5 mt-3" onclick="showPage('tasks')">Redeem for Cash</button>
-          </div>
-          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
-            <div>
-              <p class="text-slate-500 text-xs font-semibold uppercase">Peer Transfers</p>
-              <p id="p2pCount" class="text-3xl font-black text-slate-900 mt-1">0 Sent</p>
-              <p class="text-[11px] text-slate-500 mt-0.5">₦0 transfer fees</p>
-            </div>
-            <button class="btn btn-green text-xs py-1.5 mt-3" onclick="openTransferModal()">Transfer to Member</button>
-          </div>
-          <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col justify-between">
-            <div>
-              <p class="text-slate-500 text-xs font-semibold uppercase">Your Referral Code</p>
-              <p id="myRefCode" class="text-2xl font-black text-green-800 mt-1 break-all">—</p>
-              <p class="text-[11px] text-slate-500 mt-0.5">Total Referrals: <strong id="referralCount">0</strong></p>
-            </div>
-            <button class="btn btn-light text-xs py-1.5 mt-3" onclick="copyReferral()">Copy Link</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid lg:grid-cols-12 gap-6">
-        <div class="lg:col-span-5 space-y-6">
-          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-            <h2 class="font-extrabold text-lg text-slate-900">Fund Wallet</h2>
-            <p class="text-xs text-slate-600 mt-1">Pay securely with card, bank transfer or USSD via Paystack. Your wallet is credited after the payment is verified.</p>
-            <form id="fundForm" class="flex gap-2 mt-3" onsubmit="fundWallet(event)" novalidate>
-              <label for="fundAmount" class="sr-only">Amount in naira</label>
-              <input id="fundAmount" type="number" min="500" step="1" placeholder="Min ₦500" class="field text-xs min-w-0" required>
-              <button id="fundBtn" class="btn btn-green text-xs whitespace-nowrap" type="submit">Pay with Paystack</button>
-            </form>
-            <div id="fundMessage" class="notice" role="status" aria-live="polite"></div>
-          </div>
-
-          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-            <h2 class="font-extrabold text-lg text-slate-900">P2P Member Transfer</h2>
-            <p class="text-xs text-slate-600 mt-1">Send funds directly to any member using their referral code.</p>
-            <button class="btn btn-green w-full mt-4" onclick="openTransferModal()">💸 Send Money to Member</button>
-          </div>
-
-          <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-            <h2 id="refHeading" class="font-extrabold text-lg text-slate-900">Your Referral Hub</h2>
-            <div class="flex gap-2 mt-4">
-              <label for="referralLink" class="sr-only">Your referral link</label>
-              <input id="referralLink" class="field min-w-0 text-xs" readonly>
-              <button class="btn btn-green whitespace-nowrap text-xs" onclick="copyReferral()">Copy</button>
-            </div>
-            <button class="btn btn-yellow w-full mt-3 text-xs" onclick="shareWhatsApp()">Share on WhatsApp</button>
-          </div>
-
-          <div id="pinCard" class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-            <h2 class="font-extrabold text-lg text-slate-900">Security PIN</h2>
-            <p id="pinHelp" class="text-xs text-slate-600 mt-1">Set a 4-digit PIN. It is required to send money and withdraw.</p>
-            <form id="pinForm" class="grid grid-cols-2 gap-2 mt-3" onsubmit="changePin(event)" novalidate>
-              <div id="oldPinWrap">
-                <label for="oldPin" class="text-xs font-bold block mb-1">Current PIN</label>
-                <input id="oldPin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="field text-xs text-center tracking-widest">
-              </div>
-              <div id="newPinWrap" class="col-span-2">
-                <label for="newPin" class="text-xs font-bold block mb-1">New PIN (4 digits)</label>
-                <input id="newPin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="field text-xs text-center tracking-widest" required>
-              </div>
-              <button class="btn btn-light text-xs col-span-2" type="submit">Save PIN</button>
-            </form>
-            <div id="pinMessage" class="notice" role="status" aria-live="polite"></div>
-          </div>
-        </div>
-
-        <div class="lg:col-span-7 bg-white rounded-3xl p-6 shadow-soft border border-slate-100 self-start">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h2 class="font-extrabold text-lg text-slate-900">Recent Activity</h2>
-            <span class="text-xs font-bold text-green-800">Instant Settlement</span>
-          </div>
-          <div id="transferLedger" class="mt-4 space-y-3">
-            <p class="text-xs text-slate-500">No activity yet.</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="withdrawSection" class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-        <h2 class="font-extrabold text-lg text-slate-900">Request Bank Withdrawal</h2>
-        <p class="text-xs text-slate-500 mt-1">Minimum withdrawal: ₦5,000. Requests are reviewed and paid out by an admin.</p>
-        <form id="withdrawForm" class="grid sm:grid-cols-2 gap-3 mt-4" onsubmit="requestWithdrawal(event)" novalidate>
-          <div>
-            <label for="bankName" class="text-xs font-bold block mb-1">Bank Name *</label>
-            <input id="bankName" class="field text-xs" required maxlength="80">
-          </div>
-          <div>
-            <label for="accountNumber" class="text-xs font-bold block mb-1">Account Number (10 digits) *</label>
-            <input id="accountNumber" class="field text-xs" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
-          </div>
-          <div>
-            <label for="withdrawAmount" class="text-xs font-bold block mb-1">Amount (₦) *</label>
-            <input id="withdrawAmount" class="field text-xs" type="number" min="5000" required>
-          </div>
-          <div>
-            <label for="withdrawPin" class="text-xs font-bold block mb-1">Security PIN *</label>
-            <input id="withdrawPin" class="field text-xs text-center tracking-widest" type="password" inputmode="numeric" maxlength="4" autocomplete="off" required>
-          </div>
-          <div class="sm:col-span-2">
-            <button id="withdrawSubmit" class="btn btn-green w-full text-xs" type="submit">Submit Withdrawal</button>
-          </div>
-        </form>
-        <div id="withdrawMessage" class="notice" role="status" aria-live="polite"></div>
-        <div id="myWithdrawals" class="mt-4 space-y-2"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TASKS -->
-  <section id="tasks" class="page" aria-labelledby="tasksHeading">
-    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
-      <div class="bg-gradient-to-r from-amber-700 via-orange-700 to-amber-800 text-white rounded-3xl p-6 sm:p-8 shadow-soft">
-        <h1 id="tasksHeading" class="text-3xl font-black">Tasks to Earn Points</h1>
-        <p class="text-xs sm:text-sm text-amber-50 mt-1 max-w-xl">
-          Complete daily attendance, community tasks, and freelancing quizzes to earn reward points. Convert points to cash in your wallet!
-          <span id="rateNote"></span>
-        </p>
-        <div class="flex flex-wrap items-center gap-4 mt-5">
-          <button class="btn btn-yellow text-xs" onclick="claimDailyStreak()">🔥 Claim Daily +50 Pts</button>
-          <button class="btn bg-white/20 text-white text-xs" onclick="redeemPointsToCash()">💰 Convert Points to Cash</button>
-          <button class="btn bg-white/20 text-white text-xs" onclick="buyPointsWithCash()">🛒 Buy Points with Wallet</button>
-        </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
-          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+100 PTS</span><span class="text-xs text-slate-500 font-bold">SOCIAL</span></div>
-          <h3 class="font-extrabold text-base mt-2">Share Referral on WhatsApp</h3>
-          <p class="text-xs text-slate-600 mt-1">Spread the word to your freelancer groups.</p>
-          <button class="btn btn-green text-xs w-full mt-4" onclick="claimSocialTask('whatsapp')">Share &amp; Claim +100 Pts</button>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
-          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+150 PTS</span><span class="text-xs text-slate-500 font-bold">COMMUNITY</span></div>
-          <h3 class="font-extrabold text-base mt-2">Join Telegram Community Channel</h3>
-          <p class="text-xs text-slate-600 mt-1">Connect with 12,000+ Nigerian remote workers.</p>
-          <button class="btn btn-green text-xs w-full mt-4" onclick="claimSocialTask('telegram')">Join &amp; Claim +150 Pts</button>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
-          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+250 PTS</span><span class="text-xs text-slate-500 font-bold">SKILL QUIZ</span></div>
-          <h3 class="font-extrabold text-base mt-2">Freelancing &amp; Upwork Readiness Quiz</h3>
-          <p class="text-xs text-slate-600 mt-1">Answer 3 questions on proposal writing &amp; escrow safety.</p>
-          <button class="btn btn-yellow text-xs w-full mt-4" onclick="openQuizModal()">Take Quiz (+250 Pts)</button>
-        </div>
-        <div class="bg-white p-5 rounded-2xl shadow-soft border border-slate-100">
-          <div class="flex justify-between items-center"><span class="pill bg-amber-100 text-amber-900">+150 PTS</span><span class="text-xs text-slate-500 font-bold">MILESTONE</span></div>
-          <h3 class="font-extrabold text-base mt-2">Make Your First P2P Transfer</h3>
-          <p class="text-xs text-slate-600 mt-1">Transfer funds or points to a member — the +150 bonus is added automatically.</p>
-          <button class="btn btn-light text-xs w-full mt-4" onclick="openTransferModal()">Transfer Now</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ADMIN -->
-  <section id="admin" class="page" aria-labelledby="adminHeading">
-    <div class="max-w-6xl mx-auto px-4 py-10 space-y-6">
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100">
-        <h1 id="adminHeading" class="text-3xl font-black text-slate-900">Admin Panel</h1>
-        <p class="text-sm text-slate-600 mt-1">Members: <strong id="adminMemberCount">…</strong> · Pending withdrawals: <strong id="adminPendingCount">0</strong></p>
-      </div>
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-          <h2 class="font-extrabold text-lg">Issue / Burn Points</h2>
-          <form class="space-y-3 mt-3" onsubmit="adminIssueBurnAction(event)" novalidate>
-            <div>
-              <label for="adminAction" class="text-xs font-bold block mb-1">Action</label>
-              <select id="adminAction" class="field text-xs"><option value="ISSUE">Issue points</option><option value="BURN">Burn points</option></select>
-            </div>
-            <div>
-              <label for="adminMember" class="text-xs font-bold block mb-1">Member referral code or email *</label>
-              <input id="adminMember" class="field text-xs" required>
-            </div>
-            <div>
-              <label for="adminPoints" class="text-xs font-bold block mb-1">Points *</label>
-              <input id="adminPoints" type="number" min="1" class="field text-xs" value="150" required>
-            </div>
-            <button class="btn btn-green w-full text-xs" type="submit">Apply</button>
-            <div id="adminActionMessage" class="notice" role="status" aria-live="polite"></div>
-          </form>
-        </div>
-        <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-          <h2 class="font-extrabold text-lg">Points Exchange Rate</h2>
-          <p class="text-xs text-slate-600 mt-1">Current: 1 Point = <strong id="adminRateNow">₦5</strong></p>
-          <form class="space-y-3 mt-3" onsubmit="adminEditConversionRate(event)" novalidate>
-            <div>
-              <label for="adminRate" class="text-xs font-bold block mb-1">New value per point (₦) *</label>
-              <input id="adminRate" type="number" min="0.01" step="0.01" class="field text-xs" required>
-            </div>
-            <button class="btn btn-green w-full text-xs" type="submit">Update Rate</button>
-            <div id="adminRateMessage" class="notice" role="status" aria-live="polite"></div>
-          </form>
-        </div>
-      </div>
-      <div class="bg-white rounded-3xl p-6 shadow-soft border border-slate-100">
-        <h2 class="font-extrabold text-lg">Withdrawal Requests</h2>
-        <p class="text-xs text-slate-600 mt-1">Pay the member from your bank/Paystack dashboard first, then click “Mark paid”. “Reject” refunds their wallet.</p>
-        <div id="adminWithdrawals" class="mt-4 space-y-3"></div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- AUTH -->
-  <section id="auth" class="page" aria-labelledby="authHeading">
-    <div class="min-h-[75vh] flex items-center justify-center px-4 py-12">
-      <div class="w-full max-w-md bg-white rounded-3xl shadow-soft p-6 sm:p-8 border border-slate-100">
-        <h1 id="authHeading" class="text-2xl font-black text-center text-slate-900">Welcome to NaijaRemoteHub</h1>
-        <div role="tablist" aria-label="Account access" class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl mt-6">
-          <button id="loginTab" role="tab" aria-selected="true" aria-controls="loginForm" class="btn tab-active" onclick="switchAuth('login')">Login</button>
-          <button id="signupTab" role="tab" aria-selected="false" aria-controls="signupForm" class="btn tab-idle" onclick="switchAuth('signup')">Sign Up</button>
-        </div>
-        <form id="loginForm" class="mt-6 space-y-4" onsubmit="login(event)">
-          <div><label for="loginEmail" class="text-xs font-bold block mb-1">Email *</label><input id="loginEmail" class="field text-sm" type="email" autocomplete="email" required></div>
-          <div><label for="loginPassword" class="text-xs font-bold block mb-1">Password *</label><input id="loginPassword" class="field text-sm" type="password" autocomplete="current-password" required></div>
-          <button id="loginBtn" class="btn btn-green w-full" type="submit">Login</button>
-          <button type="button" class="text-xs font-bold text-green-800 underline w-full" onclick="resetPassword()">Forgot password?</button>
-          <div id="loginError" class="notice error" role="alert" aria-live="assertive"></div>
-        </form>
-        <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
-          <div><label for="signupName" class="text-xs font-bold block mb-1">Full Name *</label><input id="signupName" class="field text-sm" autocomplete="name" maxlength="80" required></div>
-          <div><label for="signupEmail" class="text-xs font-bold block mb-1">Email *</label><input id="signupEmail" class="field text-sm" type="email" autocomplete="email" required></div>
-          <div><label for="signupPassword" class="text-xs font-bold block mb-1">Password *</label><input id="signupPassword" class="field text-sm" type="password" minlength="6" autocomplete="new-password" required></div>
-          <div><label for="signupReferral" class="text-xs font-bold block mb-1">Referral Code (optional)</label><input id="signupReferral" class="field text-sm" placeholder="e.g. chioma23"></div>
-          <button id="signupBtn" class="btn btn-green w-full" type="submit">Create Account</button>
-          <div id="signupError" class="notice error" role="alert" aria-live="assertive"></div>
-        </form>
-      </div>
-    </div>
-  </section>
-</main>
-
-<!-- TRANSFER MODAL -->
-<div id="transferModal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="transferModalTitle" onclick="if(event.target===this) closeTransferModal()">
-  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-      <h3 id="transferModalTitle" class="font-black text-base text-slate-900">Transfer Funds to Member</h3>
-      <button onclick="closeTransferModal()" class="text-slate-500 hover:text-slate-900 min-h-[44px] min-w-[44px]" aria-label="Close transfer modal">✕</button>
-    </div>
-    <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-xl my-3 text-xs font-bold">
-      <button type="button" id="tabSendNaira" onclick="setTransferMode('naira')" class="py-2 rounded-lg bg-green-800 text-white">Send Naira (₦)</button>
-      <button type="button" id="tabSendPts" onclick="setTransferMode('points')" class="py-2 rounded-lg text-slate-700">Send Points (Pts)</button>
-    </div>
-    <form class="space-y-3" onsubmit="submitTransfer(event)">
-      <div>
-        <label for="transferRecipient" class="text-xs font-bold block mb-1">Recipient Referral Code or Email *</label>
-        <input id="transferRecipient" class="field text-xs" placeholder="e.g. chioma23" autocomplete="off" required>
-      </div>
-      <div>
-        <label id="transferAmountLabel" for="transferAmount" class="text-xs font-bold block mb-1">Amount (₦) *</label>
-        <input id="transferAmount" type="number" min="500" class="field text-xs" placeholder="Min ₦500" required>
-      </div>
-      <div>
-        <label for="transferPin" class="text-xs font-bold block mb-1">4-Digit Security PIN *</label>
-        <input id="transferPin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" class="field text-xs text-center font-bold tracking-widest" required>
-      </div>
-      <button id="transferSubmitBtn" class="btn btn-green w-full text-xs" type="submit">Authorize &amp; Send Transfer</button>
-      <div id="transferModalMessage" class="notice" role="alert" aria-live="assertive"></div>
-    </form>
-  </div>
-</div>
-
-<!-- QUIZ MODAL -->
-<div id="quizModal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="quizTitle" onclick="if(event.target===this) closeQuizModal()">
-  <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-      <h3 id="quizTitle" class="font-black text-base text-slate-900">Freelancing &amp; Upwork Readiness Quiz</h3>
-      <button onclick="closeQuizModal()" class="text-slate-500 hover:text-slate-900 min-h-[44px] min-w-[44px]" aria-label="Close quiz">✕</button>
-    </div>
-    <form id="quizForm" class="space-y-4 mt-4" onsubmit="submitQuiz(event)">
-      <fieldset>
-        <legend class="text-sm font-bold">1. Should you communicate outside Upwork before a contract is funded?</legend>
-        <label class="flex items-center gap-2 text-sm mt-2"><input type="radio" name="q1" value="yes" required> Yes, it speeds things up</label>
-        <label class="flex items-center gap-2 text-sm mt-1"><input type="radio" name="q1" value="no"> No, keep it on-platform</label>
-      </fieldset>
-      <fieldset>
-        <legend class="text-sm font-bold">2. What makes a strong proposal?</legend>
-        <label class="flex items-center gap-2 text-sm mt-2"><input type="radio" name="q2" value="generic" required> One generic template sent to every client</label>
-        <label class="flex items-center gap-2 text-sm mt-1"><input type="radio" name="q2" value="tailored"> A short message tailored to the client's job post</label>
-      </fieldset>
-      <fieldset>
-        <legend class="text-sm font-bold">3. When should you start work on a fixed-price job?</legend>
-        <label class="flex items-center gap-2 text-sm mt-2"><input type="radio" name="q3" value="funded" required> After the milestone is funded in escrow</label>
-        <label class="flex items-center gap-2 text-sm mt-1"><input type="radio" name="q3" value="promise"> As soon as the client promises to pay</label>
-      </fieldset>
-      <button class="btn btn-yellow w-full text-xs" type="submit">Submit Answers (+250 Pts)</button>
-      <div id="quizMessage" class="notice" role="status" aria-live="polite"></div>
-    </form>
-  </div>
-</div>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-"use strict";
-
-/* ---------------- Config (public by design) ---------------- */
+/* ================= CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
   authDomain: "naijaremotehub-6f584.firebaseapp.com",
@@ -482,774 +50,293 @@ const firebaseConfig = {
   appId: "1:662711600492:web:a307027882c532269adf49",
   measurementId: "G-GPWVV5WLEC"
 };
-const PAYSTACK_PUBLIC_KEY = "pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a";
-
-const CFG = {
-  REFERRAL_BONUS: 100, FIRST_TRANSFER_BONUS: 150, DAILY_POINTS: 50,
-  TASKS: { whatsapp: 100, telegram: 150 },
-  QUIZ_POINTS: 250, QUIZ_ANSWERS: { q1: "no", q2: "tailored", q3: "funded" },
-  MIN_TRANSFER_NAIRA: 500, MIN_TRANSFER_POINTS: 50,
-  MIN_REDEEM: 200, MIN_BUY: 100, MIN_WITHDRAW: 5000, DEFAULT_RATE: 5
-};
+const PAYSTACK_PK = 'pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a';
+/* Your deployed server endpoint that verifies a Paystack reference with the SECRET key.
+   Expected: POST {reference} -> JSON {status:true, amount:<kobo>}  (amount in kobo).
+   Leave '' only for testing: payments are then NOT verified server-side. */
+const VERIFY_URL = '';
+const DEFAULTS = {fee:30000, l1:30, l2:15, company:55, pointPrice:10, pool:0, supply:0, revenue:0};
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const fs = firebase.firestore();
-const TS = () => firebase.firestore.FieldValue.serverTimestamp();
-
-/* ---------------- State ---------------- */
-let user = null, profile = null, isAdmin = false;
-let ledger = [], myWithdrawals = [], adminWithdrawals = [], rate = CFG.DEFAULT_RATE;
-let unsubs = [], signingUp = false, initTried = false;
-let currentTransferMode = "naira", lastFocus = null;
-const processing = new Set();
-const depositTotals = {};
-
-/* ---------------- Helpers ---------------- */
+const auth = firebase.auth(), db = firebase.database();
 const $ = id => document.getElementById(id);
-const E = m => new Error(m);
-const fmtN = n => "₦" + Number(n || 0).toLocaleString();
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-function showNotice(el, msg, type) {
-  el.textContent = msg;
-  el.classList.remove("error", "success");
-  if (type) el.classList.add(type);
-  el.classList.add("show");
-}
-function hideNotice(el) { el.classList.remove("show"); el.textContent = ""; }
-let toastTimer;
-function showToast(msg) {
-  const t = $("globalToast");
-  t.textContent = msg;
-  t.className = "fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl bg-green-900 text-white font-bold text-xs shadow-xl max-w-xs";
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = "hidden"; }, 4000);
-}
-function setBusy(btn, busy, label) {
-  if (!btn) return;
-  if (busy) { btn.dataset.label = btn.textContent; btn.textContent = label || "Please wait…"; btn.disabled = true; }
-  else { btn.textContent = btn.dataset.label || btn.textContent; btn.disabled = false; }
-}
-function errText(e) {
-  const m = {
-    "auth/invalid-credential": "Incorrect email or password.",
-    "auth/wrong-password": "Incorrect email or password.",
-    "auth/user-not-found": "Incorrect email or password.",
-    "auth/invalid-email": "Enter a valid email address.",
-    "auth/email-already-in-use": "An account with this email already exists. Please log in.",
-    "auth/weak-password": "Password must be at least 6 characters.",
-    "auth/too-many-requests": "Too many attempts. Please wait a few minutes and try again.",
-    "auth/network-request-failed": "Network problem. Check your connection and try again.",
-    "auth/operation-not-allowed": "Email/password sign-in is not enabled for this Firebase project.",
-    "permission-denied": "Permission denied. Check your Firestore security rules."
-  };
-  return m[e.code] || e.message || "Something went wrong.";
-}
-const tsDate = t => (t && t.toDate ? t.toDate() : null);
-const lagosDay = () => new Date(Date.now() + 3600000).toISOString().slice(0, 10);
-const refLink = () => location.href.split(/[?#]/)[0] + "?ref=" + encodeURIComponent(profile ? profile.code : "");
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N = v => '₦'+Number(v||0).toLocaleString('en-NG',{maximumFractionDigits:2});
+const P = v => Number(v||0).toLocaleString('en-NG',{maximumFractionDigits:2})+' pts';
+const val = id => $(id).value.trim();
+const num = id => parseFloat($(id).value)||0;
+const dt = t => new Date(t).toLocaleString();
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3800)}
 
-async function sha256(text) {
-  if (window.crypto && crypto.subtle) {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-  }
-  let h = 5381;
-  for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) | 0;
-  return "f" + (h >>> 0).toString(16);
-}
-function randomHex() {
-  const a = new Uint32Array(4);
-  crypto.getRandomValues(a);
-  return Array.from(a).map(n => n.toString(16)).join("");
-}
-async function verifyPin(pin) {
-  if (!profile || !profile.hasPin) throw E("Set your 4-digit security PIN on the dashboard first.");
-  if (!/^\d{4}$/.test(String(pin)) || (await sha256(profile.pinSalt + ":" + pin)) !== profile.pinHash) throw E("Incorrect PIN.");
-}
-const userRef = uid => fs.doc("users/" + uid);
+let me=null, uid=null, isAdmin=false, S={...DEFAULTS}, tab='dash', unsubs=[];
 
-/* ---------------- Routing ---------------- */
-const PAGE_TITLES = { home: "Home", dashboard: "Dashboard", tasks: "Tasks and Points", admin: "Admin", auth: "Login or Sign up" };
+/* ============ DB helpers (transactions) ============ */
+async function tx(path, fn){ const r = await db.ref(path).transaction(fn); return r; }
+async function adjust(path, delta, requireNonNeg=true){
+  const r = await tx(path, v=>{ v=Number(v||0)+delta; if(requireNonNeg && v<0) return; return v; });
+  return r.committed;
+}
+function logTx(u, o){ return db.ref('txs/'+u).push({...o, t:Date.now()}); }
+function genCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s='NRH'; for(let i=0;i<5;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
 
-function showPage(page) {
-  if ((page === "dashboard" || page === "admin") && !user) { openAuth("login"); return; }
-  if (page === "admin" && !isAdmin) { showToast("Admin access only."); page = "dashboard"; }
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const target = $(page);
-  if (target) target.classList.add("active");
-  ["Home", "Tasks", "Login", "Dashboard", "Admin"].forEach(n => {
-    const b = $("nav" + n);
-    const on = page === n.toLowerCase() || (page === "auth" && n === "Login");
-    b.classList.toggle("text-green-900", on);
-    b.classList.toggle("text-slate-700", !on);
-    if (on) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+/* ============ Auth view ============ */
+function authView(mode='login'){
+  $('nav').classList.add('hide'); $('hdr').innerHTML='';
+  const ref = new URLSearchParams(location.search).get('ref')||'';
+  $('app').innerHTML = `<div class="card auth"><h2>${mode==='login'?'Member Login':'Join NaijaRemoteHub'}</h2>
+  ${mode==='reg'?`<label>Full name</label><input id="a_name"><label>Phone</label><input id="a_phone" type="tel">`:''}
+  <label>Email</label><input id="a_email" type="email"><label>Password</label><input id="a_pass" type="password">
+  ${mode==='reg'?`<label>Referral code (optional)</label><input id="a_ref" value="${esc(ref)}"><p class="muted">Membership fee: ${N(S.fee)} (one-time, via Paystack).</p>`:''}
+  <button class="b" style="width:100%" onclick="${mode==='login'?'doLogin()':'doReg()'}">${mode==='login'?'Login':'Register & Pay'}</button>
+  <p class="muted" style="text-align:center">${mode==='login'?'No account? <a href="#" onclick="authView(\'reg\');return false">Register</a><br><a href="#" onclick="resetPw();return false">Forgot password?</a>':'Have an account? <a href="#" onclick="authView(\'login\');return false">Login</a>'}</p></div>`;
+}
+async function doLogin(){ try{ await auth.signInWithEmailAndPassword(val('a_email'),val('a_pass')); }catch(e){toast(e.message)} }
+async function resetPw(){ const e=val('a_email'); if(!e) return toast('Enter your email first'); try{await auth.sendPasswordResetEmail(e);toast('Reset email sent')}catch(x){toast(x.message)} }
+async function doReg(){
+  const name=val('a_name'), phone=val('a_phone'), email=val('a_email'), pass=val('a_pass'), rc=val('a_ref').toUpperCase();
+  if(!name||!email||pass.length<6) return toast('Fill name, email and a 6+ char password');
+  let l1=null,l2=null;
+  if(rc){ const s=await db.ref('refCodes/'+rc).get(); if(!s.exists()) return toast('Invalid referral code'); l1=s.val();
+    const p=await db.ref('users/'+l1+'/referrer').get(); l2=p.val()||null; }
+  try{
+    const c = await auth.createUserWithEmailAndPassword(email,pass);
+    const code = genCode();
+    await db.ref('refCodes/'+code).set(c.user.uid);
+    await db.ref('users/'+c.user.uid).set({name,phone,email,code,referrer:l1,referrer2:l2,status:'pending',naira:0,points:0,joined:Date.now()});
+  }catch(e){toast(e.message)}
+}
+
+/* ============ Payments ============ */
+function paystack(email, amount, meta, onOk){
+  const ref='NRH'+Date.now()+Math.floor(Math.random()*1e4);
+  const h = PaystackPop.setup({key:PAYSTACK_PK, email, amount:Math.round(amount*100), currency:'NGN', ref, metadata:meta,
+    callback:r=>{ onOk(r.reference||ref); }, onClose:()=>toast('Payment window closed')});
+  h.openIframe();
+}
+async function verify(reference, amount){
+  if(!VERIFY_URL){ console.warn('VERIFY_URL not set – payment not verified server-side'); return true; }
+  try{ const r=await fetch(VERIFY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})}); const j=await r.json();
+    return j.status===true && Number(j.amount)>=Math.round(amount*100); }catch(e){return false}
+}
+function payMembership(){
+  paystack(me.email, S.fee, {uid, purpose:'membership'}, async ref=>{
+    toast('Verifying payment…');
+    if(!(await verify(ref,S.fee))) return toast('Payment could not be verified. Contact support with ref '+ref);
+    await activate(uid, ref);
   });
-  $("routeAnnouncer").textContent = (PAGE_TITLES[page] || page) + " page";
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  $("main-content").focus({ preventScroll: true });
-  if (page === "admin") loadMemberCount();
-  renderAll();
 }
-const currentPage = () => { const a = document.querySelector(".page.active"); return a ? a.id : "home"; };
-function updateNav() {
-  $("navLogin").classList.toggle("hidden", !!user);
-  $("navDashboard").classList.toggle("hidden", !user);
-  $("navLogout").classList.toggle("hidden", !user);
-  $("navAdmin").classList.toggle("hidden", !isAdmin);
-}
-
-/* ---------------- Auth ---------------- */
-function openAuth(mode) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  $("auth").classList.add("active");
-  $("routeAnnouncer").textContent = PAGE_TITLES.auth + " page";
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  switchAuth(mode || "login");
-}
-function switchAuth(mode) {
-  const isLogin = mode !== "signup";
-  $("loginForm").classList.toggle("hidden", !isLogin);
-  $("signupForm").classList.toggle("hidden", isLogin);
-  $("loginTab").className = "btn " + (isLogin ? "tab-active" : "tab-idle");
-  $("signupTab").className = "btn " + (isLogin ? "tab-idle" : "tab-active");
-  $("loginTab").setAttribute("aria-selected", String(isLogin));
-  $("signupTab").setAttribute("aria-selected", String(!isLogin));
-  hideNotice($("loginError")); hideNotice($("signupError"));
-  setTimeout(() => (isLogin ? $("loginEmail") : $("signupName")).focus(), 0);
+async function activate(u, ref){
+  const done = await db.ref('users/'+u+'/status').transaction(v=> v==='pending'? 'active': undefined);
+  if(!done.committed) return;
+  const usedRef = await db.ref('payments/'+ref).transaction(v=> v? undefined : {uid:u,amount:S.fee,t:Date.now(),type:'membership'});
+  if(!usedRef.committed){ await db.ref('users/'+u+'/status').set('pending'); return toast('Reference already used'); }
+  const us=(await db.ref('users/'+u).get()).val();
+  const a1=S.fee*S.l1/100, a2=S.fee*S.l2/100; let co=S.fee*S.company/100;
+  if(us.referrer){ await adjust('users/'+us.referrer+'/naira',a1,false); logTx(us.referrer,{type:'Referral L1',naira:a1,note:us.name}); } else co+=a1;
+  if(us.referrer2){ await adjust('users/'+us.referrer2+'/naira',a2,false); logTx(us.referrer2,{type:'Referral L2',naira:a2,note:us.name}); } else co+=a2;
+  await adjust('settings/revenue',co,false);
+  await db.ref('referrals/'+u).set({l1:us.referrer||null,l2:us.referrer2||null,t:Date.now()});
+  toast('Membership activated. Welcome!');
 }
 
-async function createProfile(name, referral) {
-  const u = auth.currentUser;
-  const email = u.email.toLowerCase();
-  name = (name || email.split("@")[0]).trim().slice(0, 80) || "Member";
-  const base = name.toLowerCase().replace(/[^a-z]/g, "").slice(0, 8) || "member";
-  let code = null;
-  for (let i = 0; i < 25 && !code; i++) {
-    const digits = i < 10 ? 2 : 3;
-    const c = base + String(Math.floor(Math.random() * Math.pow(10, digits))).padStart(digits, "0");
-    if (!(await fs.doc("directory/" + c).get()).exists) code = c;
-  }
-  if (!code) throw E("Could not allocate a referral code. Please try again.");
-
-  referral = String(referral || "").trim().toLowerCase();
-  let refUid = null;
-  if (referral && !referral.includes("/")) {
-    const r = await fs.doc("directory/" + referral).get();
-    if (r.exists && r.data().uid !== u.uid) refUid = r.data().uid;
-  }
-
-  const batch = fs.batch();
-  batch.set(userRef(u.uid), {
-    name, email, emailLower: email, code,
-    balance: 0, points: 0, referrals: 0, sentCount: 0,
-    hasPin: false, tasks: {}, referredBy: refUid ? referral : null, joined: TS()
-  });
-  batch.set(fs.doc("directory/" + code), { uid: u.uid, code });
-  batch.set(fs.doc("directory/" + email), { uid: u.uid, code });
-  if (refUid) {
-    batch.set(fs.collection("users/" + refUid + "/inbox").doc(), {
-      from: u.uid, fromCode: code, asset: "points", amount: CFG.REFERRAL_BONUS,
-      kind: "bonus", referral: true, ref: "REFERRAL", time: TS()
-    });
-  }
-  await batch.commit();
-  return { referralIgnored: !!referral && !refUid };
-}
-
-async function signup(e) {
-  e.preventDefault();
-  const err = $("signupError"), btn = $("signupBtn");
-  hideNotice(err);
-  const name = $("signupName").value.trim();
-  const email = $("signupEmail").value.trim().toLowerCase();
-  const pw = $("signupPassword").value;
-  const referral = $("signupReferral").value.trim();
-  if (name.length < 2) return showNotice(err, "Please enter your full name.", "error");
-  if (pw.length < 6) return showNotice(err, "Password must be at least 6 characters.", "error");
-
-  setBusy(btn, true, "Creating account…");
-  signingUp = true;
-  let created = false;
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pw);
-    created = true;
-    await cred.user.updateProfile({ displayName: name });
-    const r = await createProfile(name, referral);
-    showToast(r.referralIgnored ? "Referral code not found — account created without it." : "Welcome, " + name.split(" ")[0] + "! Account created.");
-    $("signupForm").reset();
-    showPage("dashboard");
-  } catch (ex) {
-    showNotice(err, created ? "Your account was created but setup didn't finish: " + errText(ex) + " Please log in again." : errText(ex), "error");
-  } finally {
-    signingUp = false;
-    setBusy(btn, false);
-  }
-}
-
-async function login(e) {
-  e.preventDefault();
-  const err = $("loginError"), btn = $("loginBtn");
-  hideNotice(err);
-  setBusy(btn, true, "Logging in…");
-  try {
-    await auth.signInWithEmailAndPassword($("loginEmail").value.trim(), $("loginPassword").value);
-    $("loginForm").reset();
-    showPage("dashboard");
-  } catch (ex) { showNotice(err, errText(ex), "error"); }
-  finally { setBusy(btn, false); }
-}
-
-async function resetPassword() {
-  const err = $("loginError");
-  const email = $("loginEmail").value.trim();
-  if (!email) return showNotice(err, "Type your email above first, then click “Forgot password?”.", "error");
-  try {
-    await auth.sendPasswordResetEmail(email);
-    showNotice(err, "If an account exists for that email, a reset link has been sent.", "success");
-  } catch (ex) { showNotice(err, errText(ex), "error"); }
-}
-
-function logout() {
-  auth.signOut().then(() => { showToast("You have been logged out."); showPage("home"); });
-}
-function stopListeners() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
-
-/* Apply incoming credits (transfers, bonuses, refunds, admin adjustments) to MY wallet */
-async function processInbox(snap) {
-  if (!user || processing.has(snap.id)) return;
-  processing.add(snap.id);
-  const uref = userRef(user.uid);
-  try {
-    await fs.runTransaction(async tx => {
-      const [i, u] = await Promise.all([tx.get(snap.ref), tx.get(uref)]);
-      if (!i.exists || !u.exists) return;
-      const d = i.data(), p = u.data();
-      const amt = Math.floor(Number(d.amount));
-      if (!Number.isFinite(amt) || amt === 0) { tx.delete(snap.ref); return; }
-      const upd = {};
-      if (d.asset === "points") upd.points = Math.max(0, (p.points || 0) + amt);
-      else upd.balance = Math.max(0, (p.balance || 0) + amt);
-      if (d.referral) upd.referrals = (p.referrals || 0) + 1;
-      tx.update(uref, upd);
-      tx.set(uref.collection("ledger").doc(), {
-        type: d.kind || "received", asset: d.asset === "points" ? "points" : "naira",
-        party: d.fromCode || "—", amount: amt, ref: d.ref || "", time: TS()
-      });
-      tx.delete(snap.ref);
-    });
-  } catch (ex) { console.error("inbox", ex); }
-  finally { processing.delete(snap.id); }
-}
-
-auth.onAuthStateChanged(async u => {
-  stopListeners();
-  user = u; profile = null; ledger = []; myWithdrawals = []; adminWithdrawals = [];
-  isAdmin = false; initTried = false;
-  if (!u) {
-    updateNav(); renderAll();
-    if (["dashboard", "admin"].includes(currentPage())) showPage("home");
-    return;
-  }
-  try { isAdmin = (await fs.doc("admins/" + u.uid).get()).exists; } catch (e) {}
-  updateNav();
-
-  unsubs.push(userRef(u.uid).onSnapshot(s => {
-    if (s.exists) { profile = s.data(); renderAll(); }
-    else if (!signingUp && !initTried) {
-      initTried = true;
-      createProfile(u.displayName || "", "").catch(ex => showToast(errText(ex)));
-    }
-  }, ex => showToast(errText(ex))));
-
-  unsubs.push(fs.collection("users/" + u.uid + "/ledger").orderBy("time", "desc").limit(20)
-    .onSnapshot(s => { ledger = s.docs.map(d => d.data()); renderAll(); }, () => {}));
-
-  unsubs.push(fs.collection("users/" + u.uid + "/inbox")
-    .onSnapshot(s => s.docs.forEach(processInbox), () => {}));
-
-  unsubs.push(fs.collection("withdrawals").where("uid", "==", u.uid)
-    .onSnapshot(s => {
-      myWithdrawals = s.docs.map(d => ({ id: d.id, ...d.data() }))
-        .sort((a, b) => ((tsDate(b.time) || 0) - (tsDate(a.time) || 0))).slice(0, 5);
-      renderAll();
-    }, () => {}));
-
-  unsubs.push(fs.doc("config/app").onSnapshot(s => {
-    rate = s.exists && Number(s.data().rate) > 0 ? Number(s.data().rate) : CFG.DEFAULT_RATE;
-    renderAll();
-  }, () => {}));
-
-  if (isAdmin) {
-    unsubs.push(fs.collection("withdrawals").orderBy("time", "desc").limit(100)
-      .onSnapshot(s => {
-        adminWithdrawals = s.docs.map(d => ({ id: d.id, ...d.data() }));
-        loadDeposits(adminWithdrawals.filter(w => w.status === "pending").map(w => w.uid));
-        renderAll();
-      }, () => {}));
-  }
-  renderAll();
+/* ============ Boot ============ */
+auth.onAuthStateChanged(async u=>{
+  unsubs.forEach(f=>f()); unsubs=[];
+  if(!u){ uid=null; me=null; isAdmin=false; return authView('login'); }
+  uid=u.uid;
+  const sref=db.ref('settings'); const sl=sref.on('value',s=>{ S={...DEFAULTS,...(s.val()||{})}; if(me) render(); });
+  unsubs.push(()=>sref.off('value',sl));
+  isAdmin=(await db.ref('admins/'+uid).get()).val()===true;
+  const uref=db.ref('users/'+uid); const ul=uref.on('value',s=>{ me=s.val(); if(!me) return; render(); });
+  unsubs.push(()=>uref.off('value',ul));
 });
 
-/* ---------------- Rendering ---------------- */
-function renderAll() {
-  updateNav();
-  $("rateNote").textContent = " Current rate: 1 Point = " + fmtN(rate) + ".";
-  $("adminRateNow").textContent = fmtN(rate);
-  if (!user || !profile) {
-    if (user) $("memberGreeting").textContent = "Loading your account…";
-    return;
+/* ============ Shell ============ */
+const MEMBER_TABS=[['dash','Dashboard'],['tasks','Tasks'],['wallet','Wallet & P2P'],['buy','Buy Points'],['team','My Team'],['learn','Learn'],['news','Announcements']];
+const ADMIN_TABS=[['a_over','Overview'],['a_points','Points'],['a_mass','Mass Transfer'],['a_news','Announcements'],['a_learn','Materials'],['a_tasks','Tasks'],['a_mem','Members'],['a_wd','Withdrawals'],['a_set','Settings']];
+function go(t){tab=t;render()}
+function render(){
+  if(!me) return;
+  $('hdr').innerHTML=`<span style="margin-right:10px;font-size:13px">${esc(me.name)}</span><button onclick="auth.signOut()">Logout</button>`;
+  if(me.status!=='active' && !isAdmin){
+    $('nav').classList.add('hide');
+    $('app').innerHTML=`<div class="card auth"><h2>Complete your membership</h2><p>Hi ${esc(me.name)}, pay the one-time membership fee of <b>${N(S.fee)}</b> to activate your account.</p><button class="b" style="width:100%" onclick="payMembership()">Pay ${N(S.fee)} with Paystack</button></div>`; return;
   }
-  const p = profile;
-  $("memberGreeting").textContent = "Signed in as " + p.name + " (" + p.email + ")";
-  $("accountBadge").textContent = isAdmin ? "ADMIN ACCOUNT" : "FREE ACCOUNT";
-  $("walletBalance").textContent = fmtN(p.balance);
-  $("pointsBalance").textContent = (p.points || 0).toLocaleString() + " Pts";
-  $("pointsWorth").textContent = fmtN(Math.floor((p.points || 0) * rate));
-  $("p2pCount").textContent = (p.sentCount || 0) + " Sent";
-  $("myRefCode").textContent = p.code;
-  $("referralCount").textContent = p.referrals || 0;
-  $("referralLink").value = refLink();
-  $("oldPinWrap").classList.toggle("hidden", !p.hasPin);
-  $("newPinWrap").classList.toggle("col-span-2", !p.hasPin);
-  $("pinHelp").textContent = p.hasPin ? "Change your 4-digit PIN. It's required to send money and withdraw."
-                                       : "Set a 4-digit PIN now. It is required to send money and withdraw.";
-  renderLedger();
-  renderMyWithdrawals();
-  if (isAdmin) renderAdmin();
+  const tabs = MEMBER_TABS.concat(isAdmin?ADMIN_TABS:[]);
+  if(!tabs.find(t=>t[0]===tab)) tab='dash';
+  $('nav').classList.remove('hide');
+  $('nav').innerHTML=tabs.map(t=>`<button class="${t[0]===tab?'on':''}" onclick="go('${t[0]}')">${t[1]}${t[0]==='a_over'?' ⚙':''}</button>`).join('');
+  (VIEWS[tab]||VIEWS.dash)();
 }
+const VIEWS={};
+function set(html){ $('app').innerHTML=html; }
 
-const LEDGER_LABEL = {
-  sent: t => "Sent to " + t.party, received: t => "Received from " + t.party,
-  funding: () => "Wallet funded via Paystack", bonus: () => "Referral bonus",
-  refund: () => "Withdrawal refund", adjust: () => "Admin adjustment"
+/* ============ Member views ============ */
+VIEWS.dash=async()=>{
+  const link=location.origin+location.pathname+'?ref='+me.code;
+  set(`<div class="grid"><div class="card"><div class="lbl">Naira wallet</div><div class="stat">${N(me.naira)}</div></div>
+  <div class="card"><div class="lbl">Points</div><div class="stat">${P(me.points)}</div></div>
+  <div class="card"><div class="lbl">Point price</div><div class="stat">${N(S.pointPrice)}</div></div></div>
+  <div class="card"><h2>Your referral</h2><p>Code: <b>${esc(me.code)}</b></p><input readonly value="${esc(link)}" onclick="this.select()">
+  <p class="muted">Earn ${S.l1}% (${N(S.fee*S.l1/100)}) on direct referrals and ${S.l2}% (${N(S.fee*S.l2/100)}) on their referrals' sign-ups.</p></div>
+  <div class="card"><h2>Recent activity</h2><div class="tbl" id="hist">Loading…</div></div>`);
+  const s=await db.ref('txs/'+uid).limitToLast(15).get(); const rows=[]; s.forEach(c=>rows.unshift(c.val()));
+  if($('hist')) $('hist').innerHTML=rows.length?`<table><tr><th>When</th><th>Type</th><th>Naira</th><th>Points</th><th>Note</th></tr>${rows.map(r=>`<tr><td>${dt(r.t)}</td><td>${esc(r.type)}</td><td>${r.naira?N(r.naira):''}</td><td>${r.points?P(r.points):''}</td><td>${esc(r.note||'')}</td></tr>`).join('')}</table>`:'<p class="muted">No activity yet.</p>';
 };
-function renderLedger() {
-  const box = $("transferLedger");
-  if (!ledger.length) { box.innerHTML = '<p class="text-xs text-slate-500">No activity yet.</p>'; return; }
-  box.innerHTML = ledger.map(t => {
-    const minus = t.type === "sent" || Number(t.amount) < 0;
-    const abs = Math.abs(Number(t.amount));
-    const label = (LEDGER_LABEL[t.type] || (() => "Activity"))(t);
-    const amt = t.asset === "points" ? abs.toLocaleString() + " Pts" : fmtN(abs);
-    const d = tsDate(t.time);
-    return `
-    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center">
-      <div>
-        <p class="text-xs font-bold text-slate-900">${esc(label)}</p>
-        <p class="text-[10px] text-slate-600">${esc(t.ref || "")} · ${esc(d ? d.toLocaleString() : "")}</p>
-      </div>
-      <p class="text-xs font-black ${minus ? "text-slate-900" : "text-green-800"}">${minus ? "-" : "+"}${esc(amt)}</p>
-    </div>`;
-  }).join("");
-}
-function wdPill(s) {
-  const c = s === "paid" ? "bg-green-100 text-green-900" : s === "rejected" ? "bg-red-100 text-red-900" : "bg-amber-100 text-amber-900";
-  return `<span class="pill ${c}">${esc(String(s).toUpperCase())}</span>`;
-}
-function renderMyWithdrawals() {
-  $("myWithdrawals").innerHTML = myWithdrawals.map(w => `
-    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
-      <span><b>${esc(fmtN(w.amount))}</b> to ${esc(w.bank)} ••••${esc(String(w.account).slice(-4))}</span>
-      ${wdPill(w.status)}
-    </div>`).join("");
-}
-function renderAdmin() {
-  $("adminPendingCount").textContent = adminWithdrawals.filter(w => w.status === "pending").length;
-  const box = $("adminWithdrawals");
-  if (!adminWithdrawals.length) { box.innerHTML = '<p class="text-xs text-slate-500">No withdrawal requests yet.</p>'; return; }
-  box.innerHTML = adminWithdrawals.map(w => {
-    const d = tsDate(w.time);
-    const dep = depositTotals[w.uid];
-    return `
-    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
-      <div>
-        <p class="font-bold">WD-${esc(w.id.slice(0, 6).toUpperCase())} · ${esc(fmtN(w.amount))} — ${esc(w.name)}</p>
-        <p class="text-slate-600">${esc(w.bank)} · ${esc(w.account)} · ${esc(d ? d.toLocaleString() : "")}</p>
-        ${w.status === "pending" ? `<p class="text-amber-800 font-semibold mt-1">Deposits recorded for this member: ${dep === undefined ? "…" : esc(fmtN(dep))} — confirm in your Paystack dashboard before paying.</p>` : ""}
-      </div>
-      ${w.status === "pending" ? `
-        <div class="flex gap-2">
-          <button class="btn btn-green text-xs py-1.5" data-wd="${esc(w.id)}" data-act="paid">Mark paid</button>
-          <button class="btn btn-red text-xs py-1.5" data-wd="${esc(w.id)}" data-act="rejected">Reject &amp; refund</button>
-        </div>` : wdPill(w.status)}
-    </div>`;
-  }).join("");
-}
-async function loadDeposits(uids) {
-  for (const uid of [...new Set(uids)]) {
-    if (depositTotals[uid] !== undefined) continue;
-    try {
-      const s = await fs.collection("payments").where("uid", "==", uid).get();
-      depositTotals[uid] = s.docs.reduce((a, d) => a + (Number(d.data().amount) || 0), 0);
-      renderAll();
-    } catch (e) { depositTotals[uid] = 0; }
-  }
-}
-async function loadMemberCount() {
-  if (!isAdmin) return;
-  try { $("adminMemberCount").textContent = (await fs.collection("users").get()).size; }
-  catch (e) { $("adminMemberCount").textContent = "—"; }
-}
+VIEWS.team=async()=>{
+  set('<div class="card"><h2>My Team</h2><div id="tm">Loading…</div></div>');
+  const all=(await db.ref('users').orderByChild('referrer').equalTo(uid).get()); const l1=[]; all.forEach(c=>l1.push({id:c.key,...c.val()}));
+  const all2=(await db.ref('users').orderByChild('referrer2').equalTo(uid).get()); const l2=[]; all2.forEach(c=>l2.push({id:c.key,...c.val()}));
+  const t=(a)=>a.length?`<table><tr><th>Name</th><th>Status</th><th>Joined</th></tr>${a.map(m=>`<tr><td>${esc(m.name)}</td><td><span class="pill ${m.status==='active'?'':'w'}">${m.status}</span></td><td>${dt(m.joined)}</td></tr>`).join('')}</table>`:'<p class="muted">None yet.</p>';
+  $('tm').innerHTML=`<h3>Level 1 (${l1.length})</h3>${t(l1)}<h3>Level 2 (${l2.length})</h3>${t(l2)}`;
+};
+VIEWS.tasks=async()=>{
+  set('<div class="card"><h2>Tasks</h2><div id="tk">Loading…</div></div>');
+  const [ts,ss]=await Promise.all([db.ref('tasks').get(),db.ref('submissions').orderByChild('uid').equalTo(uid).get()]);
+  const mine={}; ss.forEach(c=>{mine[c.val().taskId]=c.val()});
+  const list=[]; ts.forEach(c=>{ if(c.val().active!==false) list.unshift({id:c.key,...c.val()}) });
+  $('tk').innerHTML=list.length?list.map(t=>{ const m=mine[t.id];
+    return `<div class="card"><b>${esc(t.title)}</b> <span class="pill">${P(t.reward)}</span><p>${esc(t.desc)}</p>
+    ${m?`<span class="pill ${m.status==='approved'?'':m.status==='rejected'?'x':'w'}">${m.status}</span>`:
+    `<textarea id="pf_${t.id}" placeholder="Proof / link / notes"></textarea><button class="b s" onclick="submitTask('${t.id}')">Submit</button>`}</div>`}).join(''):'<p class="muted">No tasks available.</p>';
+};
+async function submitTask(id){ const p=val('pf_'+id); if(!p) return toast('Add proof'); 
+  await db.ref('submissions/'+uid+'_'+id).set({uid,taskId:id,name:me.name,proof:p,status:'pending',t:Date.now()}); toast('Submitted'); VIEWS.tasks(); }
 
-/* ---------------- Funding (Paystack inline) ---------------- */
-let paymentDone = false;
-function fundWallet(e) {
-  e.preventDefault();
-  const msg = $("fundMessage");
-  hideNotice(msg);
-  if (!user || !profile) return showNotice(msg, "Please wait for your account to load.", "error");
-  const amt = Math.floor(Number($("fundAmount").value));
-  if (!Number.isFinite(amt) || amt < 500 || amt > 5000000) return showNotice(msg, "Enter an amount between ₦500 and ₦5,000,000.", "error");
-  if (!window.PaystackPop) return showNotice(msg, "Paystack could not load. Check your connection and refresh.", "error");
+VIEWS.wallet=()=>{
+  set(`<div class="grid"><div class="card"><div class="lbl">Naira</div><div class="stat">${N(me.naira)}</div></div><div class="card"><div class="lbl">Points</div><div class="stat">${P(me.points)}</div></div></div>
+  <div class="card"><h2>P2P Transfer</h2><label>Recipient member code</label><input id="t_to" placeholder="e.g. NRHABC12" style="text-transform:uppercase">
+  <div class="row"><div><label>Asset</label><select id="t_as"><option value="naira">Naira</option><option value="points">Points</option></select></div><div><label>Amount</label><input id="t_amt" type="number" min="0" step="any"></div></div>
+  <label>Note (optional)</label><input id="t_note"><button class="b" onclick="p2p()">Send</button></div>
+  <div class="card"><h2>Fund wallet</h2><input id="d_amt" type="number" placeholder="Amount in ₦ (min 100)"><button class="b" onclick="deposit()">Pay with Paystack</button></div>
+  <div class="card"><h2>Withdraw naira</h2><input id="w_amt" type="number" placeholder="Amount"><input id="w_bank" placeholder="Bank, account number, account name">
+  <button class="b o" onclick="withdraw()">Request withdrawal</button></div>`);
+};
+async function p2p(){
+  const code=val('t_to').toUpperCase(), as=$('t_as').value, amt=num('t_amt'), note=val('t_note');
+  if(amt<=0) return toast('Enter an amount'); if(code===me.code) return toast('Cannot send to yourself');
+  const s=await db.ref('refCodes/'+code).get(); if(!s.exists()) return toast('Member not found'); const to=s.val();
+  const rs=(await db.ref('users/'+to+'/status').get()).val(); if(rs!=='active') return toast('Recipient is not an active member');
+  if(!(await adjust('users/'+uid+'/'+as,-amt))) return toast('Insufficient '+as);
+  if(!(await adjust('users/'+to+'/'+as,amt,false))){ await adjust('users/'+uid+'/'+as,amt,false); return toast('Transfer failed'); }
+  const o=as==='naira'?{naira:amt}:{points:amt};
+  logTx(uid,{type:'Sent',...o,note:code+(note?' – '+note:'')}); logTx(to,{type:'Received',...o,note:me.code+(note?' – '+note:'')});
+  toast('Sent'); $('t_amt').value='';
+}
+function deposit(){ const a=num('d_amt'); if(a<100) return toast('Minimum ₦100');
+  paystack(me.email,a,{uid,purpose:'deposit'},async ref=>{ if(!(await verify(ref,a))) return toast('Could not verify payment');
+    const u=await db.ref('payments/'+ref).transaction(v=>v?undefined:{uid,amount:a,type:'deposit',t:Date.now()}); if(!u.committed) return;
+    await adjust('users/'+uid+'/naira',a,false); logTx(uid,{type:'Deposit',naira:a,note:ref}); toast('Wallet funded'); }); }
+async function withdraw(){ const a=num('w_amt'), b=val('w_bank'); if(a<=0||!b) return toast('Enter amount and bank details');
+  if(!(await adjust('users/'+uid+'/naira',-a))) return toast('Insufficient balance');
+  await db.ref('withdrawals').push({uid,name:me.name,amount:a,bank:b,status:'pending',t:Date.now()}); logTx(uid,{type:'Withdrawal request',naira:-a}); toast('Request submitted'); }
 
-  paymentDone = false;
-  const reference = "NRH_" + user.uid.slice(0, 6) + "_" + Date.now();
-  const handler = PaystackPop.setup({
-    key: PAYSTACK_PUBLIC_KEY,
-    email: user.email,
-    amount: amt * 100,
-    currency: "NGN",
-    ref: reference,
-    metadata: { uid: user.uid },
-    callback: function (resp) { paymentDone = true; creditPayment(resp.reference || reference, amt); },
-    onClose: function () { if (!paymentDone) showNotice(msg, "Payment window closed. No money was taken.", "error"); }
-  });
-  handler.openIframe();
+VIEWS.buy=()=>{
+  set(`<div class="card"><h2>Buy points from pool</h2><p>Price: <b>${N(S.pointPrice)}</b> per point · Pool available: <b>${P(S.pool)}</b></p>
+  <label>Points to buy</label><input id="b_amt" type="number" min="0" step="any" oninput="$('b_cost').textContent=N(num('b_amt')*S.pointPrice)">
+  <p>Cost: <b id="b_cost">₦0</b> (from your naira wallet: ${N(me.naira)})</p><button class="b" onclick="buyPts()">Buy</button></div>`);
+};
+async function buyPts(){
+  const q=num('b_amt'); if(q<=0) return toast('Enter quantity'); const cost=+(q*S.pointPrice).toFixed(2);
+  if(!(await adjust('settings/pool',-q))) return toast('Not enough points in pool');
+  if(!(await adjust('users/'+uid+'/naira',-cost))){ await adjust('settings/pool',q,false); return toast('Insufficient naira balance'); }
+  await adjust('users/'+uid+'/points',q,false); await adjust('settings/revenue',cost,false);
+  logTx(uid,{type:'Bought points',points:q,naira:-cost}); toast('Purchased '+P(q));
 }
-async function creditPayment(reference, amount) {
-  const msg = $("fundMessage");
-  const pref = fs.doc("payments/" + reference), uref = userRef(user.uid);
-  try {
-    const r = await fs.runTransaction(async tx => {
-      const [ps, us] = await Promise.all([tx.get(pref), tx.get(uref)]);
-      if (ps.exists) return { already: true };
-      if (!us.exists) throw E("Account not found.");
-      tx.set(pref, { uid: user.uid, amount, status: "client-confirmed", time: TS() });
-      tx.update(uref, { balance: (us.data().balance || 0) + amount });
-      tx.set(uref.collection("ledger").doc(), { type: "funding", asset: "naira", party: "Paystack", amount, ref: reference, time: TS() });
-      return { already: false };
-    });
-    showNotice(msg, r.already ? "This payment was already credited." : fmtN(amount) + " has been added to your wallet.", "success");
-    $("fundAmount").value = "";
-  } catch (ex) {
-    showNotice(msg, "Payment succeeded but crediting your wallet failed (" + errText(ex) + "). Keep this reference and contact support: " + reference, "error");
-  }
-}
+VIEWS.learn=async()=>{
+  set('<div class="card"><h2>Educational materials</h2><div id="lm">Loading…</div></div>');
+  const s=await db.ref('materials').get(); const a=[]; s.forEach(c=>a.unshift(c.val()));
+  $('lm').innerHTML=a.length?a.map(m=>`<div class="card"><b>${esc(m.title)}</b> <span class="pill">${esc(m.cat||'General')}</span><p style="white-space:pre-wrap">${esc(m.body||'')}</p>${/^https?:\/\//.test(m.url||'')?`<a href="${esc(m.url)}" target="_blank" rel="noopener">Open resource ↗</a>`:''}</div>`).join(''):'<p class="muted">Nothing posted yet.</p>';
+};
+VIEWS.news=async()=>{
+  set('<div class="card"><h2>Announcements</h2><div id="an">Loading…</div></div>');
+  const s=await db.ref('announcements').get(); const a=[]; s.forEach(c=>a.unshift(c.val()));
+  $('an').innerHTML=a.length?a.map(m=>`<div class="card"><b>${esc(m.title)}</b><div class="muted">${dt(m.t)}</div><p style="white-space:pre-wrap">${esc(m.body)}</p></div>`).join(''):'<p class="muted">No announcements.</p>';
+};
 
-/* ---------------- Transfers ---------------- */
-function setTransferMode(mode) {
-  currentTransferMode = mode;
-  const amtInput = $("transferAmount");
-  if (mode === "points") {
-    $("tabSendNaira").className = "py-2 rounded-lg text-slate-700";
-    $("tabSendPts").className = "py-2 rounded-lg bg-amber-500 text-slate-950 font-black";
-    $("transferAmountLabel").textContent = "Points to Transfer (Pts) * (Available: " + (profile ? (profile.points || 0).toLocaleString() : 0) + " Pts)";
-    amtInput.min = String(CFG.MIN_TRANSFER_POINTS); amtInput.placeholder = "Min " + CFG.MIN_TRANSFER_POINTS + " Pts";
-    $("transferSubmitBtn").textContent = "Send Points P2P";
-    $("transferModalTitle").textContent = "P2P Points Transfer";
-  } else {
-    $("tabSendPts").className = "py-2 rounded-lg text-slate-700";
-    $("tabSendNaira").className = "py-2 rounded-lg bg-green-800 text-white font-bold";
-    $("transferAmountLabel").textContent = "Amount (₦) * (Available: " + fmtN(profile ? profile.balance : 0) + ")";
-    amtInput.min = String(CFG.MIN_TRANSFER_NAIRA); amtInput.placeholder = "Min ₦" + CFG.MIN_TRANSFER_NAIRA;
-    $("transferSubmitBtn").textContent = "Authorize & Send Transfer";
-    $("transferModalTitle").textContent = "Transfer Funds to Member";
-  }
-}
-function requireLogin() {
-  if (user) return true;
-  showToast("Please log in or sign up first.");
-  openAuth("login");
-  return false;
-}
-function openTransferModal(mode) {
-  if (!requireLogin()) return;
-  lastFocus = document.activeElement;
-  setTransferMode(mode || "naira");
-  hideNotice($("transferModalMessage"));
-  const m = $("transferModal");
-  m.classList.remove("hidden"); m.classList.add("flex");
-  setTimeout(() => $("transferRecipient").focus(), 0);
-}
-function closeTransferModal() {
-  const m = $("transferModal");
-  m.classList.add("hidden"); m.classList.remove("flex");
-  if (lastFocus && lastFocus.focus) lastFocus.focus();
-}
+/* ============ Admin views ============ */
+VIEWS.a_over=()=>{
+  set(`<div class="grid"><div class="card"><div class="lbl">Company revenue</div><div class="stat">${N(S.revenue)}</div></div>
+  <div class="card"><div class="lbl">Points pool</div><div class="stat">${P(S.pool)}</div></div>
+  <div class="card"><div class="lbl">Total supply</div><div class="stat">${P(S.supply)}</div></div></div>
+  ${VERIFY_URL?'':'<div class="warn">⚠ VERIFY_URL is empty: Paystack payments are not verified by your server. Set it before going live.</div>'}`);
+};
+VIEWS.a_points=()=>{
+  set(`<div class="card"><h2>Mint points (to pool)</h2><input id="m_amt" type="number" placeholder="Amount"><button class="b" onclick="mint()">Mint</button></div>
+  <div class="card"><h2>Burn points</h2><select id="bn_src"><option value="pool">From pool</option><option value="member">From a member</option></select>
+  <input id="bn_code" placeholder="Member code (if from member)"><input id="bn_amt" type="number" placeholder="Amount"><button class="b r" onclick="burn()">Burn</button></div>
+  <div class="card"><h2>Naira ⇄ points price</h2><p class="muted">Current: ${N(S.pointPrice)} per point</p><input id="pp" type="number" step="any" value="${S.pointPrice}"><button class="b" onclick="setPrice()">Update price</button></div>
+  <div class="card"><h2>Send from pool to one member</h2><input id="g_code" placeholder="Member code"><input id="g_amt" type="number" placeholder="Points"><button class="b" onclick="grant()">Send</button></div>`);
+};
+async function mint(){ const a=num('m_amt'); if(a<=0) return toast('Amount?'); await adjust('settings/pool',a,false); await adjust('settings/supply',a,false); toast('Minted '+P(a)); }
+async function memberByCode(c){ const s=await db.ref('refCodes/'+c.toUpperCase()).get(); return s.exists()?s.val():null; }
+async function burn(){ const a=num('bn_amt'); if(a<=0) return toast('Amount?');
+  if($('bn_src').value==='pool'){ if(!(await adjust('settings/pool',-a))) return toast('Pool too small'); }
+  else{ const u=await memberByCode(val('bn_code')); if(!u) return toast('Member not found'); if(!(await adjust('users/'+u+'/points',-a))) return toast('Member balance too small'); logTx(u,{type:'Burned by admin',points:-a}); }
+  await adjust('settings/supply',-a,false); toast('Burned '+P(a)); }
+async function setPrice(){ const p=num('pp'); if(p<=0) return toast('Invalid'); await db.ref('settings/pointPrice').set(p); toast('Price updated'); }
+async function grant(){ const u=await memberByCode(val('g_code')), a=num('g_amt'); if(!u||a<=0) return toast('Check inputs');
+  if(!(await adjust('settings/pool',-a))) return toast('Pool too small'); await adjust('users/'+u+'/points',a,false); logTx(u,{type:'Admin grant',points:a}); toast('Sent'); }
 
-async function submitTransfer(e) {
-  e.preventDefault();
-  const msg = $("transferModalMessage"), btn = $("transferSubmitBtn");
-  hideNotice(msg);
-  if (!profile) return;
-  const points = currentTransferMode === "points";
-  const amt = Math.floor(Number($("transferAmount").value));
-  const key = $("transferRecipient").value.trim().toLowerCase();
-  setBusy(btn, true, "Sending…");
-  try {
-    if (!Number.isFinite(amt) || amt < (points ? CFG.MIN_TRANSFER_POINTS : CFG.MIN_TRANSFER_NAIRA))
-      throw E(points ? "Minimum P2P points transfer is " + CFG.MIN_TRANSFER_POINTS + " Points." : "Minimum transfer is " + fmtN(CFG.MIN_TRANSFER_NAIRA) + ".");
-    await verifyPin($("transferPin").value.trim());
-    if (!key || key.includes("/")) throw E("Enter the recipient's referral code or email.");
-    const dir = await fs.doc("directory/" + key).get();
-    if (!dir.exists) throw E("Recipient not found. Check the referral code or email.");
-    const rid = dir.data().uid, rcode = dir.data().code;
-    if (rid === user.uid) throw E("You can't send to yourself.");
+VIEWS.a_mass=async()=>{
+  set('<div class="card"><h2>Mass points transfer (from pool)</h2><p class="muted">Pool: '+P(S.pool)+'</p><div id="ms">Loading members…</div></div>');
+  const s=await db.ref('users').get(); const a=[]; s.forEach(c=>{ if(c.val().status==='active') a.push({id:c.key,...c.val()}) });
+  $('ms').innerHTML=`<label>Points per member</label><input id="ms_amt" type="number" step="any">
+  <label><input type="checkbox" id="ms_all" style="width:auto" onchange="document.querySelectorAll('.ms_c').forEach(c=>c.checked=this.checked)"> Select all (${a.length} active members)</label>
+  <div class="tbl" style="max-height:320px;overflow:auto"><table>${a.map(m=>`<tr><td><input type="checkbox" class="ms_c" style="width:auto" value="${m.id}"></td><td>${esc(m.name)}</td><td>${esc(m.code)}</td><td>${P(m.points)}</td></tr>`).join('')}</table></div>
+  <button class="b" onclick="massSend()">Distribute</button>`;
+};
+async function massSend(){
+  const a=num('ms_amt'), ids=[...document.querySelectorAll('.ms_c:checked')].map(c=>c.value);
+  if(a<=0||!ids.length) return toast('Choose members and amount'); const total=a*ids.length;
+  if(!confirm('Send '+P(a)+' to '+ids.length+' members ('+P(total)+' total)?')) return;
+  if(!(await adjust('settings/pool',-total))) return toast('Pool too small — mint more first');
+  for(const u of ids){ await adjust('users/'+u+'/points',a,false); logTx(u,{type:'Admin distribution',points:a}); }
+  toast('Distributed to '+ids.length+' members'); }
 
-    const uref = userRef(user.uid);
-    const txId = "TXN-" + Math.floor(100000 + Math.random() * 900000);
-    const bonus = await fs.runTransaction(async tx => {
-      const s = await tx.get(uref);
-      const p = s.data();
-      const field = points ? "points" : "balance";
-      if ((p[field] || 0) < amt) throw E(points ? "Insufficient points. You have " + (p.points || 0).toLocaleString() + " Pts." : "Insufficient wallet balance.");
-      const first = !(p.tasks && p.tasks.firstTransfer);
-      const upd = { [field]: (p[field] || 0) - amt, sentCount: (p.sentCount || 0) + 1 };
-      if (first) {
-        upd["tasks.firstTransfer"] = true;
-        upd.points = (points ? upd.points : (p.points || 0)) + CFG.FIRST_TRANSFER_BONUS;
-      }
-      tx.update(uref, upd);
-      tx.set(uref.collection("ledger").doc(), { type: "sent", asset: points ? "points" : "naira", party: rcode, amount: amt, ref: txId, time: TS() });
-      tx.set(fs.collection("users/" + rid + "/inbox").doc(), {
-        from: user.uid, fromCode: p.code, asset: points ? "points" : "naira", amount: amt, kind: "received", ref: txId, time: TS()
-      });
-      return first ? CFG.FIRST_TRANSFER_BONUS : 0;
-    });
-    $("transferPin").value = ""; $("transferAmount").value = ""; $("transferRecipient").value = "";
-    closeTransferModal();
-    showToast("Transfer to " + rcode + " successful!" + (bonus ? " +" + bonus + " bonus Points for your first transfer!" : ""));
-  } catch (ex) { showNotice(msg, errText(ex), "error"); }
-  finally { setBusy(btn, false); }
-}
+VIEWS.a_news=()=>{ set(`<div class="card"><h2>Post announcement</h2><input id="n_t" placeholder="Title"><textarea id="n_b" rows="5" placeholder="Message"></textarea><button class="b" onclick="postNews()">Publish</button></div><div class="card"><h2>Existing</h2><div id="nl"></div></div>`); listAdmin('announcements','nl'); };
+async function postNews(){ if(!val('n_t')||!val('n_b')) return toast('Fill both'); await db.ref('announcements').push({title:val('n_t'),body:val('n_b'),t:Date.now()}); toast('Published'); VIEWS.a_news(); }
+VIEWS.a_learn=()=>{ set(`<div class="card"><h2>Post material</h2><input id="l_t" placeholder="Title"><input id="l_c" placeholder="Category"><textarea id="l_b" rows="5" placeholder="Content / lesson text"></textarea><input id="l_u" placeholder="Link (https://…) optional"><button class="b" onclick="postLearn()">Publish</button></div><div class="card"><h2>Existing</h2><div id="nl"></div></div>`); listAdmin('materials','nl'); };
+async function postLearn(){ if(!val('l_t')) return toast('Title?'); await db.ref('materials').push({title:val('l_t'),cat:val('l_c'),body:val('l_b'),url:val('l_u'),t:Date.now()}); toast('Published'); VIEWS.a_learn(); }
+async function listAdmin(path,el){ const s=await db.ref(path).get(); const a=[]; s.forEach(c=>a.unshift({id:c.key,...c.val()}));
+  $(el).innerHTML=a.map(x=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--bd);padding:6px 0"><span>${esc(x.title)}</span><button class="b r s" onclick="delItem('${path}','${x.id}')">Delete</button></div>`).join('')||'<p class="muted">Empty</p>'; }
+async function delItem(p,id){ if(!confirm('Delete?')) return; await db.ref(p+'/'+id).remove(); render(); }
 
-async function changePin(e) {
-  e.preventDefault();
-  const msg = $("pinMessage");
-  hideNotice(msg);
-  if (!profile) return;
-  try {
-    const newPin = $("newPin").value.trim();
-    if (!/^\d{4}$/.test(newPin)) throw E("PIN must be exactly 4 digits.");
-    if (profile.hasPin) await verifyPin($("oldPin").value.trim());
-    const salt = randomHex();
-    await userRef(user.uid).update({ pinSalt: salt, pinHash: await sha256(salt + ":" + newPin), hasPin: true });
-    $("pinForm").reset();
-    showNotice(msg, "PIN saved.", "success");
-  } catch (ex) { showNotice(msg, errText(ex), "error"); }
-}
+VIEWS.a_tasks=async()=>{
+  set(`<div class="card"><h2>Create task</h2><input id="k_t" placeholder="Title"><textarea id="k_d" rows="3" placeholder="Instructions"></textarea><input id="k_r" type="number" placeholder="Reward (points)"><button class="b" onclick="postTask()">Create</button></div>
+  <div class="card"><h2>Pending submissions</h2><div id="sb">Loading…</div></div><div class="card"><h2>Tasks</h2><div id="nl"></div></div>`);
+  listAdmin('tasks','nl');
+  const [s,ts]=await Promise.all([db.ref('submissions').orderByChild('status').equalTo('pending').get(),db.ref('tasks').get()]); const tk=ts.val()||{}; const a=[]; s.forEach(c=>a.push({id:c.key,...c.val()}));
+  $('sb').innerHTML=a.length?a.map(x=>`<div class="card"><b>${esc(x.name)}</b> → ${esc(tk[x.taskId]?.title||'(deleted task)')} <span class="pill">${P(tk[x.taskId]?.reward)}</span><p style="white-space:pre-wrap">${esc(x.proof)}</p>
+  <button class="b s" onclick="review('${x.id}',true)">Approve & pay</button> <button class="b r s" onclick="review('${x.id}',false)">Reject</button></div>`).join(''):'<p class="muted">None pending.</p>';
+};
+async function postTask(){ if(!val('k_t')||num('k_r')<=0) return toast('Title and reward needed'); await db.ref('tasks').push({title:val('k_t'),desc:val('k_d'),reward:num('k_r'),active:true,t:Date.now()}); toast('Created'); VIEWS.a_tasks(); }
+async function review(id,ok){
+  const sub=(await db.ref('submissions/'+id).get()).val(); if(!sub||sub.status!=='pending') return;
+  if(ok){ const t=(await db.ref('tasks/'+sub.taskId).get()).val(); if(!t) return toast('Task missing');
+    if(!(await adjust('settings/pool',-t.reward))) return toast('Pool too small — mint more points');
+    await adjust('users/'+sub.uid+'/points',t.reward,false); logTx(sub.uid,{type:'Task reward',points:t.reward,note:t.title}); }
+  await db.ref('submissions/'+id+'/status').set(ok?'approved':'rejected'); toast(ok?'Approved':'Rejected'); VIEWS.a_tasks(); }
 
-/* ---------------- Withdrawals ---------------- */
-async function requestWithdrawal(e) {
-  e.preventDefault();
-  const msg = $("withdrawMessage"), btn = $("withdrawSubmit");
-  hideNotice(msg);
-  if (!profile) return;
-  setBusy(btn, true, "Submitting…");
-  try {
-    const bank = $("bankName").value.trim().slice(0, 80);
-    const account = $("accountNumber").value.trim();
-    const amt = Math.floor(Number($("withdrawAmount").value));
-    if (!bank) throw E("Enter your bank name.");
-    if (!/^\d{10}$/.test(account)) throw E("Account number must be exactly 10 digits.");
-    if (!Number.isFinite(amt) || amt < CFG.MIN_WITHDRAW) throw E("Minimum withdrawal is " + fmtN(CFG.MIN_WITHDRAW) + ".");
-    await verifyPin($("withdrawPin").value.trim());
-    const uref = userRef(user.uid);
-    await fs.runTransaction(async tx => {
-      const s = await tx.get(uref);
-      const p = s.data();
-      if ((p.balance || 0) < amt) throw E("Insufficient wallet balance.");
-      tx.update(uref, { balance: p.balance - amt });
-      tx.set(fs.collection("withdrawals").doc(), { uid: user.uid, email: p.email, name: p.name, bank, account, amount: amt, status: "pending", time: TS() });
-    });
-    $("withdrawForm").reset();
-    showNotice(msg, "Withdrawal submitted. It is pending admin approval.", "success");
-  } catch (ex) { showNotice(msg, errText(ex), "error"); }
-  finally { setBusy(btn, false); }
-}
-
-/* ---------------- Points & tasks ---------------- */
-async function updateProfileTx(fn) {
-  const uref = userRef(user.uid);
-  return fs.runTransaction(async tx => {
-    const s = await tx.get(uref);
-    if (!s.exists) throw E("Account not found.");
-    const upd = fn(s.data());
-    tx.update(uref, upd);
-    return upd;
-  });
-}
-async function claimDailyStreak() {
-  if (!requireLogin()) return;
-  try {
-    const today = lagosDay();
-    await updateProfileTx(p => {
-      if (p.tasks && p.tasks.streakDate === today) throw E("You've already claimed today's streak. Come back tomorrow!");
-      return { "tasks.streakDate": today, points: (p.points || 0) + CFG.DAILY_POINTS };
-    });
-    showToast("Daily Attendance Claimed! +" + CFG.DAILY_POINTS + " Points added.");
-  } catch (ex) { showToast(errText(ex)); }
-}
-async function claimSocialTask(type) {
-  if (!requireLogin()) return;
-  const pts = CFG.TASKS[type];
-  try {
-    await updateProfileTx(p => {
-      if (p.tasks && p.tasks[type]) throw E("You've already claimed this task.");
-      return { ["tasks." + type]: true, points: (p.points || 0) + pts };
-    });
-    if (type === "whatsapp") shareWhatsApp();
-    showToast("Task completed! +" + pts + " Points awarded.");
-  } catch (ex) { showToast(errText(ex)); }
-}
-async function buyPointsWithCash() {
-  if (!requireLogin()) return;
-  const pts = Math.floor(Number(prompt("Enter amount of points to BUY with your Naira wallet balance (min " + CFG.MIN_BUY + "):\nRate: 1 Point = ₦" + rate, "200")));
-  if (!pts) return;
-  try {
-    if (pts < CFG.MIN_BUY) throw E("Minimum purchase is " + CFG.MIN_BUY + " points.");
-    const cost = Math.ceil(pts * rate);
-    await updateProfileTx(p => {
-      if ((p.balance || 0) < cost) throw E("Insufficient wallet balance. You need " + fmtN(cost) + ".");
-      return { balance: p.balance - cost, points: (p.points || 0) + pts };
-    });
-    showToast("Bought +" + pts.toLocaleString() + " Points for " + fmtN(cost) + ".");
-  } catch (ex) { alert(errText(ex)); }
-}
-async function redeemPointsToCash() {
-  if (!requireLogin()) return;
-  const pts = Math.floor(Number(prompt("Enter amount of points to REDEEM for wallet cash (min " + CFG.MIN_REDEEM + "):\nRate: 1 Point = ₦" + rate, "500")));
-  if (!pts) return;
-  try {
-    if (pts < CFG.MIN_REDEEM) throw E("Minimum redemption is " + CFG.MIN_REDEEM + " points.");
-    const cash = Math.floor(pts * rate);
-    await updateProfileTx(p => {
-      if ((p.points || 0) < pts) throw E("Insufficient points balance. You have " + (p.points || 0).toLocaleString() + " points.");
-      return { points: p.points - pts, balance: (p.balance || 0) + cash };
-    });
-    showToast("Redeemed " + pts.toLocaleString() + " Points for " + fmtN(cash) + " wallet cash!");
-  } catch (ex) { alert(errText(ex)); }
-}
-
-/* ---------------- Quiz ---------------- */
-function openQuizModal() {
-  if (!requireLogin()) return;
-  if (profile && profile.tasks && profile.tasks.quiz) return showToast("You've already earned the quiz reward.");
-  lastFocus = document.activeElement;
-  hideNotice($("quizMessage"));
-  $("quizForm").reset();
-  const m = $("quizModal");
-  m.classList.remove("hidden"); m.classList.add("flex");
-}
-function closeQuizModal() {
-  const m = $("quizModal");
-  m.classList.add("hidden"); m.classList.remove("flex");
-  if (lastFocus && lastFocus.focus) lastFocus.focus();
-}
-async function submitQuiz(e) {
-  e.preventDefault();
-  const msg = $("quizMessage");
-  const f = new FormData($("quizForm"));
-  const score = Object.keys(CFG.QUIZ_ANSWERS).filter(k => f.get(k) === CFG.QUIZ_ANSWERS[k]).length;
-  if (score < 3) return showNotice(msg, "You got " + score + " of 3. Hint: stay on-platform, tailor proposals, and start only after escrow is funded. Try again!", "error");
-  try {
-    await updateProfileTx(p => {
-      if (p.tasks && p.tasks.quiz) throw E("You've already earned the quiz reward.");
-      return { "tasks.quiz": true, points: (p.points || 0) + CFG.QUIZ_POINTS };
-    });
-    closeQuizModal();
-    showToast("Perfect score! +" + CFG.QUIZ_POINTS + " Points awarded for the Freelance Quiz!");
-  } catch (ex) { showNotice(msg, errText(ex), "error"); }
-}
-
-/* ---------------- Referral ---------------- */
-async function copyReferral() {
-  if (!requireLogin() || !profile) return;
-  const link = refLink();
-  try { await navigator.clipboard.writeText(link); }
-  catch (err) {
-    const input = $("referralLink"); input.value = link; input.select();
-    try { document.execCommand("copy"); } catch (e2) {}
-  }
-  showToast("Referral link copied to clipboard!");
-}
-function shareWhatsApp() {
-  const text = profile ? "Join me on NaijaRemoteHub — learn remote skills and earn! " + refLink() : "Join NaijaRemoteHub";
-  window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
-}
-
-/* ---------------- Admin ---------------- */
-document.addEventListener("click", async ev => {
-  const b = ev.target.closest("button[data-wd]");
-  if (!b || !isAdmin) return;
-  b.disabled = true;
-  const id = b.dataset.wd, status = b.dataset.act;
-  const wref = fs.doc("withdrawals/" + id);
-  try {
-    await fs.runTransaction(async tx => {
-      const w = await tx.get(wref);
-      if (!w.exists) throw E("Withdrawal not found.");
-      if (w.data().status !== "pending") throw E("Already processed.");
-      tx.update(wref, { status, processedAt: TS() });
-      if (status === "rejected") {
-        tx.set(fs.collection("users/" + w.data().uid + "/inbox").doc(), {
-          from: user.uid, fromCode: "ADMIN", asset: "naira", amount: w.data().amount,
-          kind: "refund", ref: "WD-" + id.slice(0, 6).toUpperCase(), time: TS()
-        });
-      }
-    });
-    showToast("Withdrawal marked " + status + ".");
-  } catch (ex) { showToast(errText(ex)); b.disabled = false; }
-});
-
-async function adminIssueBurnAction(e) {
-  e.preventDefault();
-  const msg = $("adminActionMessage");
-  hideNotice(msg);
-  if (!isAdmin) return;
-  try {
-    const action = $("adminAction").value;
-    const pts = Math.floor(Number($("adminPoints").value));
-    const key = $("adminMember").value.trim().toLowerCase();
-    if (!pts || pts <= 0) throw E("Enter a positive number of points.");
-    if (!key || key.includes("/")) throw E("Enter a member referral code or email.");
-    const dir = await fs.doc("directory/" + key).get();
-    if (!dir.exists) throw E("Member not found.");
-    await fs.collection("users/" + dir.data().uid + "/inbox").add({
-      from: user.uid, fromCode: "ADMIN", asset: "points", amount: action === "ISSUE" ? pts : -pts,
-      kind: "adjust", ref: "ADMIN", time: TS()
-    });
-    showNotice(msg, (action === "ISSUE" ? "Issued +" : "Burned -") + pts + " points " + (action === "ISSUE" ? "to " : "from ") + dir.data().code + ". It applies when they next open the app.", "success");
-  } catch (ex) { showNotice(msg, errText(ex), "error"); }
-}
-async function adminEditConversionRate(e) {
-  e.preventDefault();
-  const msg = $("adminRateMessage");
-  hideNotice(msg);
-  if (!isAdmin) return;
-  try {
-    const r = Number($("adminRate").value);
-    if (!r || r <= 0) throw E("Enter a rate greater than 0.");
-    await fs.doc("config/app").set({ rate: r }, { merge: true });
-    $("adminRate").value = "";
-    showNotice(msg, "Exchange rate updated: 1 Point = " + fmtN(r) + ".", "success");
-  } catch (ex) { showNotice(msg, errText(ex), "error"); }
-}
-
-/* ---------------- Global ---------------- */
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") {
-    if (!$("transferModal").classList.contains("hidden")) closeTransferModal();
-    if (!$("quizModal").classList.contains("hidden")) closeQuizModal();
-  }
-});
-(function init() {
-  const ref = new URLSearchParams(location.search).get("ref");
-  if (ref) { $("signupReferral").value = ref; openAuth("signup"); }
-})();
+VIEWS.a_mem=async()=>{
+  set('<div class="card"><h2>Members</h2><input id="q" placeholder="Search name/email/code" oninput="filt()"><div class="tbl" id="mt">Loading…</div></div>');
+  const s=await db.ref('users').get(); window._mem=[]; s.forEach(c=>_mem.push({id:c.key,...c.val()})); filt(); };
+function filt(){ const q=(val('q')||'').toLowerCase(); const a=_mem.filter(m=>[m.name,m.email,m.code].join(' ').toLowerCase().includes(q));
+  $('mt').innerHTML=`<table><tr><th>Name</th><th>Code</th><th>Status</th><th>Naira</th><th>Points</th></tr>${a.map(m=>`<tr><td>${esc(m.name)}<br><span class="muted">${esc(m.email)}</span></td><td>${esc(m.code)}</td><td><span class="pill ${m.status==='active'?'':'w'}">${m.status}</span></td><td>${N(m.naira)}</td><td>${P(m.points)}</td></tr>`).join('')}</table>`; }
+VIEWS.a_wd=async()=>{
+  set('<div class="card"><h2>Withdrawal requests</h2><div id="wl">Loading…</div></div>');
+  const s=await db.ref('withdrawals').orderByChild('status').equalTo('pending').get(); const a=[]; s.forEach(c=>a.push({id:c.key,...c.val()}));
+  $('wl').innerHTML=a.length?`<table><tr><th>Member</th><th>Amount</th><th>Bank</th><th></th></tr>${a.map(w=>`<tr><td>${esc(w.name)}</td><td>${N(w.amount)}</td><td>${esc(w.bank)}</td><td><button class="b s" onclick="wdDone('${w.id}',true)">Paid</button> <button class="b r s" onclick="wdDone('${w.id}',false)">Reject</button></td></tr>`).join('')}</table>`:'<p class="muted">None pending.</p>'; };
+async function wdDone(id,paid){ const w=(await db.ref('withdrawals/'+id).get()).val(); if(!w||w.status!=='pending') return;
+  if(!paid){ await adjust('users/'+w.uid+'/naira',w.amount,false); logTx(w.uid,{type:'Withdrawal refunded',naira:w.amount}); }
+  await db.ref('withdrawals/'+id+'/status').set(paid?'paid':'rejected'); VIEWS.a_wd(); }
+VIEWS.a_set=()=>{
+  set(`<div class="card"><h2>Membership & commission settings</h2><label>Membership fee (₦)</label><input id="s_fee" type="number" value="${S.fee}">
+  <div class="row"><div><label>Level 1 %</label><input id="s_l1" type="number" value="${S.l1}"></div><div><label>Level 2 %</label><input id="s_l2" type="number" value="${S.l2}"></div><div><label>Company %</label><input id="s_co" type="number" value="${S.company}"></div></div>
+  <p class="muted">The three percentages must total 100. Default: 30 / 15 / 55.</p><button class="b" onclick="saveSet()">Save</button></div>`);
+};
+async function saveSet(){ const f=num('s_fee'),a=num('s_l1'),b=num('s_l2'),c=num('s_co'); if(f<=0||Math.abs(a+b+c-100)>0.001) return toast('Percentages must total 100');
+  await db.ref('settings').update({fee:f,l1:a,l2:b,company:c}); toast('Saved'); }
 </script>
 </body>
 </html>
