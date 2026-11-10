@@ -1,342 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NaijaRemoteHub</title>
-<style>
-:root{--g:#0a7d4b;--g2:#066139;--bg:#f4f7f5;--card:#fff;--tx:#1b2a22;--mu:#6b7a72;--bd:#dfe7e2;--rd:#c0392b;--am:#e8a317}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx)}
-header{background:var(--g);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
-header h1{font-size:18px;margin:0}header button{background:#ffffff26;color:#fff;border:0;padding:6px 12px;border-radius:6px;cursor:pointer}
-nav{display:flex;gap:4px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--bd);padding:6px}
-nav button{border:0;background:none;padding:8px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;color:var(--mu);font-weight:600}
-nav button.on{background:var(--g);color:#fff}
-main{max-width:980px;margin:0 auto;padding:14px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.stat{font-size:24px;font-weight:700;color:var(--g)}.lbl{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
-input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:6px;margin:4px 0 10px;font:inherit}
-button.b{background:var(--g);color:#fff;border:0;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600}
-button.b:hover{background:var(--g2)}button.r{background:var(--rd)}button.s{padding:5px 10px;font-size:12px}button.o{background:#fff;color:var(--g);border:1px solid var(--g)}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd)}th{color:var(--mu);font-size:12px;text-transform:uppercase}
-.tbl{overflow-x:auto}h2{margin:0 0 10px;font-size:17px}h3{margin:14px 0 8px;font-size:15px}
-.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;background:#e6f4ec;color:var(--g)}.pill.w{background:#fdf3dc;color:#9a6b00}.pill.x{background:#fbe5e2;color:var(--rd)}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:8px;display:none;z-index:99;max-width:90%}
-.auth{max-width:420px;margin:30px auto}.muted{color:var(--mu);font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
-.warn{background:#fff6e0;border:1px solid #f0d28a;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px}
-.hide{display:none!important}a{color:var(--g)}
-</style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#166534">
+<title>NaijaRemoteHub | Learn. Earn. Grow.</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<style>body{font-family:Inter,system-ui,sans-serif}.page{display:none}.page.active{display:block}.field{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px 13px;background:#fff}.btn{border-radius:12px;padding:11px 16px;font-weight:700}.green{background:#166534;color:#fff}.yellow{background:#facc15;color:#14532d}.card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;box-shadow:0 8px 25px #0f172a0a}.muted{color:#64748b}.notice{padding:12px;border-radius:12px;margin-top:12px;display:none}.notice.show{display:block}.notice.error{background:#fee2e2;color:#991b1b}.notice.ok{background:#dcfce7;color:#166534}button:disabled{opacity:.5;cursor:not-allowed}</style>
 </head>
-<body>
-<header><h1>🇳🇬 NaijaRemoteHub</h1><div id="hdr"></div></header>
-<nav id="nav" class="hide"></nav>
-<main id="app"><p class="muted">Loading…</p></main>
-<div id="toast"></div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="https://js.paystack.co/v1/inline.js"></script>
+<body class="bg-slate-50 text-slate-800">
+<header class="sticky top-0 z-30 bg-white border-b"><div class="max-w-7xl mx-auto p-4 flex justify-between items-center gap-3"><a href="#" onclick="page('home');return false" class="font-black text-xl text-green-800">🇳🇬 NaijaRemoteHub</a><nav class="flex gap-2 text-sm"><button onclick="page('home')" class="px-2">Home</button><button id="loginNav" onclick="page('auth')" class="px-2">Login / Join</button><button id="dashNav" class="hidden px-2" onclick="page('dashboard')">Dashboard</button><button id="adminNav" class="hidden px-2" onclick="page('admin')">Admin</button><button id="logoutNav" class="hidden px-2 text-red-600" onclick="logout()">Logout</button></nav></div></header>
+<div id="toast" class="max-w-7xl mx-auto px-4"></div>
+<main>
+<section id="home" class="page active"><div class="bg-gradient-to-br from-green-900 via-green-700 to-emerald-600 text-white"><div class="max-w-7xl mx-auto px-5 py-20"><div class="max-w-3xl"><p class="font-bold text-yellow-300">LEARN REMOTE WORK. EARN WHILE YOU LEARN.</p><h1 class="text-5xl md:text-6xl font-black mt-4">Learn. Earn.<br>Grow.</h1><p class="text-lg mt-5 text-green-50">Build practical digital skills, access learning resources, complete tasks and grow with the NaijaRemoteHub community.</p><div class="flex flex-wrap gap-3 mt-8"><button class="btn yellow" onclick="page('auth');switchAuth('signup')">Create an account</button><button class="btn bg-white text-green-900" onclick="document.getElementById('membership').scrollIntoView({behavior:'smooth'})">Membership details</button></div><p class="text-sm text-green-100 mt-4">Start with your smartphone. A laptop is not required to get started.</p></div></div></div>
+<div class="max-w-7xl mx-auto px-5 py-12"><div id="membership" class="card max-w-3xl mx-auto"><div class="flex flex-wrap justify-between gap-3"><span class="text-green-700 font-bold">ONE-TIME MEMBERSHIP</span><span class="rounded-full bg-green-100 text-green-800 px-3 py-1 text-xs font-bold">No recurring renewal</span></div><div class="text-4xl font-black mt-3">₦30,000</div><p class="muted mt-2">Membership access, referral programme eligibility and learning resources.</p><button onclick="page('auth');switchAuth('signup')" class="btn green mt-5 w-full">Join NaijaRemoteHub</button><p class="text-xs muted mt-3">Referral commissions are based on verified membership payments: Level 1 ₦9,000, Level 2 ₦4,500. Company retention is 55% (₦16,500).</p></div><div class="grid md:grid-cols-3 gap-4 mt-10"><div class="card"><div class="text-3xl">📚</div><h3 class="font-extrabold mt-3">Learn</h3><p class="muted text-sm mt-2">Access educational materials and practical tasks.</p></div><div class="card"><div class="text-3xl">⭐</div><h3 class="font-extrabold mt-3">Earn points</h3><p class="muted text-sm mt-2">Complete approved tasks and collect reward points.</p></div><div class="card"><div class="text-3xl">🤝</div><h3 class="font-extrabold mt-3">Refer</h3><p class="muted text-sm mt-2">Earn eligible two-level referral commissions.</p></div></div><h2 class="text-2xl font-black mt-12">Announcements</h2><div id="publicAnnouncements" class="grid md:grid-cols-2 gap-4 mt-4"><p class="muted">Sign in to view announcements.</p></div></div></section>
+<section id="auth" class="page"><div class="max-w-md mx-auto px-4 py-12"><div class="card"><h1 class="text-2xl font-black">Welcome to NaijaRemoteHub</h1><p class="muted text-sm mt-1">Create your account or sign in.</p><div class="grid grid-cols-2 gap-2 mt-5"><button id="loginTab" class="btn green" onclick="switchAuth('login')">Login</button><button id="signupTab" class="btn bg-slate-100" onclick="switchAuth('signup')">Sign up</button></div><form id="loginForm" class="space-y-3 mt-5"><input id="loginEmail" class="field" type="email" placeholder="Email address" required><input id="loginPassword" class="field" type="password" placeholder="Password" required><button class="btn green w-full">Login</button></form><form id="signupForm" class="hidden space-y-3 mt-5"><input id="signupName" class="field" placeholder="Full name" required maxlength="100"><input id="signupEmail" class="field" type="email" placeholder="Email address" required><input id="signupPassword" class="field" type="password" placeholder="Password (at least 6 characters)" minlength="6" required><input id="signupReferral" class="field" placeholder="Referral code (optional)"><button class="btn green w-full">Create account</button><p class="text-xs muted">After creating an account, pay the ₦30,000 one-time membership fee from your dashboard.</p></form><div id="authMsg" class="notice"></div></div></div></section>
+<section id="dashboard" class="page"><div class="max-w-7xl mx-auto px-4 py-8"><div class="flex flex-wrap justify-between gap-3 items-center"><div><p class="text-green-700 text-xs font-black">MEMBER AREA</p><h1 class="text-3xl font-black">My Dashboard</h1><p id="welcome" class="muted mt-1"></p></div><span id="memberStatus" class="rounded-full bg-slate-200 px-3 py-1 text-xs font-bold">FREE ACCOUNT</span></div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6"><div class="card"><p class="muted text-sm">Naira wallet</p><p id="nairaBalance" class="text-2xl font-black mt-2">₦0</p></div><div class="card"><p class="muted text-sm">Points balance</p><p id="pointsBalance" class="text-2xl font-black mt-2">0</p></div><div class="card"><p class="muted text-sm">Referrals</p><p id="refCount" class="text-2xl font-black mt-2">0</p></div><div class="card"><p class="muted text-sm">Membership</p><p id="paidStatus" class="text-lg font-black mt-2">Not active</p></div></div>
+<div class="grid lg:grid-cols-2 gap-5 mt-5"><div class="card"><h2 class="font-extrabold text-lg">Membership payment</h2><p class="muted text-sm mt-1">One-time payment of ₦30,000.</p><button id="payBtn" class="btn green w-full mt-4" onclick="startPayment()">Pay ₦30,000 with Paystack</button><div id="payMsg" class="notice"></div></div><div class="card"><h2 class="font-extrabold text-lg">My referral link</h2><input id="refLink" class="field mt-3" readonly><button class="btn yellow w-full mt-3" onclick="copyRef()">Copy referral link</button><p id="refEarnings" class="text-sm muted mt-3"></p></div></div>
+<div class="grid lg:grid-cols-2 gap-5 mt-5"><div class="card"><h2 class="font-extrabold">Buy points from points pool</h2><p id="pointRate" class="muted text-sm mt-1">Conversion rate loading…</p><form id="buyPointsForm" class="mt-3 space-y-3"><input id="buyAmount" class="field" type="number" min="1" step="1" placeholder="Amount in naira" required><button class="btn green w-full">Buy points using naira wallet</button></form></div><div class="card"><h2 class="font-extrabold">Transfer to another member</h2><form id="transferForm" class="mt-3 space-y-3"><input id="transferEmail" class="field" type="email" placeholder="Recipient email" required><select id="transferType" class="field"><option value="points">Transfer points</option><option value="naira">Transfer naira wallet</option></select><input id="transferAmount" class="field" type="number" min="1" step="1" placeholder="Amount" required><button class="btn green w-full">Send transfer</button></form></div></div>
+<div class="grid lg:grid-cols-2 gap-5 mt-5"><div class="card"><h2 class="font-extrabold">Available tasks</h2><div id="tasksList" class="space-y-3 mt-3"><p class="muted">Loading tasks…</p></div></div><div class="card"><h2 class="font-extrabold">Educational materials</h2><div id="materialsList" class="space-y-3 mt-3"><p class="muted">Loading materials…</p></div></div></div>
+<div class="card mt-5"><h2 class="font-extrabold">Recent transactions</h2><div id="transactionsList" class="mt-3 text-sm muted">Loading…</div></div><div class="card mt-5"><h2 class="font-extrabold">Announcements</h2><div id="memberAnnouncements" class="mt-3 space-y-3"></div></div></div></section>
+<section id="admin" class="page"><div class="max-w-7xl mx-auto px-4 py-8"><p class="text-xs text-green-700 font-black">CONTROL CENTRE</p><h1 class="text-3xl font-black">Administrator Dashboard</h1><p class="muted mt-1">All balance changes are processed by the trusted server and recorded in the ledger.</p>
+<div class="grid md:grid-cols-3 gap-4 mt-6"><div class="card"><p class="muted text-sm">Total members</p><p id="adminMembers" class="text-2xl font-black">—</p></div><div class="card"><p class="muted text-sm">Points in pool</p><p id="adminPool" class="text-2xl font-black">—</p></div><div class="card"><p class="muted text-sm">Company retention (per signup)</p><p class="text-2xl font-black">₦16,500</p></div></div>
+<div class="grid lg:grid-cols-2 gap-5 mt-5"><div class="card"><h2 class="font-extrabold text-lg">Points control</h2><form id="pointsConfigForm" class="space-y-3 mt-3"><label class="text-sm font-semibold">Naira price per point</label><input id="nairaPerPoint" class="field" type="number" min="0.01" step="0.01" required><button class="btn green w-full">Save conversion price</button></form><hr class="my-5"><form id="mintBurnForm" class="space-y-3"><select id="mintBurnAction" class="field"><option value="mintPoints">Mint points to member</option><option value="burnPoints">Burn points from member</option><option value="mintPool">Mint points into pool</option><option value="burnPool">Burn points from pool</option></select><input id="pointsTarget" class="field" type="text" placeholder="Member email (not needed for pool)"><input id="pointsQty" class="field" type="number" min="1" step="1" placeholder="Points quantity" required><input id="pointsReason" class="field" placeholder="Reason / audit note" required><button class="btn green w-full">Apply points operation</button></form></div>
+<div class="card"><h2 class="font-extrabold text-lg">Mass points distribution</h2><p class="text-sm muted mt-1">Choose all members or enter comma-separated member email addresses.</p><form id="massForm" class="space-y-3 mt-3"><select id="massMode" class="field"><option value="all">All members</option><option value="selected">Selected email addresses</option></select><textarea id="massEmails" class="field" rows="3" placeholder="member1@example.com, member2@example.com"></textarea><input id="massPoints" class="field" type="number" min="1" step="1" placeholder="Points per member" required><input id="massReason" class="field" placeholder="Distribution reason" required><button class="btn green w-full">Distribute points</button></form></div></div>
+<div class="grid lg:grid-cols-2 gap-5 mt-5"><div class="card"><h2 class="font-extrabold">Create task</h2><form id="taskForm" class="space-y-3 mt-3"><input id="taskTitle" class="field" placeholder="Task title" required><textarea id="taskDescription" class="field" rows="3" placeholder="Instructions" required></textarea><input id="taskReward" class="field" type="number" min="1" step="1" placeholder="Points reward" required><button class="btn green w-full">Publish task</button></form><h3 class="font-bold mt-6">Task submissions</h3><div id="adminSubmissions" class="space-y-2 mt-3"></div></div><div class="card"><h2 class="font-extrabold">Post announcement</h2><form id="announcementForm" class="space-y-3 mt-3"><input id="announcementTitle" class="field" placeholder="Announcement title" required><textarea id="announcementBody" class="field" rows="4" placeholder="Message" required></textarea><button class="btn green w-full">Publish announcement</button></form><hr class="my-5"><h2 class="font-extrabold">Post educational material</h2><form id="materialForm" class="space-y-3 mt-3"><input id="materialTitle" class="field" placeholder="Material title" required><input id="materialCategory" class="field" placeholder="Category" required><textarea id="materialDescription" class="field" rows="2" placeholder="Description" required></textarea><input id="materialUrl" class="field" type="url" placeholder="Resource URL (https://...)" required><label class="text-sm"><input id="materialFree" type="checkbox" class="mr-2">Free to all members</label><button class="btn green w-full">Publish material</button></form></div></div>
+<div class="card mt-5"><h2 class="font-extrabold">Members</h2><div id="adminUsers" class="overflow-x-auto mt-3 text-sm">Loading…</div></div></div></section>
+</main><footer class="bg-slate-900 text-slate-300 mt-12"><div class="max-w-7xl mx-auto p-6 text-sm">© <span id="year"></span> NaijaRemoteHub. Learn. Earn. Grow.</div></footer>
 <script>
-/* ================= CONFIG ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
-  authDomain: "naijaremotehub-6f584.firebaseapp.com",
-  databaseURL: "https://naijaremotehub-6f584-default-rtdb.firebaseio.com",
-  projectId: "naijaremotehub-6f584",
-  storageBucket: "naijaremotehub-6f584.firebasestorage.app",
-  messagingSenderId: "662711600492",
-  appId: "1:662711600492:web:a307027882c532269adf49",
-  measurementId: "G-GPWVV5WLEC"
-};
-const PAYSTACK_PK = 'pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a';
-/* Your deployed server endpoint that verifies a Paystack reference with the SECRET key.
-   Expected: POST {reference} -> JSON {status:true, amount:<kobo>}  (amount in kobo).
-   Leave '' only for testing: payments are then NOT verified server-side. */
-const VERIFY_URL = '';
-const DEFAULTS = {fee:30000, l1:30, l2:15, company:55, pointPrice:10, pool:0, supply:0, revenue:0};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(), db = firebase.database();
-const $ = id => document.getElementById(id);
-const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const N = v => '₦'+Number(v||0).toLocaleString('en-NG',{maximumFractionDigits:2});
-const P = v => Number(v||0).toLocaleString('en-NG',{maximumFractionDigits:2})+' pts';
-const val = id => $(id).value.trim();
-const num = id => parseFloat($(id).value)||0;
-const dt = t => new Date(t).toLocaleString();
-function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3800)}
-
-let me=null, uid=null, isAdmin=false, S={...DEFAULTS}, tab='dash', unsubs=[];
-
-/* ============ DB helpers (transactions) ============ */
-async function tx(path, fn){ const r = await db.ref(path).transaction(fn); return r; }
-async function adjust(path, delta, requireNonNeg=true){
-  const r = await tx(path, v=>{ v=Number(v||0)+delta; if(requireNonNeg && v<0) return; return v; });
-  return r.committed;
-}
-function logTx(u, o){ return db.ref('txs/'+u).push({...o, t:Date.now()}); }
-function genCode(){ const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s='NRH'; for(let i=0;i<5;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
-
-/* ============ Auth view ============ */
-function authView(mode='login'){
-  $('nav').classList.add('hide'); $('hdr').innerHTML='';
-  const ref = new URLSearchParams(location.search).get('ref')||'';
-  $('app').innerHTML = `<div class="card auth"><h2>${mode==='login'?'Member Login':'Join NaijaRemoteHub'}</h2>
-  ${mode==='reg'?`<label>Full name</label><input id="a_name"><label>Phone</label><input id="a_phone" type="tel">`:''}
-  <label>Email</label><input id="a_email" type="email"><label>Password</label><input id="a_pass" type="password">
-  ${mode==='reg'?`<label>Referral code (optional)</label><input id="a_ref" value="${esc(ref)}"><p class="muted">Membership fee: ${N(S.fee)} (one-time, via Paystack).</p>`:''}
-  <button class="b" style="width:100%" onclick="${mode==='login'?'doLogin()':'doReg()'}">${mode==='login'?'Login':'Register & Pay'}</button>
-  <p class="muted" style="text-align:center">${mode==='login'?'No account? <a href="#" onclick="authView(\'reg\');return false">Register</a><br><a href="#" onclick="resetPw();return false">Forgot password?</a>':'Have an account? <a href="#" onclick="authView(\'login\');return false">Login</a>'}</p></div>`;
-}
-async function doLogin(){ try{ await auth.signInWithEmailAndPassword(val('a_email'),val('a_pass')); }catch(e){toast(e.message)} }
-async function resetPw(){ const e=val('a_email'); if(!e) return toast('Enter your email first'); try{await auth.sendPasswordResetEmail(e);toast('Reset email sent')}catch(x){toast(x.message)} }
-async function doReg(){
-  const name=val('a_name'), phone=val('a_phone'), email=val('a_email'), pass=val('a_pass'), rc=val('a_ref').toUpperCase();
-  if(!name||!email||pass.length<6) return toast('Fill name, email and a 6+ char password');
-  let l1=null,l2=null;
-  if(rc){ const s=await db.ref('refCodes/'+rc).get(); if(!s.exists()) return toast('Invalid referral code'); l1=s.val();
-    const p=await db.ref('users/'+l1+'/referrer').get(); l2=p.val()||null; }
-  try{
-    const c = await auth.createUserWithEmailAndPassword(email,pass);
-    const code = genCode();
-    await db.ref('refCodes/'+code).set(c.user.uid);
-    await db.ref('users/'+c.user.uid).set({name,phone,email,code,referrer:l1,referrer2:l2,status:'pending',naira:0,points:0,joined:Date.now()});
-  }catch(e){toast(e.message)}
-}
-
-/* ============ Payments ============ */
-function paystack(email, amount, meta, onOk){
-  const ref='NRH'+Date.now()+Math.floor(Math.random()*1e4);
-  const h = PaystackPop.setup({key:PAYSTACK_PK, email, amount:Math.round(amount*100), currency:'NGN', ref, metadata:meta,
-    callback:r=>{ onOk(r.reference||ref); }, onClose:()=>toast('Payment window closed')});
-  h.openIframe();
-}
-async function verify(reference, amount){
-  if(!VERIFY_URL){ console.warn('VERIFY_URL not set – payment not verified server-side'); return true; }
-  try{ const r=await fetch(VERIFY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reference})}); const j=await r.json();
-    return j.status===true && Number(j.amount)>=Math.round(amount*100); }catch(e){return false}
-}
-function payMembership(){
-  paystack(me.email, S.fee, {uid, purpose:'membership'}, async ref=>{
-    toast('Verifying payment…');
-    if(!(await verify(ref,S.fee))) return toast('Payment could not be verified. Contact support with ref '+ref);
-    await activate(uid, ref);
-  });
-}
-async function activate(u, ref){
-  const done = await db.ref('users/'+u+'/status').transaction(v=> v==='pending'? 'active': undefined);
-  if(!done.committed) return;
-  const usedRef = await db.ref('payments/'+ref).transaction(v=> v? undefined : {uid:u,amount:S.fee,t:Date.now(),type:'membership'});
-  if(!usedRef.committed){ await db.ref('users/'+u+'/status').set('pending'); return toast('Reference already used'); }
-  const us=(await db.ref('users/'+u).get()).val();
-  const a1=S.fee*S.l1/100, a2=S.fee*S.l2/100; let co=S.fee*S.company/100;
-  if(us.referrer){ await adjust('users/'+us.referrer+'/naira',a1,false); logTx(us.referrer,{type:'Referral L1',naira:a1,note:us.name}); } else co+=a1;
-  if(us.referrer2){ await adjust('users/'+us.referrer2+'/naira',a2,false); logTx(us.referrer2,{type:'Referral L2',naira:a2,note:us.name}); } else co+=a2;
-  await adjust('settings/revenue',co,false);
-  await db.ref('referrals/'+u).set({l1:us.referrer||null,l2:us.referrer2||null,t:Date.now()});
-  toast('Membership activated. Welcome!');
-}
-
-/* ============ Boot ============ */
-auth.onAuthStateChanged(async u=>{
-  unsubs.forEach(f=>f()); unsubs=[];
-  if(!u){ uid=null; me=null; isAdmin=false; return authView('login'); }
-  uid=u.uid;
-  const sref=db.ref('settings'); const sl=sref.on('value',s=>{ S={...DEFAULTS,...(s.val()||{})}; if(me) render(); });
-  unsubs.push(()=>sref.off('value',sl));
-  isAdmin=(await db.ref('admins/'+uid).get()).val()===true;
-  const uref=db.ref('users/'+uid); const ul=uref.on('value',s=>{ me=s.val(); if(!me) return; render(); });
-  unsubs.push(()=>uref.off('value',ul));
-});
-
-/* ============ Shell ============ */
-const MEMBER_TABS=[['dash','Dashboard'],['tasks','Tasks'],['wallet','Wallet & P2P'],['buy','Buy Points'],['team','My Team'],['learn','Learn'],['news','Announcements']];
-const ADMIN_TABS=[['a_over','Overview'],['a_points','Points'],['a_mass','Mass Transfer'],['a_news','Announcements'],['a_learn','Materials'],['a_tasks','Tasks'],['a_mem','Members'],['a_wd','Withdrawals'],['a_set','Settings']];
-function go(t){tab=t;render()}
-function render(){
-  if(!me) return;
-  $('hdr').innerHTML=`<span style="margin-right:10px;font-size:13px">${esc(me.name)}</span><button onclick="auth.signOut()">Logout</button>`;
-  if(me.status!=='active' && !isAdmin){
-    $('nav').classList.add('hide');
-    $('app').innerHTML=`<div class="card auth"><h2>Complete your membership</h2><p>Hi ${esc(me.name)}, pay the one-time membership fee of <b>${N(S.fee)}</b> to activate your account.</p><button class="b" style="width:100%" onclick="payMembership()">Pay ${N(S.fee)} with Paystack</button></div>`; return;
-  }
-  const tabs = MEMBER_TABS.concat(isAdmin?ADMIN_TABS:[]);
-  if(!tabs.find(t=>t[0]===tab)) tab='dash';
-  $('nav').classList.remove('hide');
-  $('nav').innerHTML=tabs.map(t=>`<button class="${t[0]===tab?'on':''}" onclick="go('${t[0]}')">${t[1]}${t[0]==='a_over'?' ⚙':''}</button>`).join('');
-  (VIEWS[tab]||VIEWS.dash)();
-}
-const VIEWS={};
-function set(html){ $('app').innerHTML=html; }
-
-/* ============ Member views ============ */
-VIEWS.dash=async()=>{
-  const link=location.origin+location.pathname+'?ref='+me.code;
-  set(`<div class="grid"><div class="card"><div class="lbl">Naira wallet</div><div class="stat">${N(me.naira)}</div></div>
-  <div class="card"><div class="lbl">Points</div><div class="stat">${P(me.points)}</div></div>
-  <div class="card"><div class="lbl">Point price</div><div class="stat">${N(S.pointPrice)}</div></div></div>
-  <div class="card"><h2>Your referral</h2><p>Code: <b>${esc(me.code)}</b></p><input readonly value="${esc(link)}" onclick="this.select()">
-  <p class="muted">Earn ${S.l1}% (${N(S.fee*S.l1/100)}) on direct referrals and ${S.l2}% (${N(S.fee*S.l2/100)}) on their referrals' sign-ups.</p></div>
-  <div class="card"><h2>Recent activity</h2><div class="tbl" id="hist">Loading…</div></div>`);
-  const s=await db.ref('txs/'+uid).limitToLast(15).get(); const rows=[]; s.forEach(c=>rows.unshift(c.val()));
-  if($('hist')) $('hist').innerHTML=rows.length?`<table><tr><th>When</th><th>Type</th><th>Naira</th><th>Points</th><th>Note</th></tr>${rows.map(r=>`<tr><td>${dt(r.t)}</td><td>${esc(r.type)}</td><td>${r.naira?N(r.naira):''}</td><td>${r.points?P(r.points):''}</td><td>${esc(r.note||'')}</td></tr>`).join('')}</table>`:'<p class="muted">No activity yet.</p>';
-};
-VIEWS.team=async()=>{
-  set('<div class="card"><h2>My Team</h2><div id="tm">Loading…</div></div>');
-  const all=(await db.ref('users').orderByChild('referrer').equalTo(uid).get()); const l1=[]; all.forEach(c=>l1.push({id:c.key,...c.val()}));
-  const all2=(await db.ref('users').orderByChild('referrer2').equalTo(uid).get()); const l2=[]; all2.forEach(c=>l2.push({id:c.key,...c.val()}));
-  const t=(a)=>a.length?`<table><tr><th>Name</th><th>Status</th><th>Joined</th></tr>${a.map(m=>`<tr><td>${esc(m.name)}</td><td><span class="pill ${m.status==='active'?'':'w'}">${m.status}</span></td><td>${dt(m.joined)}</td></tr>`).join('')}</table>`:'<p class="muted">None yet.</p>';
-  $('tm').innerHTML=`<h3>Level 1 (${l1.length})</h3>${t(l1)}<h3>Level 2 (${l2.length})</h3>${t(l2)}`;
-};
-VIEWS.tasks=async()=>{
-  set('<div class="card"><h2>Tasks</h2><div id="tk">Loading…</div></div>');
-  const [ts,ss]=await Promise.all([db.ref('tasks').get(),db.ref('submissions').orderByChild('uid').equalTo(uid).get()]);
-  const mine={}; ss.forEach(c=>{mine[c.val().taskId]=c.val()});
-  const list=[]; ts.forEach(c=>{ if(c.val().active!==false) list.unshift({id:c.key,...c.val()}) });
-  $('tk').innerHTML=list.length?list.map(t=>{ const m=mine[t.id];
-    return `<div class="card"><b>${esc(t.title)}</b> <span class="pill">${P(t.reward)}</span><p>${esc(t.desc)}</p>
-    ${m?`<span class="pill ${m.status==='approved'?'':m.status==='rejected'?'x':'w'}">${m.status}</span>`:
-    `<textarea id="pf_${t.id}" placeholder="Proof / link / notes"></textarea><button class="b s" onclick="submitTask('${t.id}')">Submit</button>`}</div>`}).join(''):'<p class="muted">No tasks available.</p>';
-};
-async function submitTask(id){ const p=val('pf_'+id); if(!p) return toast('Add proof'); 
-  await db.ref('submissions/'+uid+'_'+id).set({uid,taskId:id,name:me.name,proof:p,status:'pending',t:Date.now()}); toast('Submitted'); VIEWS.tasks(); }
-
-VIEWS.wallet=()=>{
-  set(`<div class="grid"><div class="card"><div class="lbl">Naira</div><div class="stat">${N(me.naira)}</div></div><div class="card"><div class="lbl">Points</div><div class="stat">${P(me.points)}</div></div></div>
-  <div class="card"><h2>P2P Transfer</h2><label>Recipient member code</label><input id="t_to" placeholder="e.g. NRHABC12" style="text-transform:uppercase">
-  <div class="row"><div><label>Asset</label><select id="t_as"><option value="naira">Naira</option><option value="points">Points</option></select></div><div><label>Amount</label><input id="t_amt" type="number" min="0" step="any"></div></div>
-  <label>Note (optional)</label><input id="t_note"><button class="b" onclick="p2p()">Send</button></div>
-  <div class="card"><h2>Fund wallet</h2><input id="d_amt" type="number" placeholder="Amount in ₦ (min 100)"><button class="b" onclick="deposit()">Pay with Paystack</button></div>
-  <div class="card"><h2>Withdraw naira</h2><input id="w_amt" type="number" placeholder="Amount"><input id="w_bank" placeholder="Bank, account number, account name">
-  <button class="b o" onclick="withdraw()">Request withdrawal</button></div>`);
-};
-async function p2p(){
-  const code=val('t_to').toUpperCase(), as=$('t_as').value, amt=num('t_amt'), note=val('t_note');
-  if(amt<=0) return toast('Enter an amount'); if(code===me.code) return toast('Cannot send to yourself');
-  const s=await db.ref('refCodes/'+code).get(); if(!s.exists()) return toast('Member not found'); const to=s.val();
-  const rs=(await db.ref('users/'+to+'/status').get()).val(); if(rs!=='active') return toast('Recipient is not an active member');
-  if(!(await adjust('users/'+uid+'/'+as,-amt))) return toast('Insufficient '+as);
-  if(!(await adjust('users/'+to+'/'+as,amt,false))){ await adjust('users/'+uid+'/'+as,amt,false); return toast('Transfer failed'); }
-  const o=as==='naira'?{naira:amt}:{points:amt};
-  logTx(uid,{type:'Sent',...o,note:code+(note?' – '+note:'')}); logTx(to,{type:'Received',...o,note:me.code+(note?' – '+note:'')});
-  toast('Sent'); $('t_amt').value='';
-}
-function deposit(){ const a=num('d_amt'); if(a<100) return toast('Minimum ₦100');
-  paystack(me.email,a,{uid,purpose:'deposit'},async ref=>{ if(!(await verify(ref,a))) return toast('Could not verify payment');
-    const u=await db.ref('payments/'+ref).transaction(v=>v?undefined:{uid,amount:a,type:'deposit',t:Date.now()}); if(!u.committed) return;
-    await adjust('users/'+uid+'/naira',a,false); logTx(uid,{type:'Deposit',naira:a,note:ref}); toast('Wallet funded'); }); }
-async function withdraw(){ const a=num('w_amt'), b=val('w_bank'); if(a<=0||!b) return toast('Enter amount and bank details');
-  if(!(await adjust('users/'+uid+'/naira',-a))) return toast('Insufficient balance');
-  await db.ref('withdrawals').push({uid,name:me.name,amount:a,bank:b,status:'pending',t:Date.now()}); logTx(uid,{type:'Withdrawal request',naira:-a}); toast('Request submitted'); }
-
-VIEWS.buy=()=>{
-  set(`<div class="card"><h2>Buy points from pool</h2><p>Price: <b>${N(S.pointPrice)}</b> per point · Pool available: <b>${P(S.pool)}</b></p>
-  <label>Points to buy</label><input id="b_amt" type="number" min="0" step="any" oninput="$('b_cost').textContent=N(num('b_amt')*S.pointPrice)">
-  <p>Cost: <b id="b_cost">₦0</b> (from your naira wallet: ${N(me.naira)})</p><button class="b" onclick="buyPts()">Buy</button></div>`);
-};
-async function buyPts(){
-  const q=num('b_amt'); if(q<=0) return toast('Enter quantity'); const cost=+(q*S.pointPrice).toFixed(2);
-  if(!(await adjust('settings/pool',-q))) return toast('Not enough points in pool');
-  if(!(await adjust('users/'+uid+'/naira',-cost))){ await adjust('settings/pool',q,false); return toast('Insufficient naira balance'); }
-  await adjust('users/'+uid+'/points',q,false); await adjust('settings/revenue',cost,false);
-  logTx(uid,{type:'Bought points',points:q,naira:-cost}); toast('Purchased '+P(q));
-}
-VIEWS.learn=async()=>{
-  set('<div class="card"><h2>Educational materials</h2><div id="lm">Loading…</div></div>');
-  const s=await db.ref('materials').get(); const a=[]; s.forEach(c=>a.unshift(c.val()));
-  $('lm').innerHTML=a.length?a.map(m=>`<div class="card"><b>${esc(m.title)}</b> <span class="pill">${esc(m.cat||'General')}</span><p style="white-space:pre-wrap">${esc(m.body||'')}</p>${/^https?:\/\//.test(m.url||'')?`<a href="${esc(m.url)}" target="_blank" rel="noopener">Open resource ↗</a>`:''}</div>`).join(''):'<p class="muted">Nothing posted yet.</p>';
-};
-VIEWS.news=async()=>{
-  set('<div class="card"><h2>Announcements</h2><div id="an">Loading…</div></div>');
-  const s=await db.ref('announcements').get(); const a=[]; s.forEach(c=>a.unshift(c.val()));
-  $('an').innerHTML=a.length?a.map(m=>`<div class="card"><b>${esc(m.title)}</b><div class="muted">${dt(m.t)}</div><p style="white-space:pre-wrap">${esc(m.body)}</p></div>`).join(''):'<p class="muted">No announcements.</p>';
-};
-
-/* ============ Admin views ============ */
-VIEWS.a_over=()=>{
-  set(`<div class="grid"><div class="card"><div class="lbl">Company revenue</div><div class="stat">${N(S.revenue)}</div></div>
-  <div class="card"><div class="lbl">Points pool</div><div class="stat">${P(S.pool)}</div></div>
-  <div class="card"><div class="lbl">Total supply</div><div class="stat">${P(S.supply)}</div></div></div>
-  ${VERIFY_URL?'':'<div class="warn">⚠ VERIFY_URL is empty: Paystack payments are not verified by your server. Set it before going live.</div>'}`);
-};
-VIEWS.a_points=()=>{
-  set(`<div class="card"><h2>Mint points (to pool)</h2><input id="m_amt" type="number" placeholder="Amount"><button class="b" onclick="mint()">Mint</button></div>
-  <div class="card"><h2>Burn points</h2><select id="bn_src"><option value="pool">From pool</option><option value="member">From a member</option></select>
-  <input id="bn_code" placeholder="Member code (if from member)"><input id="bn_amt" type="number" placeholder="Amount"><button class="b r" onclick="burn()">Burn</button></div>
-  <div class="card"><h2>Naira ⇄ points price</h2><p class="muted">Current: ${N(S.pointPrice)} per point</p><input id="pp" type="number" step="any" value="${S.pointPrice}"><button class="b" onclick="setPrice()">Update price</button></div>
-  <div class="card"><h2>Send from pool to one member</h2><input id="g_code" placeholder="Member code"><input id="g_amt" type="number" placeholder="Points"><button class="b" onclick="grant()">Send</button></div>`);
-};
-async function mint(){ const a=num('m_amt'); if(a<=0) return toast('Amount?'); await adjust('settings/pool',a,false); await adjust('settings/supply',a,false); toast('Minted '+P(a)); }
-async function memberByCode(c){ const s=await db.ref('refCodes/'+c.toUpperCase()).get(); return s.exists()?s.val():null; }
-async function burn(){ const a=num('bn_amt'); if(a<=0) return toast('Amount?');
-  if($('bn_src').value==='pool'){ if(!(await adjust('settings/pool',-a))) return toast('Pool too small'); }
-  else{ const u=await memberByCode(val('bn_code')); if(!u) return toast('Member not found'); if(!(await adjust('users/'+u+'/points',-a))) return toast('Member balance too small'); logTx(u,{type:'Burned by admin',points:-a}); }
-  await adjust('settings/supply',-a,false); toast('Burned '+P(a)); }
-async function setPrice(){ const p=num('pp'); if(p<=0) return toast('Invalid'); await db.ref('settings/pointPrice').set(p); toast('Price updated'); }
-async function grant(){ const u=await memberByCode(val('g_code')), a=num('g_amt'); if(!u||a<=0) return toast('Check inputs');
-  if(!(await adjust('settings/pool',-a))) return toast('Pool too small'); await adjust('users/'+u+'/points',a,false); logTx(u,{type:'Admin grant',points:a}); toast('Sent'); }
-
-VIEWS.a_mass=async()=>{
-  set('<div class="card"><h2>Mass points transfer (from pool)</h2><p class="muted">Pool: '+P(S.pool)+'</p><div id="ms">Loading members…</div></div>');
-  const s=await db.ref('users').get(); const a=[]; s.forEach(c=>{ if(c.val().status==='active') a.push({id:c.key,...c.val()}) });
-  $('ms').innerHTML=`<label>Points per member</label><input id="ms_amt" type="number" step="any">
-  <label><input type="checkbox" id="ms_all" style="width:auto" onchange="document.querySelectorAll('.ms_c').forEach(c=>c.checked=this.checked)"> Select all (${a.length} active members)</label>
-  <div class="tbl" style="max-height:320px;overflow:auto"><table>${a.map(m=>`<tr><td><input type="checkbox" class="ms_c" style="width:auto" value="${m.id}"></td><td>${esc(m.name)}</td><td>${esc(m.code)}</td><td>${P(m.points)}</td></tr>`).join('')}</table></div>
-  <button class="b" onclick="massSend()">Distribute</button>`;
-};
-async function massSend(){
-  const a=num('ms_amt'), ids=[...document.querySelectorAll('.ms_c:checked')].map(c=>c.value);
-  if(a<=0||!ids.length) return toast('Choose members and amount'); const total=a*ids.length;
-  if(!confirm('Send '+P(a)+' to '+ids.length+' members ('+P(total)+' total)?')) return;
-  if(!(await adjust('settings/pool',-total))) return toast('Pool too small — mint more first');
-  for(const u of ids){ await adjust('users/'+u+'/points',a,false); logTx(u,{type:'Admin distribution',points:a}); }
-  toast('Distributed to '+ids.length+' members'); }
-
-VIEWS.a_news=()=>{ set(`<div class="card"><h2>Post announcement</h2><input id="n_t" placeholder="Title"><textarea id="n_b" rows="5" placeholder="Message"></textarea><button class="b" onclick="postNews()">Publish</button></div><div class="card"><h2>Existing</h2><div id="nl"></div></div>`); listAdmin('announcements','nl'); };
-async function postNews(){ if(!val('n_t')||!val('n_b')) return toast('Fill both'); await db.ref('announcements').push({title:val('n_t'),body:val('n_b'),t:Date.now()}); toast('Published'); VIEWS.a_news(); }
-VIEWS.a_learn=()=>{ set(`<div class="card"><h2>Post material</h2><input id="l_t" placeholder="Title"><input id="l_c" placeholder="Category"><textarea id="l_b" rows="5" placeholder="Content / lesson text"></textarea><input id="l_u" placeholder="Link (https://…) optional"><button class="b" onclick="postLearn()">Publish</button></div><div class="card"><h2>Existing</h2><div id="nl"></div></div>`); listAdmin('materials','nl'); };
-async function postLearn(){ if(!val('l_t')) return toast('Title?'); await db.ref('materials').push({title:val('l_t'),cat:val('l_c'),body:val('l_b'),url:val('l_u'),t:Date.now()}); toast('Published'); VIEWS.a_learn(); }
-async function listAdmin(path,el){ const s=await db.ref(path).get(); const a=[]; s.forEach(c=>a.unshift({id:c.key,...c.val()}));
-  $(el).innerHTML=a.map(x=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--bd);padding:6px 0"><span>${esc(x.title)}</span><button class="b r s" onclick="delItem('${path}','${x.id}')">Delete</button></div>`).join('')||'<p class="muted">Empty</p>'; }
-async function delItem(p,id){ if(!confirm('Delete?')) return; await db.ref(p+'/'+id).remove(); render(); }
-
-VIEWS.a_tasks=async()=>{
-  set(`<div class="card"><h2>Create task</h2><input id="k_t" placeholder="Title"><textarea id="k_d" rows="3" placeholder="Instructions"></textarea><input id="k_r" type="number" placeholder="Reward (points)"><button class="b" onclick="postTask()">Create</button></div>
-  <div class="card"><h2>Pending submissions</h2><div id="sb">Loading…</div></div><div class="card"><h2>Tasks</h2><div id="nl"></div></div>`);
-  listAdmin('tasks','nl');
-  const [s,ts]=await Promise.all([db.ref('submissions').orderByChild('status').equalTo('pending').get(),db.ref('tasks').get()]); const tk=ts.val()||{}; const a=[]; s.forEach(c=>a.push({id:c.key,...c.val()}));
-  $('sb').innerHTML=a.length?a.map(x=>`<div class="card"><b>${esc(x.name)}</b> → ${esc(tk[x.taskId]?.title||'(deleted task)')} <span class="pill">${P(tk[x.taskId]?.reward)}</span><p style="white-space:pre-wrap">${esc(x.proof)}</p>
-  <button class="b s" onclick="review('${x.id}',true)">Approve & pay</button> <button class="b r s" onclick="review('${x.id}',false)">Reject</button></div>`).join(''):'<p class="muted">None pending.</p>';
-};
-async function postTask(){ if(!val('k_t')||num('k_r')<=0) return toast('Title and reward needed'); await db.ref('tasks').push({title:val('k_t'),desc:val('k_d'),reward:num('k_r'),active:true,t:Date.now()}); toast('Created'); VIEWS.a_tasks(); }
-async function review(id,ok){
-  const sub=(await db.ref('submissions/'+id).get()).val(); if(!sub||sub.status!=='pending') return;
-  if(ok){ const t=(await db.ref('tasks/'+sub.taskId).get()).val(); if(!t) return toast('Task missing');
-    if(!(await adjust('settings/pool',-t.reward))) return toast('Pool too small — mint more points');
-    await adjust('users/'+sub.uid+'/points',t.reward,false); logTx(sub.uid,{type:'Task reward',points:t.reward,note:t.title}); }
-  await db.ref('submissions/'+id+'/status').set(ok?'approved':'rejected'); toast(ok?'Approved':'Rejected'); VIEWS.a_tasks(); }
-
-VIEWS.a_mem=async()=>{
-  set('<div class="card"><h2>Members</h2><input id="q" placeholder="Search name/email/code" oninput="filt()"><div class="tbl" id="mt">Loading…</div></div>');
-  const s=await db.ref('users').get(); window._mem=[]; s.forEach(c=>_mem.push({id:c.key,...c.val()})); filt(); };
-function filt(){ const q=(val('q')||'').toLowerCase(); const a=_mem.filter(m=>[m.name,m.email,m.code].join(' ').toLowerCase().includes(q));
-  $('mt').innerHTML=`<table><tr><th>Name</th><th>Code</th><th>Status</th><th>Naira</th><th>Points</th></tr>${a.map(m=>`<tr><td>${esc(m.name)}<br><span class="muted">${esc(m.email)}</span></td><td>${esc(m.code)}</td><td><span class="pill ${m.status==='active'?'':'w'}">${m.status}</span></td><td>${N(m.naira)}</td><td>${P(m.points)}</td></tr>`).join('')}</table>`; }
-VIEWS.a_wd=async()=>{
-  set('<div class="card"><h2>Withdrawal requests</h2><div id="wl">Loading…</div></div>');
-  const s=await db.ref('withdrawals').orderByChild('status').equalTo('pending').get(); const a=[]; s.forEach(c=>a.push({id:c.key,...c.val()}));
-  $('wl').innerHTML=a.length?`<table><tr><th>Member</th><th>Amount</th><th>Bank</th><th></th></tr>${a.map(w=>`<tr><td>${esc(w.name)}</td><td>${N(w.amount)}</td><td>${esc(w.bank)}</td><td><button class="b s" onclick="wdDone('${w.id}',true)">Paid</button> <button class="b r s" onclick="wdDone('${w.id}',false)">Reject</button></td></tr>`).join('')}</table>`:'<p class="muted">None pending.</p>'; };
-async function wdDone(id,paid){ const w=(await db.ref('withdrawals/'+id).get()).val(); if(!w||w.status!=='pending') return;
-  if(!paid){ await adjust('users/'+w.uid+'/naira',w.amount,false); logTx(w.uid,{type:'Withdrawal refunded',naira:w.amount}); }
-  await db.ref('withdrawals/'+id+'/status').set(paid?'paid':'rejected'); VIEWS.a_wd(); }
-VIEWS.a_set=()=>{
-  set(`<div class="card"><h2>Membership & commission settings</h2><label>Membership fee (₦)</label><input id="s_fee" type="number" value="${S.fee}">
-  <div class="row"><div><label>Level 1 %</label><input id="s_l1" type="number" value="${S.l1}"></div><div><label>Level 2 %</label><input id="s_l2" type="number" value="${S.l2}"></div><div><label>Company %</label><input id="s_co" type="number" value="${S.company}"></div></div>
-  <p class="muted">The three percentages must total 100. Default: 30 / 15 / 55.</p><button class="b" onclick="saveSet()">Save</button></div>`);
-};
-async function saveSet(){ const f=num('s_fee'),a=num('s_l1'),b=num('s_l2'),c=num('s_co'); if(f<=0||Math.abs(a+b+c-100)>0.001) return toast('Percentages must total 100');
-  await db.ref('settings').update({fee:f,l1:a,l2:b,company:c}); toast('Saved'); }
-</script>
-</body>
-</html>
+const firebaseConfig={apiKey:"AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",authDomain:"naijaremotehub-6f584.firebaseapp.com",databaseURL:"https://naijaremotehub-6f584-default-rtdb.firebaseio.com",projectId:"naijaremotehub-6f584",storageBucket:"naijaremotehub-6f584.firebasestorage.app",messagingSenderId:"662711600492",appId:"1:662711600492:web:a307027882c532269adf49",measurementId:"G-GPWVV5WLEC"};
+const PAYSTACK_PUBLIC_KEY="pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a";
+// Firebase Hosting rewrites /api/** to the Cloud Function in this project.
+const API_BASE="/api/app";
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth();let currentUser=null,profile=null,adminMode=false;
+const $=id=>document.getElementById(id);const money=n=>new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN',maximumFractionDigits:0}).format(Number(n||0));
+function notify(msg,ok=false){$('toast').innerHTML=`<div class="my-3 rounded-xl p-3 ${ok?'bg-green-100 text-green-900':'bg-red-100 text-red-900'}">${esc(msg)}</div>`;setTimeout(()=>$('toast').innerHTML='',5500)}function msg(id,text,ok=false){const e=$(id);e.textContent=text;e.className='notice show '+(ok?'ok':'error')}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function page(id){if((id==='dashboard'||id==='admin')&&!currentUser){id='auth';switchAuth('login')}if(id==='admin'&&!adminMode){id='dashboard'}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');window.scrollTo(0,0);if(id==='dashboard')loadDashboard();if(id==='admin')loadAdmin()}
+function switchAuth(which){$('loginForm').classList.toggle('hidden',which!=='login');$('signupForm').classList.toggle('hidden',which!=='signup');$('loginTab').className='btn '+(which==='login'?'green':'bg-slate-100');$('signupTab').className='btn '+(which==='signup'?'green':'bg-slate-100')}
+async function api(action,data={}){if(!currentUser)throw Error('Please sign in.');const token=await currentUser.getIdToken();const res=await fetch(API_BASE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({action,...data})});const body=await res.json().catch(()=>({}));if(!res.ok||body.ok===false)throw Error(body.error||'Request failed');return body}
+async function publicApi(action,data={}){const res=await fetch(API_BASE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...data})});const b=await res.json();if(!res.ok||!b.ok)throw Error(b.error||'Request failed');return b}
+$('year').textContent=new Date().getFullYear();const refParam=new URLSearchParams(location.search).get('ref');if(refParam)$('signupReferral').value=refParam;
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();try{await auth.signInWithEmailAndPassword($('loginEmail').value.trim(),$('loginPassword').value)}catch(x){msg('authMsg',x.message)}});
+$('signupForm').addEventListener('submit',async e=>{e.preventDefault();try{const c=await auth.createUserWithEmailAndPassword($('signupEmail').value.trim(),$('signupPassword').value);await c.user.getIdToken(true);await api('createProfile',{fullName:$('signupName').value.trim(),referralCode:$('signupReferral').value.trim()});notify('Account created successfully. You can now pay for membership.',true);page('dashboard')}catch(x){msg('authMsg',x.message)}});
+async function refreshProfile(){const d=await api('getDashboard');profile=d.profile;adminMode=!!d.isAdmin;updateNav();}
+function updateNav(){const on=!!currentUser;$('loginNav').classList.toggle('hidden',on);$('dashNav').classList.toggle('hidden',!on);$('logoutNav').classList.toggle('hidden',!on);$('adminNav').classList.toggle('hidden',!adminMode)}
+auth.onAuthStateChanged(async u=>{currentUser=u;profile=null;adminMode=false;updateNav();if(u){try{await refreshProfile();const qp=new URLSearchParams(location.search);const paymentRef=qp.get('reference')||qp.get('trxref');if(paymentRef){await api('verifyMembershipPayment',{reference:paymentRef});history.replaceState({},'',location.pathname);notify('Membership payment verified successfully.',true);await refreshProfile()}page('dashboard')}catch(e){notify(e.message);page('dashboard')}}else page('home')});
+async function logout(){await auth.signOut();notify('You have signed out.',true)}
+async function startPayment(){try{const d=await api('initializeMembershipPayment');location.href=d.authorizationUrl}catch(e){msg('payMsg',e.message)}}
+async function loadDashboard(){if(!currentUser)return;try{const d=await api('getDashboard');profile=d.profile;adminMode=d.isAdmin;$('welcome').textContent=`${profile.fullName} · ${profile.email}`;$('nairaBalance').textContent=money(profile.nairaBalanceKobo/100);$('pointsBalance').textContent=Number(profile.pointsBalance||0).toLocaleString();$('memberStatus').textContent=profile.isPaid?'PAID MEMBER':'FREE ACCOUNT';$('paidStatus').textContent=profile.isPaid?'Active':'Not active';$('payBtn').classList.toggle('hidden',!!profile.isPaid);$('refCount').textContent=d.referralCount;$('refLink').value=location.origin+location.pathname+'?ref='+encodeURIComponent(profile.referralCode);$('refEarnings').textContent=`Level 1: ${money(d.level1EarningsKobo/100)} · Level 2: ${money(d.level2EarningsKobo/100)}`;$('pointRate').textContent=`Current price: ₦${d.settings.nairaPerPoint} per point · Available pool: ${Number(d.settings.pointsPool||0).toLocaleString()} points`;
+$('tasksList').innerHTML=d.tasks.map(t=>`<div class="border rounded-xl p-3"><b>${esc(t.title)}</b><p class="text-sm muted mt-1">${esc(t.description)}</p><p class="text-xs mt-2">Reward: ${t.rewardPoints} points</p><button class="btn green mt-2 text-sm" onclick="submitTask('${t.id}')">Submit task</button></div>`).join('')||'<p class="muted">No tasks published.</p>';
+$('materialsList').innerHTML=d.materials.map(m=>`<div class="border rounded-xl p-3"><b>${esc(m.title)}</b><p class="text-sm muted">${esc(m.category)} · ${esc(m.description)}</p><a class="text-green-700 underline text-sm" href="${esc(m.url)}" target="_blank" rel="noopener">Open material</a></div>`).join('')||'<p class="muted">No materials published.</p>';
+$('memberAnnouncements').innerHTML=d.announcements.map(a=>`<div class="border rounded-xl p-3"><b>${esc(a.title)}</b><p class="text-sm muted mt-1">${esc(a.body)}</p></div>`).join('')||'<p class="muted">No announcements.</p>';
+$('transactionsList').innerHTML=d.transactions.map(t=>`<div class="flex justify-between gap-3 border-b py-2"><span>${esc(t.description||t.type)}</span><b>${esc(t.amountLabel||'—')}</b></div>`).join('')||'No transactions yet.';updateNav();}catch(e){notify(e.message)}}
+async function copyRef(){try{await navigator.clipboard.writeText($('refLink').value);notify('Referral link copied.',true)}catch(e){notify('Could not copy link.')}}
+async function submitTask(taskId){try{const note=prompt('Add a short note or link showing your completed task:');if(note===null)return;await api('submitTask',{taskId,note});notify('Task submitted for admin review.',true);loadDashboard()}catch(e){notify(e.message)}}
+$('buyPointsForm').addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('buyPoints',{nairaAmount:Number($('buyAmount').value)});notify(`Purchased ${d.points} points successfully.`,true);$('buyAmount').value='';loadDashboard()}catch(x){notify(x.message)}});
+$('transferForm').addEventListener('submit',async e=>{e.preventDefault();try{await api('transfer',{recipientEmail:$('transferEmail').value.trim(),asset:$('transferType').value,amount:Number($('transferAmount').value)});notify('Transfer completed.',true);$('transferForm').reset();loadDashboard()}catch(x){notify(x.message)}});
+async function loadAdmin(){if(!adminMode)return;try{const d=await api('adminOverview');$('adminMembers').textContent=d.memberCount;$('adminPool').textContent=Number(d.settings.pointsPool||0).toLocaleString();$('nairaPerPoint').value=d.settings.nairaPerPoint;$('adminUsers').innerHTML='<table class="min-w-full"><thead><tr><th class="text-left p-2">Name</th><th class="text-left p-2">Email</th><th class="text-left p-2">Naira</th><th class="text-left p-2">Points</th><th class="text-left p-2">Paid</th></tr></thead><tbody>'+d.users.map(u=>`<tr class="border-t"><td class="p-2">${esc(u.fullName)}</td><td class="p-2">${esc(u.email)}</td><td class="p-2">${money(u.nairaBalanceKobo/100)}</td><td class="p-2">${Number(u.pointsBalance||0).toLocaleString()}</td><td class="p-2">${u.isPaid?'Yes':'No'}</td></tr>`).join('')+'</tbody></table>';$('adminSubmissions').innerHTML=d.submissions.map(s=>`<div class="border rounded-xl p-3"><b>${esc(s.memberEmail)}</b><p class="text-sm muted">${esc(s.taskTitle)} — ${esc(s.note)}</p><button class="btn green text-sm mt-2" onclick="reviewTask('${s.id}','approve')">Approve</button> <button class="btn bg-red-100 text-red-800 text-sm mt-2" onclick="reviewTask('${s.id}','reject')">Reject</button></div>`).join('')||'<p class="muted">No pending submissions.</p>'}catch(e){notify(e.message)}}
+$('pointsConfigForm').addEventListener('submit',async e=>{e.preventDefault();try{await api('setPointsConfig',{nairaPerPoint:Number($('nairaPerPoint').value)});notify('Points conversion rate saved.',true);loadAdmin()}catch(x){notify(x.message)}});
+$('mintBurnForm').addEventListener('submit',async e=>{e.preventDefault();try{const action=$('mintBurnAction').value;await api(action,{email:$('pointsTarget').value.trim(),points:Number($('pointsQty').value),reason:$('pointsReason').value.trim()});notify('Points operation completed.',true);$('mintBurnForm').reset();loadAdmin()}catch(x){notify(x.message)}});
+$('massForm').addEventListener('submit',async e=>{e.preventDefault();try{const emails=$('massEmails').value.split(/[\s,;]+/).map(x=>x.trim()).filter(Boolean);const d=await api('massDistributePoints',{mode:$('massMode').value,emails,points:Number($('massPoints').value),reason:$('massReason').value.trim()});notify(`Distributed points to ${d.updated} members.`,true);loadAdmin()}catch(x){notify(x.message)}});
+$('taskForm').addEventListener('submit',async e=>{e.preventDefault();try{await api('createTask',{title:$('taskTitle').value,description:$('taskDescription').value,rewardPoints:Number($('taskReward').value)});notify('Task published.',true);$('taskForm').reset();loadAdmin()}catch(x){notify(x.message)}});
+async function reviewTask(submissionId,decision){try{await api('reviewTask',{submissionId,decision});notify('Submission '+decision+'d.',true);loadAdmin()}catch(e){notify(e.message)}}
+$('announcementForm').addEventListener('submit',async e=>{e.preventDefault();try{await api('postAnnouncement',{title:$('announcementTitle').value,body:$('announcementBody').value});notify('Announcement published.',true);$('announcementForm').reset()}catch(x){notify(x.message)}});
+$('materialForm').addEventListener('submit',async e=>{e.preventDefault();try{await api('postMaterial',{title:$('materialTitle').value,category:$('materialCategory').value,description:$('materialDescription').value,url:$('materialUrl').value,isFree:$('materialFree').checked});notify('Educational material published.',true);$('materialForm').reset()}catch(x){notify(x.message)}});
+(async()=>{try{const d=await publicApi('publicAnnouncements');$('publicAnnouncements').innerHTML=d.announcements.map(a=>`<div class="card"><b>${esc(a.title)}</b><p class="text-sm muted mt-2">${esc(a.body)}</p></div>`).join('')||'<p class="muted">No announcements yet.</p>'}catch(e){}})();
+</script></body></html>

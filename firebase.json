@@ -1,0 +1,41 @@
+{
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "runtime": "nodejs20"
+    }
+  ],
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "functions/**",
+      "README.md",
+      "set-admin.js",
+      "firestore.rules"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/app",
+        "function": {
+          "functionId": "appApi",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/paystack-webhook",
+        "function": {
+          "functionId": "paystackWebhook",
+          "region": "us-central1"
+        }
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
