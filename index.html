@@ -440,7 +440,7 @@ async function forgotPassword() {
   const show = el.type === "password";
   el.type = show ? "text" : "password";
   if (btn) btn.textContent = show ? "🙈" : "👁️";
-}
+  }
   async function fundWallet() {
   clearNotice("fundWalletMsg");
   if (!currentUser || !userData) return showNotice("fundWalletMsg", "Please log in first.");
@@ -453,29 +453,26 @@ async function forgotPassword() {
     await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: amountKobo, amountNaira: amountNaira, currency: "NGN", type: "wallet_funding", reference, status: "initiated", createdAt: serverTimestamp() });
     const handler = PaystackPop.setup({
       key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: amountKobo, currency: "NGN", ref: reference,
-      metadata: { custom_fields: [{ display_name: "Firebase User ID", variable_name: "firebase_uid", value: currentUser.uid }, { display_name: "Type", variable_name: "type", value: "wallet_funding" }] },
-                 db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true }).then(async () => {
+      callback: function(response) {
+        db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true }).then(async () => {
           try {
-            // AUTO-CREDIT WALLET - after Paystack success
-            await db.runTransaction(async (tx) => {
-              const userRef = db.collection("users").doc(currentUser.uid);
-              const snap = await tx.get(userRef);
-              const oldBal = (snap.exists && snap.data().walletNaira) || 0;
-              tx.update(userRef, { walletNaira: oldBal + amountNaira });
-            });
+            const userRef = db.collection("users").doc(currentUser.uid);
+            const snap = await userRef.get();
+            const oldBal = (snap.exists && snap.data().walletNaira) || 0;
+            await userRef.update({ walletNaira: oldBal + amountNaira });
             await db.collection("payment_requests").doc(reference).set({ status: "verified", creditedAt: serverTimestamp() }, { merge: true });
-            await db.collection("transactions").add({ uid: currentUser.uid, type: "wallet_funding", amountNaira: amountNaira, amount: amountNaira, description: "Wallet funded via Paystack - " + reference, reference: reference, createdAt: serverTimestamp() });
             showNotice("fundWalletMsg", "✅ ₦" + amountNaira.toLocaleString() + " added to your wallet!", "success");
             document.getElementById("fundWalletAmt").value = "";
             await loadCurrentProfile(currentUser);
-          } catch (e) { showNotice("fundWalletMsg", "Payment succeeded but credit failed: " + friendlyError(e) + " - contact support with ref " + reference); }
+          } catch (e) { showNotice("fundWalletMsg", "Payment succeeded but credit failed: " + friendlyError(e)); }
         }).catch((e) => { showNotice("fundWalletMsg", friendlyError(e)); });
-      },   
+      },
       onClose: function() {}
     });
     handler.openIframe();
   } catch (error) { showNotice("fundWalletMsg", friendlyError(error)); }
 }
+
   function friendlyError(error) {
 const code = error && error.code;
   const messages = { "auth/invalid-email":"Please enter a valid email address.", "auth/user-not-found":"No account was found with that email.", "auth/wrong-password":"Incorrect email or password.", "auth/invalid-credential":"Incorrect email or password.", "auth/email-already-in-use":"An account already exists with this email. Please log in.", "auth/weak-password":"Choose a stronger password (at least 6 characters).", "auth/too-many-requests":"Too many attempts. Please wait and try again.", "permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.", "unavailable":"Service temporarily unavailable. Please try again." };
