@@ -131,6 +131,38 @@
   <section id="dashboard" class="page">
     <div class="max-w-6xl mx-auto px-4 py-10">
       <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="text-green-700 font-bold text-sm">MEMBER AREA</p><h1 class="text-3xl font-black">Your Dashboard</h1><p id="memberGreeting" class="text-slate-500 mt-1"></p></div><span id="accountBadge" class="pill bg-slate-200 text-slate-700">FREE ACCOUNT</span></div>
+            <!-- EXCHANGE RATE + MASS TRANSFER - NEW -->
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-7 border-2 border-green-200">
+        <h2 class="text-xl font-extrabold">💱 Exchange Rate - Admin can change anytime</h2>
+        <p class="text-sm text-slate-500 mt-1">This reads from Firestore <b>settings / exchange</b> - the doc you already saved. Change it here, it goes live instantly for all users.</p>
+        <div class="grid sm:grid-cols-3 gap-3 mt-4">
+          <div><label class="text-sm font-bold block mb-1">1 Naira = ? Points</label><input id="exNairaToPoints" class="field" type="number" step="0.01" placeholder="10"></div>
+          <div><label class="text-sm font-bold block mb-1">1 Point = ? Naira</label><input id="exPointsToNaira" class="field" type="number" step="0.01" placeholder="2"></div>
+          <div><label class="text-sm font-bold block mb-1">Transfer Fee %</label><input id="exFee" class="field" type="number" step="0.1" placeholder="0"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 mt-3">
+          <div><label class="text-sm font-bold block mb-1">Min Transfer Naira</label><input id="exMinNaira" class="field" type="number" placeholder="100"></div>
+          <div><label class="text-sm font-bold block mb-1">Min Transfer Points</label><input id="exMinPoints" class="field" type="number" placeholder="100"></div>
+        </div>
+        <p id="exLastUpdated" class="text-xs text-slate-500 mt-2"></p>
+        <button class="btn btn-green w-full mt-3" onclick="saveExchangeRate()">Save Exchange Rate</button>
+        <div id="exMsg" class="notice"></div>
+      </section>
+
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-blue-200">
+        <h2 class="text-xl font-extrabold">📤 Mass Transfer - Send to Many Users</h2>
+        <p class="text-sm text-slate-500 mt-1">Send Points or Naira to all users at once. This was missing before.</p>
+        <div class="grid sm:grid-cols-2 gap-3 mt-4">
+          <div><label class="text-sm font-bold block mb-1">Currency</label><select id="massCurrency" class="field"><option value="points">Points</option><option value="naira">Naira</option></select></div>
+          <div><label class="text-sm font-bold block mb-1">Amount per user</label><input id="massAmount" class="field" type="number" placeholder="e.g. 500"></div>
+          <div><label class="text-sm font-bold block mb-1">Who?</label><select id="massTarget" class="field"><option value="all">All Users</option><option value="paid">Paid Only</option><option value="free">Free Only</option></select></div>
+          <div><label class="text-sm font-bold block mb-1">Reason</label><input id="massReason" class="field" placeholder="e.g. Weekly Bonus"></div>
+        </div>
+        <button class="btn btn-light w-full mt-3" onclick="previewMass()">Preview - How many users?</button>
+        <p id="massPreview" class="text-sm font-bold mt-2 text-green-800"></p>
+        <button class="btn btn-green w-full mt-2" onclick="confirmMass()">Confirm Send to All</button>
+        <div id="massMsg" class="notice"></div>
+      </section>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
         <div class="bg-green-800 text-white rounded-2xl p-6 shadow-soft"><p class="text-green-100 text-sm font-semibold">Wallet Balance</p><p id="walletBalance" class="text-3xl font-black mt-2">₦0</p></div>
         <div class="bg-amber-400 text-green-950 rounded-2xl p-6 shadow-soft"><p class="text-green-950 text-sm font-semibold">Task Points</p><p id="pointsBalance" class="text-3xl font-black mt-2">0</p><p class="text-xs mt-1">Points earned from approved tasks</p></div>
@@ -140,6 +172,38 @@
       <div class="grid lg:grid-cols-2 gap-6 mt-6">
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
+      </div>
+            <!-- BUY / SEND / SWAP - NEW FOR USERS -->
+      <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-amber-200">
+        <h2 class="font-extrabold text-lg">💰 Buy, Send & Swap</h2>
+        <p class="text-sm text-slate-500 mt-1">Rate: <span id="userRateText">Loading rate...</span></p>
+        <div class="grid md:grid-cols-3 gap-4 mt-4">
+          <div class="border rounded-xl p-4">
+            <b>Buy Points with Naira</b>
+            <p class="text-xs text-slate-500 mt-1">Use your Naira wallet balance to buy Points.</p>
+            <input id="buyPointsAmt" class="field mt-2" type="number" placeholder="Naira amount e.g. 1000">
+            <p id="buyPointsPreview" class="text-xs mt-1 text-green-700"></p>
+            <button class="btn btn-green w-full mt-2" onclick="buyPointsWithNaira()">Buy Points</button>
+          </div>
+          <div class="border rounded-xl p-4">
+            <b>Send Points</b>
+            <input id="sendPointsTo" class="field mt-2" placeholder="Recipient email">
+            <input id="sendPointsAmt" class="field mt-2" type="number" placeholder="Points e.g. 500">
+            <button class="btn btn-green w-full mt-2" onclick="sendPoints()">Send Points</button>
+          </div>
+          <div class="border rounded-xl p-4">
+            <b>Send Naira</b>
+            <input id="sendNairaTo" class="field mt-2" placeholder="Recipient email">
+            <input id="sendNairaAmt" class="field mt-2" type="number" placeholder="Naira e.g. 500">
+            <button class="btn btn-green w-full mt-2" onclick="sendNaira()">Send Naira</button>
+          </div>
+        </div>
+        <div class="border rounded-xl p-4 mt-4">
+          <b>Swap Points → Naira</b>
+          <div class="flex gap-2 mt-2"><input id="swapPointsAmt" class="field" type="number" placeholder="Points to swap"><button class="btn btn-yellow whitespace-nowrap" onclick="swapPointsToNaira()">Swap to Naira</button></div>
+          <p id="swapPreview" class="text-xs mt-1 text-green-700"></p>
+        </div>
+        <div class="mt-5"><h3 class="font-bold">My Transactions</h3><div id="myTransactions" class="space-y-2 mt-2 text-sm"><p class="text-slate-500">Loading...</p></div></div>
       </div>
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="font-extrabold text-lg">Request a Withdrawal</h2><p class="text-sm text-slate-500 mt-1">Minimum withdrawal: ₦5,000. Requests are reviewed by the administrator.</p>
         <form id="withdrawForm" class="grid sm:grid-cols-2 gap-3 mt-4" onsubmit="requestWithdrawal(event)">
@@ -660,6 +724,92 @@ function loadAdminData() {
     container.innerHTML=snapshot.docs.map(doc=>{ const s=doc.data()||{}; return `<div class="border rounded-xl p-4"><div class="flex flex-wrap justify-between gap-2"><b>${safeText(s.task_title||"Task")}</b><span class="pill bg-amber-100 text-amber-900">${Number(s.points||0).toLocaleString("en-NG")} points</span></div><p class="text-sm mt-2">${safeText(s.full_name||"Member")} · ${safeText(s.email||"")}</p><p class="text-xs text-slate-500 mt-1">Submitted: ${s.createdAt&&s.createdAt.toDate?s.createdAt.toDate().toLocaleString():"—"}</p><div class="grid grid-cols-2 gap-2 mt-3"><button class="btn btn-green" onclick="reviewTaskSubmission('${doc.id}','approved')">Approve & credit</button><button class="btn bg-red-50 text-red-700" onclick="reviewTaskSubmission('${doc.id}','rejected')">Reject</button></div></div>`; }).join("");
   },err=>console.error("Pending task submissions:",err));
   adminUnsubscribers=[usersSub,withdrawalSub,materialSub,tasksSub,submissionsSub];
+}
+  // ===== EXCHANGE RATE + MASS TRANSFER + BUY/SEND - NEW =====
+let exchangeRate = { nairaToPoints: 10, pointsToNaira: 2, transferFeePercent: 0, minTransferNaira: 100, minTransferPoints: 100 };
+async function loadExchangeRate(){
+  try{
+    const snap = await db.collection("settings").doc("exchange").get();
+    if(snap.exists){ exchangeRate = {...exchangeRate, ...snap.data()};
+      const a=document.getElementById("exNairaToPoints"); if(a) a.value=exchangeRate.nairaToPoints;
+      const b=document.getElementById("exPointsToNaira"); if(b) b.value=exchangeRate.pointsToNaira;
+      const c=document.getElementById("exFee"); if(c) c.value=exchangeRate.transferFeePercent;
+      const d=document.getElementById("exMinNaira"); if(d) d.value=exchangeRate.minTransferNaira;
+      const e=document.getElementById("exMinPoints"); if(e) e.value=exchangeRate.minTransferPoints;
+      const f=document.getElementById("exLastUpdated"); if(f) f.textContent="Last updated by: "+(snap.data().updatedBy||"admin");
+      const g=document.getElementById("userRateText"); if(g) g.textContent="1 Naira = "+exchangeRate.nairaToPoints+" Points | 1 Point = ₦"+exchangeRate.pointsToNaira;
+    }
+  }catch(e){ console.warn("Rate:",e); }
+}
+async function saveExchangeRate(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const data={ nairaToPoints:Number(document.getElementById("exNairaToPoints").value), pointsToNaira:Number(document.getElementById("exPointsToNaira").value), transferFeePercent:Number(document.getElementById("exFee").value||0), minTransferNaira:Number(document.getElementById("exMinNaira").value||100), minTransferPoints:Number(document.getElementById("exMinPoints").value||100), updatedBy: currentUser.email, updatedAt: serverTimestamp() };
+  if(!data.nairaToPoints || !data.pointsToNaira) return alert("Enter valid rates");
+  await db.collection("settings").doc("exchange").set(data,{merge:true});
+  exchangeRate=data; showNotice("exMsg","Exchange rate updated! Live for all users now.","success");
+}
+async function previewMass(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const snap=await db.collection("users").get(); let users=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const t=document.getElementById("massTarget").value; if(t==="paid") users=users.filter(u=>u.is_paid===true); if(t==="free") users=users.filter(u=>u.is_paid!==true);
+  const amt=Number(document.getElementById("massAmount").value||0); const cur=document.getElementById("massCurrency").value;
+  document.getElementById("massPreview").textContent="Will send to "+users.length+" users - Total: "+(amt*users.length).toLocaleString()+" "+cur;
+}
+async function confirmMass(){
+  if(!(userData && userData.is_admin===true)) return alert("Admin only");
+  const cur=document.getElementById("massCurrency").value; const amt=Number(document.getElementById("massAmount").value); const reason=document.getElementById("massReason").value||"Mass Transfer"; const target=document.getElementById("massTarget").value;
+  if(!amt||amt<=0) return alert("Enter amount > 0");
+  if(!confirm("Send "+amt+" "+cur+" to selected users? Cannot undo!")) return;
+  const snap=await db.collection("users").get(); let users=snap.docs.map(d=>({id:d.id,...d.data()}));
+  if(target==="paid") users=users.filter(u=>u.is_paid===true); if(target==="free") users=users.filter(u=>u.is_paid!==true);
+  for(let i=0;i<users.length;i+=50){ const batch=db.batch(); const chunk=users.slice(i,i+50);
+    chunk.forEach(u=>{ const ref=db.collection("users").doc(u.id); const field=cur==="points"?"points_balance":"balance"; batch.update(ref,{[field]: Number(u[field]||0)+amt}); const tx=db.collection("transactions").doc(); batch.set(tx,{to_user:u.id,to_email:u.email||"",type:"mass_transfer",amount:amt,currency:cur,reason,admin:currentUser.email,createdAt:serverTimestamp()}); });
+    await batch.commit();
+  }
+  showNotice("massMsg","Done! Sent to "+users.length+" users.","success"); loadAdminStats();
+}
+// --- USER: BUY / SEND / SWAP ---
+async function buyPointsWithNaira(){
+  await loadExchangeRate(); const naira=Number(document.getElementById("buyPointsAmt").value);
+  if(!naira||naira<=0) return alert("Enter Naira amount"); if(naira>Number(userData.balance||0)) return alert("Not enough Naira balance");
+  const points=Math.floor(naira*Number(exchangeRate.nairaToPoints));
+  if(!confirm("Buy "+points+" Points with ₦"+naira+"?")) return;
+  const ref=db.collection("users").doc(currentUser.uid);
+  await db.runTransaction(async tx=>{ const s=await tx.get(ref); const d=s.data(); if(Number(d.balance||0)<naira) throw new Error("Insufficient balance"); tx.update(ref,{balance:Number(d.balance)-naira, points_balance:Number(d.points_balance||0)+points}); });
+  await db.collection("transactions").add({from_user:currentUser.uid,to_user:currentUser.uid,type:"buy_points",amount:points,currency:"points",naira_spent:naira,rate_used:exchangeRate.nairaToPoints,createdAt:serverTimestamp()});
+  alert("Bought "+points+" Points!"); await loadCurrentProfile(currentUser);
+}
+async function sendPoints(){
+  await loadExchangeRate(); const toEmail=cleanEmail(document.getElementById("sendPointsTo").value); const amt=Number(document.getElementById("sendPointsAmt").value);
+  if(!toEmail) return alert("Enter recipient email"); if(!amt||amt<Number(exchangeRate.minTransferPoints)) return alert("Min is "+exchangeRate.minTransferPoints+" Points");
+  if(amt>Number(userData.points_balance||0)) return alert("Not enough Points");
+  const q=await db.collection("users").where("email","==",toEmail).limit(1).get(); if(q.empty) return alert("User not found"); const rec=q.docs[0]; if(rec.id===currentUser.uid) return alert("Cannot send to yourself");
+  if(!confirm("Send "+amt+" Points to "+toEmail+"?")) return;
+  const fee=Math.floor(amt*Number(exchangeRate.transferFeePercent||0)/100); const net=amt-fee;
+  await db.runTransaction(async tx=>{ const sRef=db.collection("users").doc(currentUser.uid); const rRef=db.collection("users").doc(rec.id); const s=await tx.get(sRef); const r=await tx.get(rRef); if(Number(s.data().points_balance||0)<amt) throw new Error("Insufficient"); tx.update(sRef,{points_balance:Number(s.data().points_balance)-amt}); tx.update(rRef,{points_balance:Number(r.data().points_balance||0)+net}); });
+  await db.collection("transactions").add({from_user:currentUser.uid,from_email:currentUser.email,to_user:rec.id,to_email:toEmail,type:"send_points",amount:net,fee,currency:"points",createdAt:serverTimestamp()});
+  alert("Sent "+net+" Points to "+toEmail); await loadCurrentProfile(currentUser);
+}
+async function sendNaira(){
+  await loadExchangeRate(); const toEmail=cleanEmail(document.getElementById("sendNairaTo").value); const amt=Number(document.getElementById("sendNairaAmt").value);
+  if(!toEmail) return alert("Enter recipient email"); if(!amt||amt<Number(exchangeRate.minTransferNaira)) return alert("Min is ₦"+exchangeRate.minTransferNaira);
+  if(amt>Number(userData.balance||0)) return alert("Not enough Naira");
+  const q=await db.collection("users").where("email","==",toEmail).limit(1).get(); if(q.empty) return alert("User not found"); const rec=q.docs[0]; if(rec.id===currentUser.uid) return alert("Cannot send to yourself");
+  if(!confirm("Send ₦"+amt+" to "+toEmail+"?")) return;
+  const fee=Math.floor(amt*Number(exchangeRate.transferFeePercent||0)/100); const net=amt-fee;
+  await db.runTransaction(async tx=>{ const sRef=db.collection("users").doc(currentUser.uid); const rRef=db.collection("users").doc(rec.id); const s=await tx.get(sRef); const r=await tx.get(rRef); if(Number(s.data().balance||0)<amt) throw new Error("Insufficient"); tx.update(sRef,{balance:Number(s.data().balance)-amt}); tx.update(rRef,{balance:Number(r.data().balance||0)+net}); });
+  await db.collection("transactions").add({from_user:currentUser.uid,from_email:currentUser.email,to_user:rec.id,to_email:toEmail,type:"send_naira",amount:net,fee,currency:"naira",createdAt:serverTimestamp()});
+  alert("Sent ₦"+net+" to "+toEmail); await loadCurrentProfile(currentUser);
+}
+async function swapPointsToNaira(){
+  await loadExchangeRate(); const pts=Number(document.getElementById("swapPointsAmt").value);
+  if(!pts||pts<=0) return alert("Enter points"); if(pts>Number(userData.points_balance||0)) return alert("Not enough Points");
+  const naira=pts*Number(exchangeRate.pointsToNaira);
+  if(!confirm("Swap "+pts+" Points to ₦"+naira+"?")) return;
+  const ref=db.collection("users").doc(currentUser.uid);
+  await db.runTransaction(async tx=>{ const s=await tx.get(ref); const d=s.data(); if(Number(d.points_balance||0)<pts) throw new Error("Insufficient"); tx.update(ref,{points_balance:Number(d.points_balance)-pts, balance:Number(d.balance||0)+naira}); });
+  await db.collection("transactions").add({from_user:currentUser.uid,to_user:currentUser.uid,type:"swap_points_to_naira",amount:naira,currency:"naira",points_spent:pts,rate_used:exchangeRate.pointsToNaira,createdAt:serverTimestamp()});
+  alert("Swapped to ₦"+naira); await loadCurrentProfile(currentUser);
 }
 async function deleteMaterial(id) { if (!(userData && userData.is_admin===true)) return alert("Admin access required."); if (!confirm("Delete this learning material permanently?")) return; try { await db.collection("materials").doc(id).delete(); } catch(error) { alert("Could not delete material: "+friendlyError(error)); } }
 </script>
