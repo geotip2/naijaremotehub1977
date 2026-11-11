@@ -117,6 +117,8 @@
           <div><label class="block text-sm font-bold mb-1" for="loginPassword">Password</label><input id="loginPassword" class="field" type="password" autocomplete="current-password" required></div>
           <button id="loginSubmit" class="btn btn-green w-full" type="submit">Login</button><div id="loginError" class="notice error"></div>
         </form>
+        <div class="text-right"><button type="button" class="text-sm font-bold text-green-700" onclick="forgotPassword()">Forgot password?</button></div>
+<div id="forgotMessage" class="notice"></div>
         <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
           <div><label class="block text-sm font-bold mb-1" for="signupName">Full Name</label><input id="signupName" class="field" autocomplete="name" required maxlength="100"></div>
           <div><label class="block text-sm font-bold mb-1" for="signupEmail">Email</label><input id="signupEmail" class="field" type="email" autocomplete="email" required></div>
@@ -407,8 +409,17 @@ async function login(event) {
   try { await auth.signInWithEmailAndPassword(email, password); document.getElementById("loginForm").reset(); }
   catch (error) { showNotice("loginError", friendlyError(error)); } finally { setBusy("loginSubmit", false); }
 }
-function friendlyError(error) {
-  const code = error && error.code;
+async function forgotPassword() {
+  clearNotice("forgotMessage");
+  const email = cleanEmail(document.getElementById("loginEmail").value);
+  if (!email) return showNotice("forgotMessage", "Enter your email above first, then tap Forgot password.");
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showNotice("forgotMessage", "Reset link sent to " + email + ". Check your inbox / spam. Link expires in 1 hour.", "success");
+  } catch (error) { showNotice("forgotMessage", friendlyError(error)); }
+}
+  function friendlyError(error) {
+const code = error && error.code;
   const messages = { "auth/invalid-email":"Please enter a valid email address.", "auth/user-not-found":"No account was found with that email.", "auth/wrong-password":"Incorrect email or password.", "auth/invalid-credential":"Incorrect email or password.", "auth/email-already-in-use":"An account already exists with this email. Please log in.", "auth/weak-password":"Choose a stronger password (at least 6 characters).", "auth/too-many-requests":"Too many attempts. Please wait and try again.", "permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.", "unavailable":"Service temporarily unavailable. Please try again." };
   return messages[code] || (error && error.message) || "Something went wrong. Please try again.";
 }
