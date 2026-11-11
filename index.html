@@ -143,6 +143,22 @@
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
       </div>
+            <!-- FUND WALLET - PAYSTACK AUTOMATED -->
+      <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-green-200">
+        <h2 class="font-extrabold text-lg">💳 Fund Wallet</h2>
+        <p class="text-sm text-slate-500 mt-1">Add Naira to your wallet with card / bank transfer. Minimum ₦100. Credited automatically after Paystack confirms.</p>
+        <div class="flex gap-2 mt-4">
+          <input id="fundWalletAmt" class="field" type="number" min="100" step="1" placeholder="Amount e.g. 5000">
+          <button class="btn btn-green whitespace-nowrap" onclick="fundWallet()">Fund Wallet</button>
+        </div>
+        <div class="flex gap-2 mt-2">
+          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=500">₦500</button>
+          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=1000">₦1,000</button>
+          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=5000">₦5,000</button>
+          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=10000">₦10,000</button>
+        </div>
+        <div id="fundWalletMsg" class="notice"></div>
+      </div>
             <!-- BUY / SEND / SWAP - NEW FOR USERS -->
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-amber-200">
         <h2 class="font-extrabold text-lg">💰 Buy, Send & Swap</h2>
@@ -424,6 +440,33 @@ async function forgotPassword() {
   const show = el.type === "password";
   el.type = show ? "text" : "password";
   if (btn) btn.textContent = show ? "🙈" : "👁️";
+}
+  async function fundWallet() {
+  clearNotice("fundWalletMsg");
+  if (!currentUser || !userData) return showNotice("fundWalletMsg", "Please log in first.");
+  const amountNaira = Number(document.getElementById("fundWalletAmt").value);
+  if (!amountNaira || amountNaira < 100) return showNotice("fundWalletMsg", "Minimum funding is ₦100.");
+  if (!window.PaystackPop) return showNotice("fundWalletMsg", "Payment service did not load. Refresh and try again.");
+  const amountKobo = Math.round(amountNaira * 100);
+  const reference = "WALLET_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+  try {
+    await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: amountKobo, amountNaira: amountNaira, currency: "NGN", type: "wallet_funding", reference, status: "initiated", createdAt: serverTimestamp() });
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: amountKobo, currency: "NGN", ref: reference,
+      metadata: { custom_fields: [{ display_name: "Firebase User ID", variable_name: "firebase_uid", value: currentUser.uid }, { display_name: "Type", variable_name: "type", value: "wallet_funding" }] },
+      callback: async function(response) {
+        try {
+          await db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true });
+          showNotice("fundWalletMsg", "Payment received! Verifying... Your wallet will update automatically in a few seconds. If it doesn't, refresh the page.", "success");
+          document.getElementById("fundWalletAmt").value = "";
+          // Auto-refresh profile after 8 seconds to show new balance
+          setTimeout(async () => { await loadCurrentProfile(currentUser); }, 8000);
+        } catch (e) { showNotice("fundWalletMsg", friendlyError(e)); }
+      },
+      onClose: function() {}
+    });
+    handler.openIframe();
+  } catch (error) { showNotice("fundWalletMsg", friendlyError(error)); }
 }
   function friendlyError(error) {
 const code = error && error.code;
