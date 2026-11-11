@@ -141,7 +141,9 @@
       </div>
       <div class="grid lg:grid-cols-2 gap-6 mt-6">
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2>
+          <div id="membershipPlansList">Loading plans...</div>
+          <p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
       </div>
             <!-- FUND WALLET - PAYSTACK AUTOMATED -->
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-green-200">
@@ -494,6 +496,7 @@ async function loadCurrentProfile(user) {
   renderDashboard(); startLiveListeners(); updateNavigation();
 }
 function renderDashboard() {
+  loadMembershipPlans();
   if (!currentUser || !userData) return;
   document.getElementById("memberGreeting").textContent = (userData.full_name || "Member") + " · " + (userData.email || currentUser.email || "");
   document.getElementById("walletBalance").textContent = money(userData.balance);
@@ -508,30 +511,33 @@ function renderDashboard() {
 async function copyReferral() { const value = document.getElementById("referralLink").value; try { await navigator.clipboard.writeText(value); alert("Referral link copied."); } catch (_) { const input=document.getElementById("referralLink"); input.select(); document.execCommand("copy"); alert("Referral link copied."); } }
 function shareWhatsApp() { const link = document.getElementById("referralLink").value; const message = "Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: " + link; window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener"); }
 async function payMembership() {
+  async function payMembership(planId) {
   if (!currentUser) { openAuth("login"); return; }
   if (userData.is_paid === true) { alert("Your membership is already active."); return; }
+  const plan = membershipPlans.find(p => p.id === planId) || { name: "Membership", priceNaira: 30000 };
+  const priceNaira = Number(plan.priceNaira);
+  const priceKobo = Math.round(priceNaira * 100);
   if (!window.PaystackPop) { alert("Payment service did not load. Refresh the page and try again."); return; }
   const reference = "MEMBERSHIP_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
   try {
-    await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: MEMBERSHIP_FEE_KOBO, amountNaira: MEMBERSHIP_FEE_NAIRA, currency: "NGN", type: "membership", reference, status: "initiated", createdAt: serverTimestamp() });
+    await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: priceKobo, amountNaira: priceNaira, currency: "NGN", type: "membership", planId: planId, planName: plan.name, reference, status: "initiated", createdAt: serverTimestamp() });
     const handler = PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: MEMBERSHIP_FEE_KOBO, currency: "NGN", ref: reference,
+      key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: priceKobo, currency: "NGN", ref: reference,
       callback: function(response) {
         db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true }).then(async () => {
           try {
-            await db.collection("users").doc(currentUser.uid).update({ is_paid: true, membershipPaidAt: serverTimestamp(), membershipReference: reference });
+            await db.collection("users").doc(currentUser.uid).update({ is_paid: true, membershipPlanId: planId, membershipPlanName: plan.name, membershipPaidAt: serverTimestamp(), membershipReference: reference });
             await db.collection("payment_requests").doc(reference).set({ status: "verified", creditedAt: serverTimestamp() }, { merge: true });
-            alert("✅ Membership activated! You are now a PAID MEMBER.");
+            alert("✅ " + plan.name + " activated! You are now a PAID MEMBER.");
             await loadCurrentProfile(currentUser);
-          } catch (e) { alert("Payment succeeded but activation failed: " + friendlyError(e) + " - contact support with ref " + reference); }
-        }).catch((e) => { alert(friendlyError(e)); });
+          } catch (e) { alert("Payment succeeded but activation failed: " + friendlyError(e)); }
+        });
       },
       onClose: function() {}
     });
     handler.openIframe();
   } catch (error) { alert("Could not start payment: " + friendlyError(error)); }
 }
-function startLiveListeners() {
   if (!currentUser) return;
   if (referralsUnsubscribe) referralsUnsubscribe();
   referralsUnsubscribe = db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(snapshot => { document.getElementById("referralCount").textContent = snapshot.size; }, error => console.warn("Referral count:",error));
