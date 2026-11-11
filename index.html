@@ -507,17 +507,29 @@ function renderDashboard() {
 }
 async function copyReferral() { const value = document.getElementById("referralLink").value; try { await navigator.clipboard.writeText(value); alert("Referral link copied."); } catch (_) { const input=document.getElementById("referralLink"); input.select(); document.execCommand("copy"); alert("Referral link copied."); } }
 function shareWhatsApp() { const link = document.getElementById("referralLink").value; const message = "Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: " + link; window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener"); }
-function pay() {
-  if (!currentUser || !userData) { openAuth("login"); return; }
+async function payMembership() {
+  if (!currentUser) { openAuth("login"); return; }
   if (userData.is_paid === true) { alert("Your membership is already active."); return; }
   if (!window.PaystackPop) { alert("Payment service did not load. Refresh the page and try again."); return; }
-  if (!PAYSTACK_PUBLIC_KEY || !PAYSTACK_PUBLIC_KEY.startsWith("pk_")) { alert("Paystack public key is not configured."); return; }
-  const reference = "NRH_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
-  const requestRef = db.collection("payment_requests").doc(reference);
-  requestRef.set({ uid:currentUser.uid,email:cleanEmail(currentUser.email),amount:MEMBERSHIP_FEE_KOBO, currency:"NGN",reference,status:"initiated",createdAt:serverTimestamp() }).then(() => {
-    const handler = PaystackPop.setup({ key:PAYSTACK_PUBLIC_KEY, email:cleanEmail(currentUser.email), amount:MEMBERSHIP_FEE_KOBO, currency:"NGN", ref:reference, metadata:{custom_fields:[{display_name:"Firebase User ID",variable_name:"firebase_uid",value:currentUser.uid}]}, callback:function(response) { requestRef.set({status:"awaiting_server_verification",paystack_reference:response.reference,callbackAt:serverTimestamp()},{merge:true}).then(() => alert("Payment response received. Your payment is awaiting secure verification. Your account will update automatically after verification.")).catch(error => alert("Payment response received, but we could not update its status. Contact support with reference: " + response.reference)); }, onClose:function() {} });
+  const reference = "MEMBERSHIP_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+  try {
+    await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: MEMBERSHIP_FEE_KOBO, amountNaira: MEMBERSHIP_FEE_NAIRA, currency: "NGN", type: "membership", reference, status: "initiated", createdAt: serverTimestamp() });
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: MEMBERSHIP_FEE_KOBO, currency: "NGN", ref: reference,
+      callback: function(response) {
+        db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true }).then(async () => {
+          try {
+            await db.collection("users").doc(currentUser.uid).update({ is_paid: true, membershipPaidAt: serverTimestamp(), membershipReference: reference });
+            await db.collection("payment_requests").doc(reference).set({ status: "verified", creditedAt: serverTimestamp() }, { merge: true });
+            alert("✅ Membership activated! You are now a PAID MEMBER.");
+            await loadCurrentProfile(currentUser);
+          } catch (e) { alert("Payment succeeded but activation failed: " + friendlyError(e) + " - contact support with ref " + reference); }
+        }).catch((e) => { alert(friendlyError(e)); });
+      },
+      onClose: function() {}
+    });
     handler.openIframe();
-  }).catch(error => alert("Could not start payment: " + friendlyError(error)));
+  } catch (error) { alert("Could not start payment: " + friendlyError(error)); }
 }
 function startLiveListeners() {
   if (!currentUser) return;
@@ -528,7 +540,7 @@ function startLiveListeners() {
   if (announcementsUnsubscribe) announcementsUnsubscribe();
   announcementsUnsubscribe = db.collection("announcements").orderBy("createdAt","desc").limit(8).onSnapshot(snapshot => { renderAnnouncements(snapshot.docs); }, error => console.warn("Announcements:",error));
   if (tasksUnsubscribe) tasksUnsubscribe();
-  tasksUnsubscribe = db.collection("tasks").where("active","==",true).onSnapshot(snapshot => { renderTasks(snapshot.docs); }, error => { document.getElementById("tasksGrid").innerHTML = '<p class="text-red-600">Unable to load tasks. Check Firestore rules.</p>'; console.error("Tasks:", error); });
+  tasksUnsubscribe = db.collecton("tasks").where("active","==",true).onSnapshot(snapshot => { renderTasks(snapshot.docs); }, error => { document.getElementById("tasksGrid").innerHTML = '<p class="text-red-600">Unable to load tasks. Check Firestore rules.</p>'; console.error("Tasks:", error); });
   if (myTaskSubmissionsUnsubscribe) myTaskSubmissionsUnsubscribe();
   myTaskSubmissionsUnsubscribe = db.collection("task_submissions").where("uid","==",currentUser.uid).onSnapshot(snapshot => { renderMyTaskSubmissions(snapshot.docs); }, error => console.warn("My task submissions:",error));
   if (userData && userData.is_admin === true) loadAdminData();
