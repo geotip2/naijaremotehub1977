@@ -458,8 +458,8 @@ async function forgotPassword() {
           try {
             const userRef = db.collection("users").doc(currentUser.uid);
             const snap = await userRef.get();
-            const oldBal = (snap.exists && snap.data().walletNaira) || 0;
-            await userRef.update({ walletNaira: oldBal + amountNaira });
+                        const oldBal = (snap.exists && snap.data().balance) || 0;
+            await userRef.update({ balance: oldBal + amountNaira });
             await db.collection("payment_requests").doc(reference).set({ status: "verified", creditedAt: serverTimestamp() }, { merge: true });
             showNotice("fundWalletMsg", "✅ ₦" + amountNaira.toLocaleString() + " added to your wallet!", "success");
             document.getElementById("fundWalletAmt").value = "";
