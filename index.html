@@ -131,7 +131,16 @@
   <section id="dashboard" class="page">
     <div class="max-w-6xl mx-auto px-4 py-10">
       <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="text-green-700 font-bold text-sm">MEMBER AREA</p><h1 class="text-3xl font-black">Your Dashboard</h1><p id="memberGreeting" class="text-slate-00 mt-1"></p></div><span id="accountBadge" class="pill bg-slate-200 text-slate-700">FREE ACCOUNT</span></div>
-     
+     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
+        <div class="bg-green-800 text-white rounded-2xl p-6 shadow-soft"><p class="text-green-100 text-sm font-semibold">Wallet Balance</p><p id="walletBalance" class="text-3xl font-black mt-2">₦0</p></div>
+        <div class="bg-amber-400 text-green-950 rounded-2xl p-6 shadow-soft"><p class="text-green-950 text-sm font-semibold">Task Points</p><p id="pointsBalance" class="text-3xl font-black mt-2">0</p><p class="text-xs mt-1">Points earned from approved tasks</p></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Total Referrals</p><p id="referralCount" class="text-3xl font-black mt-2">0</p></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Your Referral Code</p><p id="myRefCode" class="text-2xl font-black text-green-700 mt-2 break-all">—</p></div>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6 mt-6">
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
+      </div>
             <!-- BUY / SEND / SWAP - NEW FOR USERS -->
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-amber-200">
         <h2 class="font-extrabold text-lg">💰 Buy, Send & Swap</h2>
@@ -223,16 +232,7 @@
         <button class="btn btn-green w-full mt-2" onclick="confirmMass()">Confirm Send to All</button>
         <div id="massMsg" class="notice"></div>
       </section>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
-        <div class="bg-green-800 text-white rounded-2xl p-6 shadow-soft"><p class="text-green-100 text-sm font-semibold">Wallet Balance</p><p id="walletBalance" class="text-3xl font-black mt-2">₦0</p></div>
-        <div class="bg-amber-400 text-green-950 rounded-2xl p-6 shadow-soft"><p class="text-green-950 text-sm font-semibold">Task Points</p><p id="pointsBalance" class="text-3xl font-black mt-2">0</p><p class="text-xs mt-1">Points earned from approved tasks</p></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Total Referrals</p><p id="referralCount" class="text-3xl font-black mt-2">0</p></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Your Referral Code</p><p id="myRefCode" class="text-2xl font-black text-green-700 mt-2 break-all">—</p></div>
-      </div>
-      <div class="grid lg:grid-cols-2 gap-6 mt-6">
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Your Referral Link</h2><div class="flex gap-2 mt-4"><input id="referralLink" class="field min-w-0 text-sm" readonly><button class="btn btn-green whitespace-nowrap" onclick="copyReferral()">Copy</button></div><button class="btn btn-yellow w-full mt-3" onclick="shareWhatsApp()">Share on WhatsApp</button></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="font-extrabold text-lg">Membership</h2><p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
-      </div>
+      
       <!-- MINT / BURN - NEW -->
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-7 border-2 border-amber-200">
         <h2 class="text-xl font-extrabold">🪙 Mint &amp; Burn Points - Admin Only</h2>
