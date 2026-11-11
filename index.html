@@ -38,7 +38,6 @@
     </nav>
   </div>
 </header>
-
 <main>
   <section id="home" class="page active">
     <div class="bg-gradient-to-br from-green-800 via-green-700 to-green-600 text-white">
@@ -65,7 +64,6 @@
         </div>
       </div>
     </div>
-
     <div class="max-w-6xl mx-auto px-4 py-14">
       <div id="courseOffer" class="max-w-3xl mx-auto bg-white rounded-3xl border border-green-100 shadow-soft overflow-hidden">
         <div class="bg-green-800 text-white p-6 sm:p-8">
@@ -86,7 +84,6 @@
           <p class="text-xs text-slate-500 mt-4">Payment access is activated only after the server securely verifies the Paystack transaction.</p>
         </div>
       </div>
-
       <div class="grid md:grid-cols-2 gap-8 mt-16">
         <div><h2 class="text-3xl font-black">How You Earn</h2><p class="text-slate-600 mt-2">Referral rewards are subject to verified membership payments and the programme terms.</p>
           <div class="mt-6 space-y-3">
@@ -106,7 +103,6 @@
       <section class="mt-16"><h2 class="text-3xl font-black">Latest Announcements</h2><div id="homeAnnouncements" class="grid md:grid-cols-2 gap-4 mt-5"><p class="text-slate-500">Loading announcements…</p></div></section>
     </div>
   </section>
-
   <section id="auth" class="page">
     <div class="min-h-[75vh] flex items-center justify-center px-4 py-12">
       <div class="w-full max-w-md bg-white rounded-3xl shadow-soft p-6 sm:p-8">
@@ -118,7 +114,7 @@
           <button id="loginSubmit" class="btn btn-green w-full" type="submit">Login</button><div id="loginError" class="notice error"></div>
         </form>
         <div class="text-right"><button type="button" class="text-sm font-bold text-green-700" onclick="forgotPassword()">Forgot password?</button></div>
-<div id="forgotMessage" class="notice"></div>
+        <div id="forgotMessage" class="notice"></div>
         <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
           <div><label class="block text-sm font-bold mb-1" for="signupName">Full Name</label><input id="signupName" class="field" autocomplete="name" required maxlength="100"></div>
           <div><label class="block text-sm font-bold mb-1" for="signupEmail">Email</label><input id="signupEmail" class="field" type="email" autocomplete="email" required></div>
@@ -129,11 +125,10 @@
       </div>
     </div>
   </section>
-
   <section id="dashboard" class="page">
     <div class="max-w-6xl mx-auto px-4 py-10">
-      <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="text-green-700 font-bold text-sm">MEMBER AREA</p><h1 class="text-3xl font-black">Your Dashboard</h1><p id="memberGreeting" class="text-slate-00 mt-1"></p></div><span id="accountBadge" class="pill bg-slate-200 text-slate-700">FREE ACCOUNT</span></div>
-     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
+      <div class="flex flex-wrap items-center justify-between gap-4"><div><p class="text-green-700 font-bold text-sm">MEMBER AREA</p><h1 class="text-3xl font-black">Your Dashboard</h1><p id="memberGreeting" class="text-slate-600 mt-1"></p></div><span id="accountBadge" class="pill bg-slate-200 text-slate-700">FREE ACCOUNT</span></div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7">
         <div class="bg-green-800 text-white rounded-2xl p-6 shadow-soft"><p class="text-green-100 text-sm font-semibold">Wallet Balance</p><p id="walletBalance" class="text-3xl font-black mt-2">₦0</p></div>
         <div class="bg-amber-400 text-green-950 rounded-2xl p-6 shadow-soft"><p class="text-green-950 text-sm font-semibold">Task Points</p><p id="pointsBalance" class="text-3xl font-black mt-2">0</p><p class="text-xs mt-1">Points earned from approved tasks</p></div>
         <div class="bg-white rounded-2xl p-6 shadow-soft"><p class="text-slate-500 text-sm">Total Referrals</p><p id="referralCount" class="text-3xl font-black mt-2">0</p></div>
@@ -145,52 +140,22 @@
           <div id="membershipPlansList">Loading plans...</div>
           <p id="membershipText" class="text-slate-600 text-sm mt-2">You are using a free account.</p><button id="upgradeButton" class="btn btn-green w-full mt-4" onclick="pay()">Upgrade — Pay ₦30,000</button></div>
       </div>
-            <!-- FUND WALLET - PAYSTACK AUTOMATED -->
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-green-200">
         <h2 class="font-extrabold text-lg">💳 Fund Wallet</h2>
         <p class="text-sm text-slate-500 mt-1">Add Naira to your wallet with card / bank transfer. Minimum ₦100. Credited automatically after Paystack confirms.</p>
-        <div class="flex gap-2 mt-4">
-          <input id="fundWalletAmt" class="field" type="number" min="100" step="1" placeholder="Amount e.g. 5000">
-          <button class="btn btn-green whitespace-nowrap" onclick="fundWallet()">Fund Wallet</button>
-        </div>
-        <div class="flex gap-2 mt-2">
-          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=500">₦500</button>
-          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=1000">₦1,000</button>
-          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=5000">₦5,000</button>
-          <button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=10000">₦10,000</button>
-        </div>
+        <div class="flex gap-2 mt-4"><input id="fundWalletAmt" class="field" type="number" min="100" step="1" placeholder="Amount e.g. 5000"><button class="btn btn-green whitespace-nowrap" onclick="fundWallet()">Fund Wallet</button></div>
+        <div class="flex gap-2 mt-2"><button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=500">₦500</button><button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=1000">₦1,000</button><button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=5000">₦5,000</button><button class="btn btn-light !py-1 !px-3 text-xs" onclick="document.getElementById('fundWalletAmt').value=10000">₦10,000</button></div>
         <div id="fundWalletMsg" class="notice"></div>
       </div>
-            <!-- BUY / SEND / SWAP - NEW FOR USERS -->
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-amber-200">
         <h2 class="font-extrabold text-lg">💰 Buy, Send & Swap</h2>
         <p class="text-sm text-slate-500 mt-1">Rate: <span id="userRateText">Loading rate...</span></p>
         <div class="grid md:grid-cols-3 gap-4 mt-4">
-          <div class="border rounded-xl p-4">
-            <b>Buy Points with Naira</b>
-            <p class="text-xs text-slate-500 mt-1">Use your Naira wallet balance to buy Points.</p>
-            <input id="buyPointsAmt" class="field mt-2" type="number" placeholder="Naira amount e.g. 1000">
-            <p id="buyPointsPreview" class="text-xs mt-1 text-green-700"></p>
-            <button class="btn btn-green w-full mt-2" onclick="buyPointsWithNaira()">Buy Points</button>
-          </div>
-          <div class="border rounded-xl p-4">
-            <b>Send Points</b>
-            <input id="sendPointsTo" class="field mt-2" placeholder="Recipient email">
-            <input id="sendPointsAmt" class="field mt-2" type="number" placeholder="Points e.g. 500">
-            <button class="btn btn-green w-full mt-2" onclick="sendPoints()">Send Points</button>
-          </div>
-          <div class="border rounded-xl p-4">
-            <b>Send Naira</b>
-            <input id="sendNairaTo" class="field mt-2" placeholder="Recipient email">
-            <input id="sendNairaAmt" class="field mt-2" type="number" placeholder="Naira e.g. 500">
-            <button class="btn btn-green w-full mt-2" onclick="sendNaira()">Send Naira</button>
-          </div>
+          <div class="border rounded-xl p-4"><b>Buy Points with Naira</b><p class="text-xs text-slate-500 mt-1">Use your Naira wallet balance to buy Points.</p><input id="buyPointsAmt" class="field mt-2" type="number" placeholder="Naira amount e.g. 1000"><p id="buyPointsPreview" class="text-xs mt-1 text-green-700"></p><button class="btn btn-green w-full mt-2" onclick="buyPointsWithNaira()">Buy Points</button></div>
+          <div class="border rounded-xl p-4"><b>Send Points</b><input id="sendPointsTo" class="field mt-2" placeholder="Recipient email"><input id="sendPointsAmt" class="field mt-2" type="number" placeholder="Points e.g. 500"><button class="btn btn-green w-full mt-2" onclick="sendPoints()">Send Points</button></div>
+          <div class="border rounded-xl p-4"><b>Send Naira</b><input id="sendNairaTo" class="field mt-2" placeholder="Recipient email"><input id="sendNairaAmt" class="field mt-2" type="number" placeholder="Naira e.g. 500"><button class="btn btn-green w-full mt-2" onclick="sendNaira()">Send Naira</button></div>
         </div>
-        <div class="border rounded-xl p-4 mt-4">
-          <b>Swap Points → Naira</b>
-          <div class="flex gap-2 mt-2"><input id="swapPointsAmt" class="field" type="number" placeholder="Points to swap"><button class="btn btn-yellow whitespace-nowrap" onclick="swapPointsToNaira()">Swap to Naira</button></div>
-          <p id="swapPreview" class="text-xs mt-1 text-green-700"></p>
-        </div>
+        <div class="border rounded-xl p-4 mt-4"><b>Swap Points → Naira</b><div class="flex gap-2 mt-2"><input id="swapPointsAmt" class="field" type="number" placeholder="Points to swap"><button class="btn btn-yellow whitespace-nowrap" onclick="swapPointsToNaira()">Swap to Naira</button></div><p id="swapPreview" class="text-xs mt-1 text-green-700"></p></div>
         <div class="mt-5"><h3 class="font-bold">My Transactions</h3><div id="myTransactions" class="space-y-2 mt-2 text-sm"><p class="text-slate-500">Loading...</p></div></div>
       </div>
       <div class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="font-extrabold text-lg">Request a Withdrawal</h2><p class="text-sm text-slate-500 mt-1">Minimum withdrawal: ₦5,000. Requests are reviewed by the administrator.</p>
@@ -201,702 +166,129 @@
           <div class="flex items-end"><button id="withdrawSubmit" class="btn btn-green w-full" type="submit">Request Withdrawal</button></div>
         </form><div id="withdrawMessage" class="notice"></div>
       </div>
-      <section class="mt-10">
-        <div class="flex flex-wrap items-end justify-between gap-3">
-          <div><h2 class="text-2xl font-black">Points-to-Task Centre</h2><p class="text-sm text-slate-500 mt-1">Complete a task and submit your work for admin review. Points are added after approval.</p></div>
-          <span class="pill bg-amber-100 text-amber-900">Earn points</span>
-        </div>
-        <div id="tasksGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5"><p class="text-slate-500">Loading tasks…</p></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft mt-6">
-          <h3 class="font-extrabold text-lg">My Task Submissions</h3>
-          <div id="myTaskSubmissions" class="space-y-3 mt-4"><p class="text-slate-500 text-sm">Your submissions will appear here.</p></div>
-        </div>
-      </section>
+      <section class="mt-10"><div class="flex flex-wrap items-end justify-between gap-3"><div><h2 class="text-2xl font-black">Points-to-Task Centre</h2><p class="text-sm text-slate-500 mt-1">Complete a task and submit your work for admin review. Points are added after approval.</p></div><span class="pill bg-amber-100 text-amber-900">Earn points</span></div><div id="tasksGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5"><p class="text-slate-500">Loading tasks…</p></div><div class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h3 class="font-extrabold text-lg">My Task Submissions</h3><div id="myTaskSubmissions" class="space-y-3 mt-4"><p class="text-slate-500 text-sm">Your submissions will appear here.</p></div></div></section>
       <section class="mt-10"><div class="flex items-end justify-between gap-3"><div><h2 class="text-2xl font-black">My Courses / Learning Materials</h2><p class="text-sm text-slate-500 mt-1">Course resources published by the NaijaRemoteHub team.</p></div></div><div id="materialsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-5"><p class="text-slate-500">Loading materials…</p></div></section>
     </div>
   </section>
-
   <section id="admin" class="page">
     <div class="max-w-6xl mx-auto px-4 py-10">
       <h1 class="text-3xl font-black">Admin Panel</h1><p class="text-slate-500 mt-1">Manage announcements, members, withdrawals and learning materials.</p>
-
-    <!-- EXCHANGE RATE + MASS TRANSFER - NEW -->
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-7 border-2 border-green-200">
-        <h2 class="text-xl font-extrabold">💱 Exchange Rate - Admin can change anytime</h2>
-        <p class="text-sm text-slate-500 mt-1">This reads from Firestore <b>settings / exchange</b> - the doc you already saved. Change it here, it goes live instantly for all users.</p>
-        <div class="grid sm:grid-cols-3 gap-3 mt-4">
-          <div><label class="text-sm font-bold block mb-1">1 Naira = ? Points</label><input id="exNairaToPoints" class="field" type="number" step="0.01" placeholder="10"></div>
-          <div><label class="text-sm font-bold block mb-1">1 Point = ? Naira</label><input id="exPointsToNaira" class="field" type="number" step="0.01" placeholder="2"></div>
-          <div><label class="text-sm font-bold block mb-1">Transfer Fee %</label><input id="exFee" class="field" type="number" step="0.1" placeholder="0"></div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-3 mt-3">
-          <div><label class="text-sm font-bold block mb-1">Min Transfer Naira</label><input id="exMinNaira" class="field" type="number" placeholder="100"></div>
-          <div><label class="text-sm font-bold block mb-1">Min Transfer Points</label><input id="exMinPoints" class="field" type="number" placeholder="100"></div>
-        </div>
-        <p id="exLastUpdated" class="text-xs text-slate-500 mt-2"></p>
-        <button class="btn btn-green w-full mt-3" onclick="saveExchangeRate()">Save Exchange Rate</button>
-        <div id="exMsg" class="notice"></div>
+        <h2 class="text-xl font-extrabold">💱 Exchange Rate</h2><p class="text-sm text-slate-500 mt-1">Reads from Firestore <b>settings / exchange</b>.</p>
+        <div class="grid sm:grid-cols-3 gap-3 mt-4"><div><label class="text-sm font-bold block mb-1">1 Naira = ? Points</label><input id="exNairaToPoints" class="field" type="number" step="0.01" placeholder="10"></div><div><label class="text-sm font-bold block mb-1">1 Point = ? Naira</label><input id="exPointsToNaira" class="field" type="number" step="0.01" placeholder="2"></div><div><label class="text-sm font-bold block mb-1">Transfer Fee %</label><input id="exFee" class="field" type="number" step="0.1" placeholder="0"></div></div>
+        <div class="grid sm:grid-cols-2 gap-3 mt-3"><div><label class="text-sm font-bold block mb-1">Min Transfer Naira</label><input id="exMinNaira" class="field" type="number" placeholder="100"></div><div><label class="text-sm font-bold block mb-1">Min Transfer Points</label><input id="exMinPoints" class="field" type="number" placeholder="100"></div></div>
+        <p id="exLastUpdated" class="text-xs text-slate-500 mt-2"></p><button class="btn btn-green w-full mt-3" onclick="saveExchangeRate()">Save Exchange Rate</button><div id="exMsg" class="notice"></div>
       </section>
-
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-6 border-2 border-blue-200">
-        <h2 class="text-xl font-extrabold">📤 Mass Transfer - Send to Many Users</h2>
-        <p class="text-sm text-slate-500 mt-1">Send Points or Naira to all users at once. This was missing before.</p>
-        <div class="grid sm:grid-cols-2 gap-3 mt-4">
-          <div><label class="text-sm font-bold block mb-1">Currency</label><select id="massCurrency" class="field"><option value="points">Points</option><option value="naira">Naira</option></select></div>
-          <div><label class="text-sm font-bold block mb-1">Amount per user</label><input id="massAmount" class="field" type="number" placeholder="e.g. 500"></div>
-          <div><label class="text-sm font-bold block mb-1">Who?</label><select id="massTarget" class="field"><option value="all">All Users</option><option value="paid">Paid Only</option><option value="free">Free Only</option></select></div>
-          <div><label class="text-sm font-bold block mb-1">Reason</label><input id="massReason" class="field" placeholder="e.g. Weekly Bonus"></div>
-        </div>
-        <button class="btn btn-light w-full mt-3" onclick="previewMass()">Preview - How many users?</button>
-        <p id="massPreview" class="text-sm font-bold mt-2 text-green-800"></p>
-        <button class="btn btn-green w-full mt-2" onclick="confirmMass()">Confirm Send to All</button>
-        <div id="massMsg" class="notice"></div>
+        <h2 class="text-xl font-extrabold">📤 Mass Transfer</h2><p class="text-sm text-slate-500 mt-1">Send Points or Naira to all users at once.</p>
+        <div class="grid sm:grid-cols-2 gap-3 mt-4"><div><label class="text-sm font-bold block mb-1">Currency</label><select id="massCurrency" class="field"><option value="points">Points</option><option value="naira">Naira</option></select></div><div><label class="text-sm font-bold block mb-1">Amount per user</label><input id="massAmount" class="field" type="number" placeholder="e.g. 500"></div><div><label class="text-sm font-bold block mb-1">Who?</label><select id="massTarget" class="field"><option value="all">All Users</option><option value="paid">Paid Only</option><option value="free">Free Only</option></select></div><div><label class="text-sm font-bold block mb-1">Reason</label><input id="massReason" class="field" placeholder="e.g. Weekly Bonus"></div></div>
+        <button class="btn btn-light w-full mt-3" onclick="previewMass()">Preview - How many users?</button><p id="massPreview" class="text-sm font-bold mt-2 text-green-800"></p><button class="btn btn-green w-full mt-2" onclick="confirmMass()">Confirm Send to All</button><div id="massMsg" class="notice"></div>
       </section>
-      
-      <!-- MINT / BURN - NEW -->
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-7 border-2 border-amber-200">
-        <h2 class="text-xl font-extrabold">🪙 Mint &amp; Burn Points - Admin Only</h2>
-        <p class="text-sm text-slate-500 mt-1">Mint creates new points into Treasury. Burn destroys points forever.</p>
-        <div class="grid grid-cols-3 gap-3 mt-4 text-center">
-          <div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">Total Supply</p><b id="statSupply" class="text-lg">0</b></div>
-          <div class="bg-amber-50 rounded-xl p-3"><p class="text-xs text-slate-500">Treasury</p><b id="statTreasury" class="text-lg">0</b></div>
-          <div class="bg-green-50 rounded-xl p-3"><p class="text-xs text-slate-500">Circulating</p><b id="statCirculating" class="text-lg">0</b></div>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-3 mt-5">
-          <div>
-            <label class="text-sm font-bold block mb-1">Mint to Treasury</label>
-            <input id="mintAmt" class="field" type="number" placeholder="e.g. 10000">
-            <button class="btn btn-green w-full mt-2" onclick="adminMint()">Mint to Treasury</button>
-          </div>
-          <div>
-            <label class="text-sm font-bold block mb-1">Burn from Treasury</label>
-            <input id="burnTreasuryAmt" class="field" type="number" placeholder="e.g. 5000">
-            <button class="btn w-full mt-2 bg-red-50 text-red-700" onclick="adminBurnTreasury()">Burn Treasury</button>
-          </div>
-        </div>
-        <div class="border-t mt-5 pt-4">
-          <label class="text-sm font-bold block mb-1">Burn % From ALL Users</label>
-          <input id="burnPct" class="field" type="number" placeholder="e.g. 10 for 10%">
-          <button class="btn w-full mt-2 bg-red-600 text-white" onclick="adminBurnAllPct()">Burn % From All Users</button>
-          <p class="text-xs text-slate-500 mt-2">Example: If a user has 1000 points and you burn 10%, they will have 900 left. Total Supply and Circulating will also drop.</p>
-        </div>
-        <div class="border-t mt-4 pt-4">
-          <label class="text-sm font-bold block mb-1">Burn Fixed Total - Split Proportional</label>
-          <input id="burnFixedAmt" class="field" type="number" placeholder="e.g. 5000 total to burn">
-          <button class="btn w-full mt-2 bg-red-100 text-red-800" onclick="adminBurnAllFixed()">Burn Fixed Total</button>
-        </div>
+        <h2 class="text-xl font-extrabold">🪙 Mint & Burn Points</h2><p class="text-sm text-slate-500 mt-1">Mint creates new points into Treasury. Burn destroys points forever.</p>
+        <div class="grid grid-cols-3 gap-3 mt-4 text-center"><div class="bg-slate-50 rounded-xl p-3"><p class="text-xs text-slate-500">Total Supply</p><b id="statSupply" class="text-lg">0</b></div><div class="bg-amber-50 rounded-xl p-3"><p class="text-xs text-slate-500">Treasury</p><b id="statTreasury" class="text-lg">0</b></div><div class="bg-green-50 rounded-xl p-3"><p class="text-xs text-slate-500">Circulating</p><b id="statCirculating" class="text-lg">0</b></div></div>
+        <div class="grid sm:grid-cols-2 gap-3 mt-5"><div><label class="text-sm font-bold block mb-1">Mint to Treasury</label><input id="mintAmt" class="field" type="number" placeholder="e.g. 10000"><button class="btn btn-green w-full mt-2" onclick="adminMint()">Mint to Treasury</button></div><div><label class="text-sm font-bold block mb-1">Burn from Treasury</label><input id="burnTreasuryAmt" class="field" type="number" placeholder="e.g. 5000"><button class="btn w-full mt-2 bg-red-50 text-red-700" onclick="adminBurnTreasury()">Burn Treasury</button></div></div>
+        <div class="border-t mt-5 pt-4"><label class="text-sm font-bold block mb-1">Burn % From ALL Users</label><input id="burnPct" class="field" type="number" placeholder="e.g. 10 for 10%"><button class="btn w-full mt-2 bg-red-600 text-white" onclick="adminBurnAllPct()">Burn % From All Users</button></div>
+        <div class="border-t mt-4 pt-4"><label class="text-sm font-bold block mb-1">Burn Fixed Total - Split Proportional</label><input id="burnFixedAmt" class="field" type="number" placeholder="e.g. 5000 total to burn"><button class="btn w-full mt-2 bg-red-100 text-red-800" onclick="adminBurnAllFixed()">Burn Fixed Total</button></div>
       </section>
-
       <div class="grid lg:grid-cols-2 gap-6 mt-7">
         <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Announcement</h2><form id="announcementForm" class="space-y-3 mt-4" onsubmit="postAnnouncement(event)"><input id="announcementTitle" class="field" placeholder="Title" required maxlength="150"><textarea id="announcementMessage" class="field" rows="4" placeholder="Message" required maxlength="3000"></textarea><button class="btn btn-green w-full">Post Announcement</button><div id="announcementMessageBox" class="notice"></div></form></div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Educational Material</h2>
-          <form id="materialForm" class="space-y-3 mt-4" onsubmit="postMaterial(event)">
-            <input id="materialTitle" class="field" placeholder='Material Title (e.g. "Virtual Assistant Module 1")' required maxlength="150">
-            <select id="materialCategory" class="field" required><option value="">Select Category</option><option>Virtual Assistant</option><option>Freelancing</option><option>Content Creation</option><option>WhatsApp Marketing</option><option>Canva Design</option><option>General</option></select>
-            <textarea id="materialDescription" class="field" rows="3" placeholder="Description" required maxlength="3000"></textarea>
-            <input id="materialVideo" class="field" type="url" placeholder="Video Link (optional)">
-            <input id="materialPdf" class="field" type="url" placeholder="PDF / Download Link (optional)">
-            <label class="flex items-center gap-3 text-sm font-semibold"><input id="materialFree" type="checkbox" class="w-5 h-5 accent-green-700"> Is Free? (free users can access this material)</label>
-            <button id="materialSubmit" class="btn btn-green w-full">Post Material</button><div id="materialMessage" class="notice"></div>
-          </form>
-        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Post Educational Material</h2><form id="materialForm" class="space-y-3 mt-4" onsubmit="postMaterial(event)"><input id="materialTitle" class="field" placeholder="Material Title" required maxlength="150"><select id="materialCategory" class="field" required><option value="">Select Category</option><option>Virtual Assistant</option><option>Freelancing</option><option>Content Creation</option><option>WhatsApp Marketing</option><option>Canva Design</option><option>General</option></select><textarea id="materialDescription" class="field" rows="3" placeholder="Description" required maxlength="3000"></textarea><input id="materialVideo" class="field" type="url" placeholder="Video Link (optional)"><input id="materialPdf" class="field" type="url" placeholder="PDF / Download Link (optional)"><label class="flex items-center gap-3 text-sm font-semibold"><input id="materialFree" type="checkbox" class="w-5 h-5 accent-green-700"> Is Free?</label><button id="materialSubmit" class="btn btn-green w-full">Post Material</button><div id="materialMessage" class="notice"></div></form></div>
       </div>
       <section class="grid lg:grid-cols-2 gap-6 mt-6">
-        <div class="bg-white rounded-2xl p-6 shadow-soft">
-          <h2 class="text-xl font-extrabold">Create Points-to-Task</h2>
-          <form id="taskForm" class="space-y-3 mt-4" onsubmit="createTask(event)">
-            <input id="taskTitle" class="field" placeholder="Task title" required maxlength="150">
-            <textarea id="taskDescription" class="field" rows="4" placeholder="Task instructions and requirements" required maxlength="3000"></textarea>
-            <input id="taskReward" class="field" type="number" min="1" step="1" placeholder="Points reward" required>
-            <input id="taskProofHint" class="field" placeholder="What should members submit? (e.g. link, screenshot description)" maxlength="300">
-            <label class="flex items-center gap-3 text-sm font-semibold"><input id="taskActive" type="checkbox" class="w-5 h-5 accent-green-700" checked> Publish task immediately</label>
-            <button id="taskSubmit" class="btn btn-green w-full" type="submit">Create Task</button>
-            <div id="taskMessage" class="notice"></div>
-          </form>
-          <div class="border-t mt-6 pt-5"><h3 class="font-bold">Existing Tasks</h3><div id="adminTasks" class="space-y-3 mt-3"><p class="text-slate-500 text-sm">Loading tasks…</p></div></div>
-        </div>
-        <div class="bg-white rounded-2xl p-6 shadow-soft">
-          <h2 class="text-xl font-extrabold">Review Task Submissions</h2>
-          <p class="text-sm text-slate-500 mt-1">Approve a submission to credit its points, or reject it with no points credited.</p>
-          <div id="taskSubmissionsAdmin" class="space-y-3 mt-4"><p class="text-slate-500 text-sm">Loading submissions…</p></div>
-        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Create Points-to-Task</h2><form id="taskForm" class="space-y-3 mt-4" onsubmit="createTask(event)"><input id="taskTitle" class="field" placeholder="Task title" required maxlength="150"><textarea id="taskDescription" class="field" rows="4" placeholder="Task instructions" required maxlength="3000"></textarea><input id="taskReward" class="field" type="number" min="1" step="1" placeholder="Points reward" required><input id="taskProofHint" class="field" placeholder="What should members submit?" maxlength="300"><label class="flex items-center gap-3 text-sm font-semibold"><input id="taskActive" type="checkbox" class="w-5 h-5 accent-green-700" checked> Publish task immediately</label><button id="taskSubmit" class="btn btn-green w-full" type="submit">Create Task</button><div id="taskMessage" class="notice"></div></form><div class="border-t mt-6 pt-5"><h3 class="font-bold">Existing Tasks</h3><div id="adminTasks" class="space-y-3 mt-3"><p class="text-slate-500 text-sm">Loading tasks…</p></div></div></div>
+        <div class="bg-white rounded-2xl p-6 shadow-soft"><h2 class="text-xl font-extrabold">Review Task Submissions</h2><p class="text-sm text-slate-500 mt-1">Approve to credit points, or reject.</p><div id="taskSubmissionsAdmin" class="space-y-3 mt-4"><p class="text-slate-500 text-sm">Loading submissions…</p></div></div>
       </section>
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">All Users</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[850px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Email</th><th class="p-2">Balance</th><th class="p-2">Points</th><th class="p-2">Membership</th><th class="p-2">Actions</th></tr></thead><tbody id="usersTable"><tr><td class="p-2" colspan="6">Loading…</td></tr></tbody></table></div></section>
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Withdrawals</h2><div class="overflow-x-auto mt-4"><table class="w-full text-sm text-left min-w-[750px]"><thead><tr class="border-b text-slate-500"><th class="p-2">Name</th><th class="p-2">Amount</th><th class="p-2">Bank</th><th class="p-2">Account</th><th class="p-2">Status</th></tr></thead><tbody id="withdrawalsTable"><tr><td class="p-2" colspan="5">Loading…</td></tr></tbody></table></div></section>
       <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Manage Materials</h2><div id="adminMaterials" class="space-y-3 mt-4">Loading…</div></section>
+      <section class="bg-white rounded-2xl p-6 shadow-soft mt-6"><h2 class="text-xl font-extrabold">Manage Membership Plans</h2><p class="text-sm text-slate-500 mt-1">Add / edit plans without touching code. Price is in Naira.</p><div class="grid sm:grid-cols-2 gap-3 mt-4"><div><label class="text-sm font-bold block mb-1">Plan Name</label><input id="planName" class="field" placeholder="e.g. Starter"></div><div><label class="text-sm font-bold block mb-1">Price Naira</label><input id="planPrice" class="field" type="number" placeholder="30000"></div><div><label class="text-sm font-bold block mb-1">Order</label><input id="planOrder" class="field" type="number" placeholder="1"></div><div><label class="text-sm font-bold block mb-1">Active?</label><select id="planActive" class="field"><option value="true">Active</option><option value="false">Inactive</option></select></div></div><textarea id="planDesc" class="field mt-3" rows="2" placeholder="Description"></textarea><button class="btn btn-green w-full mt-3" onclick="saveMembershipPlan()">Save Plan</button><div id="planMsg" class="notice"></div><div id="adminPlansList" class="space-y-3 mt-4"><p class="text-slate-500 text-sm">Loading plans…</p></div></section>
     </div>
   </section>
 </main>
-
 <footer class="bg-slate-900 text-slate-300 mt-16"><div class="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row justify-between gap-3 text-sm"><p>© <span id="year"></span> NaijaRemoteHub. Learn. Earn. Grow.</p><p>Build skills. Create opportunities.</p></div></footer>
-
 <script>
 "use strict";
-const firebaseConfig = {
-  apiKey: "AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",
-  authDomain: "naijaremotehub-6f584.firebaseapp.com",
-  databaseURL: "https://naijaremotehub-6f584-default-rtdb.firebaseio.com",
-  projectId: "naijaremotehub-6f584",
-  storageBucket: "naijaremotehub-6f584.firebasestorage.app",
-  messagingSenderId: "662711600492",
-  appId: "1:662711600492:web:a307027882c532269adf49",
-  measurementId: "G-GPWVV5WLEC"
-};
-const PAYSTACK_PUBLIC_KEY = "pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a";
-const MEMBERSHIP_FEE_NAIRA = 30000;
-const MEMBERSHIP_FEE_KOBO = MEMBERSHIP_FEE_NAIRA * 100;
-const MIN_WITHDRAWAL = 5000;
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
-
-let currentUser = null;
-let userData = null;
-let referralsUnsubscribe = null;
-let materialsUnsubscribe = null;
-let announcementsUnsubscribe = null;
-let tasksUnsubscribe = null;
-let myTaskSubmissionsUnsubscribe = null;
-let adminUnsubscribers = [];
-
-document.getElementById("year").textContent = new Date().getFullYear();
-const urlParams = new URLSearchParams(window.location.search);
-const incomingReferral = (urlParams.get("ref") || "").trim();
-if (incomingReferral) document.getElementById("signupReferral").value = incomingReferral;
-
-function cleanEmail(value) { return String(value || "").trim().toLowerCase().replace(/\s/g, ""); }
-function money(value) { return new Intl.NumberFormat("en-NG", {style:"currency",currency:"NGN",maximumFractionDigits:0}).format(Number(value || 0)); }
-function safeText(value) { return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function showNotice(id, message, type="error") { const el = document.getElementById(id); if (!el) return; el.textContent = message; el.className = "notice show " + (type === "success" ? "success" : "error"); }
-function clearNotice(id) { const el = document.getElementById(id); if (el) { el.textContent = ""; el.className = "notice"; } }
-function setBusy(id, busy, busyText) { const button = document.getElementById(id); if (!button) return; if (busy) { button.dataset.originalText = button.textContent; button.textContent = busyText || "Please wait…"; button.disabled = true; } else { button.textContent = button.dataset.originalText || button.textContent; button.disabled = false; } }
-function showPage(page) {
-  if ((page === "home" || page === "auth") && currentUser) page = "dashboard";
-  if ((page === "dashboard" || page === "admin") && !currentUser) { openAuth("login"); return; }
-  if (page === "admin" && !(userData && userData.is_admin === true)) { showPage("dashboard"); return; }
-  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
-  const target = document.getElementById(page); if (target) target.classList.add("active");
-  window.scrollTo({top:0,behavior:"smooth"});
+const firebaseConfig={apiKey:"AIzaSyDe4TrV0vzxysfCNOx_X10SHuIaRjO_xeA",authDomain:"naijaremotehub-6f584.firebaseapp.com",databaseURL:"https://naijaremotehub-6f584-default-rtdb.firebaseio.com",projectId:"naijaremotehub-6f584",storageBucket:"naijaremotehub-6f584.firebasestorage.app",messagingSenderId:"662711600492",appId:"1:662711600492:web:a307027882c532269adf49",measurementId:"G-GPWVV5WLEC"};
+const PAYSTACK_PUBLIC_KEY="pk_live_4925a4ff1de743ea4ee109443a430f1e3efdc10a";
+const MEMBERSHIP_FEE_NAIRA=30000; const MEMBERSHIP_FEE_KOBO=MEMBERSHIP_FEE_NAIRA*100; const MIN_WITHDRAWAL=5000;
+firebase.initializeApp(firebaseConfig); const auth=firebase.auth(); const db=firebase.firestore(); const serverTimestamp=()=>firebase.firestore.FieldValue.serverTimestamp();
+let currentUser=null; let userData=null; let referralsUnsubscribe=null; let materialsUnsubscribe=null; let announcementsUnsubscribe=null; let tasksUnsubscribe=null; let myTaskSubmissionsUnsubscribe=null; let adminUnsubscribers=[]; let membershipPlans=[]; let exchangeRate={nairaToPoints:10,pointsToNaira:0.1,feePct:0,minNaira:100,minPoints:100};
+document.getElementById("year").textContent=new Date().getFullYear();
+const urlParams=new URLSearchParams(window.location.search); const incomingReferral=(urlParams.get("ref")||"").trim(); if(incomingReferral) document.getElementById("signupReferral").value=incomingReferral;
+function cleanEmail(v){return String(v||"").trim().toLowerCase().replace(/\s/g,"");}
+function money(v){return new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",maximumFractionDigits:0}).format(Number(v||0));}
+function safeText(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function showNotice(id,m,t="error"){const el=document.getElementById(id); if(!el) return; el.textContent=m; el.className="notice show "+(t==="success"?"success":"error");}
+function clearNotice(id){const el=document.getElementById(id); if(el){el.textContent=""; el.className="notice";}}
+function setBusy(id,busy,busyText){const b=document.getElementById(id); if(!b) return; if(busy){b.dataset.originalText=b.textContent; b.textContent=busyText||"Please wait…"; b.disabled=true;} else {b.textContent=b.dataset.originalText||b.textContent; b.disabled=false;}}
+function showPage(page){ if((page==="home"||page==="auth")&&currentUser) page="dashboard"; if((page==="dashboard"||page==="admin")&&!currentUser){openAuth("login"); return;} if(page==="admin"&&!(userData&&userData.is_admin===true)){showPage("dashboard"); return;} document.querySelectorAll(".page").forEach(el=>el.classList.remove("active")); const t=document.getElementById(page); if(t) t.classList.add("active"); window.scrollTo({top:0,behavior:"smooth"}); }
+function openAuth(mode="login"){ if(currentUser){showPage("dashboard"); return;} switchAuth(mode); showPage("auth"); }
+function switchAuth(mode){ const isLogin=mode==="login"; document.getElementById("loginForm").classList.toggle("hidden",!isLogin); document.getElementById("signupForm").classList.toggle("hidden",isLogin); document.getElementById("loginTab").className="btn "+(isLogin?"tab-active":"tab-idle"); document.getElementById("signupTab").className="btn "+(!isLogin?"tab-active":"tab-idle"); clearNotice("loginError"); clearNotice("signupError"); }
+function updateNavigation(){ const s=!!currentUser; document.getElementById("navLogin").classList.toggle("hidden",s); document.getElementById("navLogout").classList.toggle("hidden",!s); document.getElementById("navDashboard").classList.toggle("hidden",!s); document.getElementById("navAdmin").classList.toggle("hidden",!(s&&userData&&userData.is_admin===true)); }
+function makeReferralCode(fullName){ const first=String(fullName||"member").trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g,"")||"member"; return first+Math.random().toString(36).slice(2,7); }
+async function findReferrer(code){ if(!code) return null; const snap=await db.collection("users").where("ref_code","==",code).limit(1).get(); if(snap.empty) return null; return snap.docs[0].id; }
+function friendlyError(error){ const code=error&&error.code; const messages={"auth/invalid-email":"Please enter a valid email address.","auth/user-not-found":"No account was found with that email.","auth/wrong-password":"Incorrect email or password.","auth/invalid-credential":"Incorrect email or password.","auth/email-already-in-use":"An account already exists with this email. Please log in.","auth/weak-password":"Choose a stronger password (at least 6 characters).","auth/too-many-requests":"Too many attempts. Please wait and try again.","permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.","unavailable":"Service temporarily unavailable. Please try again."}; return messages[code]||(error&&error.message)||"Something went wrong. Please try again."; }
+async function signup(event){ event.preventDefault(); clearNotice("signupError"); const fullName=document.getElementById("signupName").value.trim(); const email=cleanEmail(document.getElementById("signupEmail").value); const password=document.getElementById("signupPassword").value; const referralCode=document.getElementById("signupReferral").value.trim(); if(!fullName) return showNotice("signupError","Please enter your full name."); if(password.length<6) return showNotice("signupError","Password must be at least 6 characters."); setBusy("signupSubmit",true,"Creating account…"); try{ let referredBy=null; if(referralCode){ referredBy=await findReferrer(referralCode); if(!referredBy) throw new Error("That referral code was not found. Check the code or leave the field blank."); } const credential=await auth.createUserWithEmailAndPassword(email,password); const refCode=makeReferralCode(fullName); const profile={full_name:fullName,email,ref_code:refCode,referred_by:referredBy,balance:0,points_balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()}; await db.collection("users").doc(credential.user.uid).set(profile); document.getElementById("signupForm").reset(); await loadCurrentProfile(credential.user); showPage("dashboard"); }catch(error){ showNotice("signupError",friendlyError(error)); } finally{ setBusy("signupSubmit",false); } }
+async function login(event){ event.preventDefault(); clearNotice("loginError"); const email=cleanEmail(document.getElementById("loginEmail").value); const password=document.getElementById("loginPassword").value; setBusy("loginSubmit",true,"Signing in…"); try{ await auth.signInWithEmailAndPassword(email,password); document.getElementById("loginForm").reset(); }catch(error){ showNotice("loginError",friendlyError(error)); } finally{ setBusy("loginSubmit",false); } }
+async function forgotPassword(){ clearNotice("forgotMessage"); const email=cleanEmail(document.getElementById("loginEmail").value); if(!email) return showNotice("forgotMessage","Enter your email above first, then tap Forgot password."); try{ await auth.sendPasswordResetEmail(email); showNotice("forgotMessage","Reset link sent to "+email+". Check your inbox / spam. Link expires in 1 hour.","success"); }catch(error){ showNotice("forgotMessage",friendlyError(error)); } }
+function togglePass(id,btn){ const el=document.getElementById(id); if(!el) return; const show=el.type==="password"; el.type=show?"text":"password"; if(btn) btn.textContent=show?"🙈":"👁️"; }
+async function logout(){ try{ await auth.signOut(); }catch(error){ alert(friendlyError(error)); } }
+auth.onAuthStateChanged(async user=>{ currentUser=user||null; userData=null; stopLiveListeners(); if(currentUser){ try{ await loadCurrentProfile(currentUser); updateNavigation(); const onAdmin=document.getElementById("admin").classList.contains("active"); if(!(onAdmin&&userData&&userData.is_admin===true)) showPage("dashboard"); }catch(error){ console.error(error); updateNavigation(); showPage("dashboard"); if(error.code==="permission-denied") alert("Your account profile could not be read. Check your Firestore rules."); } } else { updateNavigation(); if(!document.getElementById("home").classList.contains("active")) openAuth("login"); } });
+async function loadCurrentProfile(user){ const ref=db.collection("users").doc(user.uid); const snap=await ref.get(); if(!snap.exists){ const name=user.displayName||(user.email?user.email.split("@")[0]:"Member"); const profile={full_name:name,email:cleanEmail(user.email),ref_code:makeReferralCode(name),referred_by:null,balance:0,points_balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()}; await ref.set(profile); userData={...profile}; } else userData=snap.data()||{}; renderDashboard(); startLiveListeners(); updateNavigation(); }
+function renderDashboard(){ if(!currentUser||!userData) return; loadMembershipPlans().catch(e=>console.warn(e)); document.getElementById("memberGreeting").textContent=(userData.full_name||"Member")+" · "+(userData.email||currentUser.email||""); document.getElementById("walletBalance").textContent=money(userData.balance); document.getElementById("pointsBalance").textContent=Number(userData.points_balance||0).toLocaleString("en-NG"); document.getElementById("myRefCode").textContent=userData.ref_code||"—"; document.getElementById("accountBadge").textContent=userData.is_paid===true?"PAID MEMBER":"FREE ACCOUNT"; document.getElementById("accountBadge").className="pill "+(userData.is_paid===true?"bg-green-100 text-green-800":"bg-slate-200 text-slate-700"); document.getElementById("membershipText").textContent=userData.is_paid===true?"Your one-time membership payment has been verified.":"You are using a free account. Upgrade once to unlock paid learning materials."; document.getElementById("upgradeButton").classList.toggle("hidden",userData.is_paid===true); const link=new URL(window.location.href); link.search=""; link.hash=""; link.searchParams.set("ref",userData.ref_code||""); document.getElementById("referralLink").value=link.toString(); loadExchangeRate(); loadMyTransactions(); }
+async function copyReferral(){ const v=document.getElementById("referralLink").value; try{ await navigator.clipboard.writeText(v); alert("Referral link copied."); }catch(_){ const i=document.getElementById("referralLink"); i.select(); document.execCommand("copy"); alert("Referral link copied."); } }
+function shareWhatsApp(){ const link=document.getElementById("referralLink").value; const message="Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: "+link; window.open("https://wa.me/?text="+encodeURIComponent(message),"_blank","noopener"); }
+// ===== MEMBERSHIP PLANS - FIXED =====
+async function loadMembershipPlans(){ const box=document.getElementById("membershipPlansList"); try{ const snap=await db.collection("membership_plans").where("active","==",true).orderBy("order").get(); membershipPlans=snap.docs.map(d=>({id:d.id,...d.data()})); if(!membershipPlans.length){ if(box) box.innerHTML='<p class="text-sm text-slate-500">No plans available yet.</p>'; return; } if(box){ box.innerHTML=membershipPlans.map(p=>{ const price=Number(p.priceNaira||0); return `<div class="border rounded-xl p-4 mt-3"><div class="flex justify-between items-start gap-2"><b>${safeText(p.name||"Membership")}</b><span class="pill bg-green-100 text-green-800">₦${price.toLocaleString("en-NG")}</span></div><p class="text-sm text-slate-600 mt-1">${safeText(p.description||"")}</p><button class="btn btn-green w-full mt-3" onclick="payMembership('${p.id}')">Join - Pay ₦${price.toLocaleString("en-NG")}</button></div>`; }).join(""); } }catch(e){ console.warn("loadMembershipPlans:",e); if(box) box.innerHTML='<p class="text-sm text-red-600">Could not load plans. Check Firestore rules for membership_plans.</p>'; } }
+async function payMembership(planId){ if(!currentUser){openAuth("login"); return;} if(userData&&userData.is_paid===true){alert("Your membership is already active."); return;} const plan=membershipPlans.find(p=>p.id===planId)||{name:"Membership",priceNaira:30000}; const priceNaira=Number(plan.priceNaira); const priceKobo=Math.round(priceNaira*100); if(!window.PaystackPop){alert("Payment service did not load. Refresh the page and try again."); return;} const reference="MEMBERSHIP_"+currentUser.uid.slice(0,10)+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,7); try{ await db.collection("payment_requests").doc(reference).set({uid:currentUser.uid,email:cleanEmail(currentUser.email),amount:priceKobo,amountNaira:priceNaira,currency:"NGN",type:"membership",planId:planId,planName:plan.name,reference,status:"initiated",createdAt:serverTimestamp()}); const handler=PaystackPop.setup({key:PAYSTACK_PUBLIC_KEY,email:cleanEmail(currentUser.email),amount:priceKobo,currency:"NGN",ref:reference,callback:function(response){ db.collection("payment_requests").doc(reference).set({status:"awaiting_server_verification",paystack_reference:response.reference,callbackAt:serverTimestamp()},{merge:true}).then(async()=>{ try{ await db.collection("users").doc(currentUser.uid).update({is_paid:true,membershipPlanId:planId,membershipPlanName:plan.name,membershipPaidAt:serverTimestamp(),membershipReference:reference}); await db.collection("payment_requests").doc(reference).set({status:"verified",creditedAt:serverTimestamp()},{merge:true}); alert("✅ "+plan.name+" activated! You are now a PAID MEMBER."); await loadCurrentProfile(currentUser); }catch(e){ alert("Payment succeeded but activation failed: "+friendlyError(e)); } }); },onClose:function(){}}); handler.openIframe(); }catch(error){ alert("Could not start payment: "+friendlyError(error)); } }
+async function pay(){ if(membershipPlans.length) return payMembership(membershipPlans[0].id); await loadMembershipPlans(); if(membershipPlans.length) return payMembership(membershipPlans[0].id); return payMembership("starter"); }
+async function saveMembershipPlan(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const name=document.getElementById("planName").value.trim(); const price=Number(document.getElementById("planPrice").value); const order=Number(document.getElementById("planOrder").value||1); const active=document.getElementById("planActive").value==="true"; const desc=document.getElementById("planDesc").value.trim(); if(!name||!price) return showNotice("planMsg","Enter plan name and price"); try{ await db.collection("membership_plans").add({name,priceNaira:price,order,active,description:desc,createdAt:serverTimestamp()}); showNotice("planMsg","Plan saved!","success"); document.getElementById("planName").value=""; document.getElementById("planPrice").value=""; document.getElementById("planDesc").value=""; loadAdminPlans(); loadMembershipPlans(); }catch(e){ showNotice("planMsg",friendlyError(e)); } }
+async function loadAdminPlans(){ const box=document.getElementById("adminPlansList"); if(!box) return; try{ const snap=await db.collection("membership_plans").orderBy("order").get(); if(snap.empty){ box.innerHTML='<p class="text-slate-500 text-sm">No plans yet.</p>'; return; } box.innerHTML=snap.docs.map(d=>{ const p=d.data(); return `<div class="border rounded-xl p-3 flex justify-between gap-3"><div><b>${safeText(p.name)}</b> - ₦${Number(p.priceNaira||0).toLocaleString("en-NG")} - ${p.active?"Active":"Inactive"}</div><button class="btn btn-light !py-1 !px-3 text-xs" onclick="deletePlan('${d.id}')">Delete</button></div>`; }).join(""); }catch(e){ box.innerHTML='<p class="text-red-600 text-sm">Could not load plans.</p>'; } }
+async function deletePlan(id){ if(!confirm("Delete this plan?")) return; await db.collection("membership_plans").doc(id).delete(); loadAdminPlans(); loadMembershipPlans(); }
+// ===== WALLET / EXCHANGE / TRANSFERS =====
+async function loadExchangeRate(){ try{ const snap=await db.collection("settings").doc("exchange").get(); if(snap.exists){ const d=snap.data(); exchangeRate={nairaToPoints:Number(d.nairaToPoints||10),pointsToNaira:Number(d.pointsToNaira||0.1),feePct:Number(d.feePct||0),minNaira:Number(d.minNaira||100),minPoints:Number(d.minPoints||100)}; } const el=document.getElementById("userRateText"); if(el) el.textContent=`1 Naira = ${exchangeRate.nairaToPoints} Points | 1 Point = ₦${exchangeRate.pointsToNaira}`; }catch(e){ console.warn(e); } }
+async function fundWallet(){ clearNotice("fundWalletMsg"); if(!currentUser||!userData) return showNotice("fundWalletMsg","Please log in first."); const amountNaira=Number(document.getElementById("fundWalletAmt").value); if(!amountNaira||amountNaira<100) return showNotice("fundWalletMsg","Minimum funding is ₦100."); if(!window.PaystackPop) return showNotice("fundWalletMsg","Payment service did not load. Refresh and try again."); const amountKobo=Math.round(amountNaira*100); const reference="WALLET_"+currentUser.uid.slice(0,10)+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,7); try{ await db.collection("payment_requests").doc(reference).set({uid:currentUser.uid,email:cleanEmail(currentUser.email),amount:amountKobo,amountNaira:amountNaira,currency:"NGN",type:"wallet_funding",reference,status:"initiated",createdAt:serverTimestamp()}); const handler=PaystackPop.setup({key:PAYSTACK_PUBLIC_KEY,email:cleanEmail(currentUser.email),amount:amountKobo,currency:"NGN",ref:reference,callback:function(response){ db.collection("payment_requests").doc(reference).set({status:"awaiting_server_verification",paystack_reference:response.reference,callbackAt:serverTimestamp()},{merge:true}).then(async()=>{ try{ const userRef=db.collection("users").doc(currentUser.uid); const snap=await userRef.get(); const oldBal=(snap.exists&&snap.data().balance)||0; await userRef.update({balance:oldBal+amountNaira}); await db.collection("payment_requests").doc(reference).set({status:"verified",creditedAt:serverTimestamp()},{merge:true}); showNotice("fundWalletMsg","✅ ₦"+amountNaira.toLocaleString()+" added to your wallet!","success"); document.getElementById("fundWalletAmt").value=""; await loadCurrentProfile(currentUser); }catch(e){ showNotice("fundWalletMsg","Payment succeeded but credit failed: "+friendlyError(e)); } }).catch((e)=>{ showNotice("fundWalletMsg",friendlyError(e)); }); },onClose:function(){}}); handler.openIframe(); }catch(error){ showNotice("fundWalletMsg",friendlyError(error)); } }
+async function buyPointsWithNaira(){ const amt=Number(document.getElementById("buyPointsAmt").value); if(!amt||amt<exchangeRate.minNaira) return alert("Minimum ₦"+exchangeRate.minNaira); if(Number(userData.balance||0)<amt) return alert("Not enough Naira balance. Fund wallet first."); const points=Math.floor(amt*exchangeRate.nairaToPoints); if(!confirm(`Buy ${points} points for ₦${amt}?`)) return; try{ await db.runTransaction(async tx=>{ const ref=db.collection("users").doc(currentUser.uid); const s=await tx.get(ref); const bal=Number(s.data().balance||0); if(bal<amt) throw new Error("Not enough balance"); tx.update(ref,{balance:bal-amt,points_balance:Number(s.data().points_balance||0)+points}); }); await db.collection("transactions").add({uid:currentUser.uid,email:userData.email,type:"buy_points",amountNaira:amt,points:points,createdAt:serverTimestamp()}); alert("Bought "+points+" points"); await loadCurrentProfile(currentUser); }catch(e){ alert(friendlyError(e)); } }
+async function sendPoints(){ const to=cleanEmail(document.getElementById("sendPointsTo").value); const amt=Number(document.getElementById("sendPointsAmt").value); if(!to||!amt) return alert("Enter recipient email and points"); if(amt<exchangeRate.minPoints) return alert("Minimum "+exchangeRate.minPoints+" points"); if(Number(userData.points_balance||0)<amt) return alert("Not enough points"); try{ const snap=await db.collection("users").where("email","==",to).limit(1).get(); if(snap.empty) return alert("Recipient not found"); const rid=snap.docs[0].id; const fee=Math.floor(amt*exchangeRate.feePct/100); const net=amt-fee; await db.runTransaction(async tx=>{ const sRef=db.collection("users").doc(currentUser.uid); const rRef=db.collection("users").doc(rid); const s=await tx.get(sRef); const r=await tx.get(rRef); if(Number(s.data().points_balance||0)<amt) throw new Error("Not enough points"); tx.update(sRef,{points_balance:Number(s.data().points_balance||0)-amt}); tx.update(rRef,{points_balance:Number(r.data().points_balance||0)+net}); }); alert("Sent "+net+" points (fee "+fee+")"); await loadCurrentProfile(currentUser); }catch(e){ alert(friendlyError(e)); } }
+async function sendNaira(){ const to=cleanEmail(document.getElementById("sendNairaTo").value); const amt=Number(document.getElementById("sendNairaAmt").value); if(!to||!amt) return alert("Enter recipient email and amount"); if(amt<exchangeRate.minNaira) return alert("Minimum ₦"+exchangeRate.minNaira); if(Number(userData.balance||0)<amt) return alert("Not enough Naira"); try{ const snap=await db.collection("users").where("email","==",to).limit(1).get(); if(snap.empty) return alert("Recipient not found"); const rid=snap.docs[0].id; const fee=Math.floor(amt*exchangeRate.feePct/100); const net=amt-fee; await db.runTransaction(async tx=>{ const sRef=db.collection("users").doc(currentUser.uid); const rRef=db.collection("users").doc(rid); const s=await tx.get(sRef); const r=await tx.get(rRef); if(Number(s.data().balance||0)<amt) throw new Error("Not enough balance"); tx.update(sRef,{balance:Number(s.data().balance||0)-amt}); tx.update(rRef,{balance:Number(r.data().balance||0)+net}); }); alert("Sent ₦"+net+" (fee ₦"+fee+")"); await loadCurrentProfile(currentUser); }catch(e){ alert(friendlyError(e)); } }
+async function swapPointsToNaira(){ const pts=Number(document.getElementById("swapPointsAmt").value); if(!pts||pts<=0) return alert("Enter points"); if(Number(userData.points_balance||0)<pts) return alert("Not enough points"); const naira=Math.floor(pts*exchangeRate.pointsToNaira); if(!confirm(`Swap ${pts} points for ₦${naira}?`)) return; try{ await db.runTransaction(async tx=>{ const ref=db.collection("users").doc(currentUser.uid); const s=await tx.get(ref); tx.update(ref,{points_balance:Number(s.data().points_balance||0)-pts,balance:Number(s.data().balance||0)+naira}); }); alert("Swapped to ₦"+naira); await loadCurrentProfile(currentUser); }catch(e){ alert(friendlyError(e)); } }
+async function loadMyTransactions(){ const box=document.getElementById("myTransactions"); if(!box||!currentUser) return; try{ const snap=await db.collection("transactions").where("uid","==",currentUser.uid).orderBy("createdAt","desc").limit(10).get(); if(snap.empty){ box.innerHTML='<p class="text-slate-500">No transactions yet.</p>'; return; } box.innerHTML=snap.docs.map(d=>{ const t=d.data(); return `<div class="border rounded-lg p-2 flex justify-between"><span>${safeText(t.type||"Transaction")}</span><span>${t.points?safeText(t.points+" pts"):""} ${t.amountNaira?money(t.amountNaira):""}</span></div>`; }).join(""); }catch(e){ box.innerHTML='<p class="text-slate-500">Transactions will appear here.</p>'; } }
+// ===== LIVE LISTENERS - FIXED =====
+function startLiveListeners(){ if(!currentUser) return; if(referralsUnsubscribe) referralsUnsubscribe(); referralsUnsubscribe=db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(s=>{ document.getElementById("referralCount").textContent=s.size; },e=>console.warn(e)); if(materialsUnsubscribe) materialsUnsubscribe(); materialsUnsubscribe=db.collection("materials").orderBy("createdAt","desc").onSnapshot(s=>{ renderMaterials(s.docs); },e=>{ document.getElementById("materialsGrid").innerHTML='<p class="text-red-600">Unable to load learning materials.</p>'; }); if(announcementsUnsubscribe) announcementsUnsubscribe(); announcementsUnsubscribe=db.collection("announcements").orderBy("createdAt","desc").limit(8).onSnapshot(s=>{ renderAnnouncements(s.docs); },e=>console.warn(e)); if(tasksUnsubscribe) tasksUnsubscribe(); tasksUnsubscribe=db.collection("tasks").where("active","==",true).onSnapshot(s=>{ renderTasks(s.docs); },e=>{ document.getElementById("tasksGrid").innerHTML='<p class="text-red-600">Unable to load tasks.</p>'; }); if(myTaskSubmissionsUnsubscribe) myTaskSubmissionsUnsubscribe(); myTaskSubmissionsUnsubscribe=db.collection("task_submissions").where("uid","==",currentUser.uid).onSnapshot(s=>{ renderMyTaskSubmissions(s.docs); },e=>console.warn(e)); if(userData&&userData.is_admin===true) loadAdminData(); }
+function stopLiveListeners(){ [referralsUnsubscribe,materialsUnsubscribe,announcementsUnsubscribe,tasksUnsubscribe,myTaskSubmissionsUnsubscribe,...adminUnsubscribers].forEach(fn=>{if(typeof fn==="function")fn();}); referralsUnsubscribe=null; materialsUnsubscribe=null; announcementsUnsubscribe=null; tasksUnsubscribe=null; myTaskSubmissionsUnsubscribe=null; adminUnsubscribers=[]; }
+function renderTasks(docs){ const c=document.getElementById("tasksGrid"); if(!docs.length){ c.innerHTML='<p class="text-slate-500">No active tasks at the moment.</p>'; return; } c.innerHTML=docs.map(doc=>{ const t=doc.data()||{}; const reward=Math.max(0,Number(t.points||0)); return `<article class="bg-white rounded-2xl p-5 shadow-soft border flex flex-col"><div class="flex justify-between"><span class="pill bg-green-100 text-green-800">Available task</span><span class="pill bg-amber-100 text-amber-900">${reward.toLocaleString("en-NG")} points</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(t.title||"Task")}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(t.description||"")}</p>${t.proof_hint?`<p class="text-xs text-slate-500 mt-3"><b>Submission:</b> ${safeText(t.proof_hint)}</p>`:""}<button class="btn btn-green w-full mt-4" onclick="submitTask('${doc.id}')">Submit completed task</button></article>`; }).join(""); }
+function renderMyTaskSubmissions(docs){ const c=document.getElementById("myTaskSubmissions"); if(!docs.length){ c.innerHTML='<p class="text-slate-500 text-sm">You have not submitted any tasks yet.</p>'; return; } const ordered=docs.slice().sort((a,b)=>{ const av=a.data().createdAt&&a.data().createdAt.toMillis?a.data().createdAt.toMillis():0; const bv=b.data().createdAt&&b.data().createdAt.toMillis?b.data().createdAt.toMillis():0; return bv-av; }); c.innerHTML=ordered.map(doc=>{ const item=doc.data()||{}; const status=String(item.status||"pending").toLowerCase(); const color=status==="approved"?"bg-green-100 text-green-800":status==="rejected"?"bg-red-100 text-red-800":"bg-amber-100 text-amber-900"; return `<div class="border rounded-xl p-4 flex justify-between gap-3"><div><b>${safeText(item.task_title||"Task submission")}</b><p class="text-xs text-slate-500 mt-1">${Number(item.points||0).toLocaleString("en-NG")} points</p></div><span class="pill ${color}">${safeText(status.toUpperCase())}</span></div>`; }).join(""); }
+async function submitTask(taskId){ if(!currentUser) return openAuth("login"); if(!userData||userData.is_paid!==true){ alert("Please activate your membership before submitting tasks."); return; } try{ const taskSnap=await db.collection("tasks").doc(taskId).get(); if(!taskSnap.exists||taskSnap.data().active!==true) throw new Error("This task is no longer available."); const subRef=db.collection("task_submissions").doc(currentUser.uid+"_"+taskId); const existing=await subRef.get(); if(existing.exists) throw new Error("You have already submitted this task."); const task=taskSnap.data()||{}; await subRef.set({uid:currentUser.uid,email:cleanEmail(currentUser.email),full_name:userData.full_name||"",task_id:taskId,task_title:String(task.title||"Task"),points:Math.max(0,Number(task.points||0)),status:"pending",createdAt:serverTimestamp()}); alert("Task submitted successfully."); }catch(e){ alert(friendlyError(e)); } }
+async function createTask(event){ event.preventDefault(); if(!(userData&&userData.is_admin===true)) return showNotice("taskMessage","Admin access required."); clearNotice("taskMessage"); const title=document.getElementById("taskTitle").value.trim(); const description=document.getElementById("taskDescription").value.trim(); const points=Number(document.getElementById("taskReward").value); const proofHint=document.getElementById("taskProofHint").value.trim(); const active=document.getElementById("taskActive").checked; if(!title||!description||!points||points<1) return showNotice("taskMessage","Enter title, instructions and valid reward."); setBusy("taskSubmit",true,"Creating…"); try{ await db.collection("tasks").add({title,description,points,proof_hint:proofHint,active,createdAt:serverTimestamp(),createdBy:currentUser.uid}); document.getElementById("taskForm").reset(); document.getElementById("taskActive").checked=true; showNotice("taskMessage","Task created successfully.","success"); }catch(e){ showNotice("taskMessage",friendlyError(e)); } finally{ setBusy("taskSubmit",false); } }
+async function setTaskActive(taskId,active){ if(!(userData&&userData.is_admin===true)) return alert("Admin access required."); try{ await db.collection("tasks").doc(taskId).update({active:!!active}); }catch(e){ alert(friendlyError(e)); } }
+async function reviewTaskSubmission(submissionId,decision){ if(!(userData&&userData.is_admin===true)) return alert("Admin access required."); const ref=db.collection("task_submissions").doc(submissionId); try{ await db.runTransaction(async tx=>{ const s=await tx.get(ref); if(!s.exists) throw new Error("Submission not found."); const sub=s.data()||{}; if(sub.status!=="pending") throw new Error("Already reviewed."); const mRef=db.collection("users").doc(sub.uid); const m=await tx.get(mRef); if(!m.exists) throw new Error("Member not found."); if(decision==="approved"){ tx.update(mRef,{points_balance:Number(m.data().points_balance||0)+Number(sub.points||0)}); } tx.update(ref,{status:decision,reviewedAt:serverTimestamp(),reviewedBy:currentUser.uid}); }); alert(decision==="approved"?"Approved and points credited.":"Rejected."); }catch(e){ alert(friendlyError(e)); } }
+// ===== MINT & BURN =====
+async function loadAdminStats(){ try{ const snap=await db.collection("pointSupply").doc("main").get(); const s=snap.exists?snap.data():{totalSupply:0,treasury:0,circulating:0}; const a=document.getElementById("statSupply"); if(a) a.textContent=Number(s.totalSupply||0).toLocaleString("en-NG"); const b=document.getElementById("statTreasury"); if(b) b.textContent=Number(s.treasury||0).toLocaleString("en-NG"); const c=document.getElementById("statCirculating"); if(c) c.textContent=Number(s.circulating||0).toLocaleString("en-NG"); }catch(e){ console.warn(e); } }
+async function adminMint(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const amt=Number(document.getElementById("mintAmt").value); if(!amt||amt<=0) return alert("Enter amount > 0"); if(!confirm("Mint "+amt+" to Treasury?")) return; const ref=db.collection("pointSupply").doc("main"); await db.runTransaction(async tx=>{ const s=await tx.get(ref); const d=s.exists?s.data():{totalSupply:0,treasury:0,circulating:0}; tx.set(ref,{totalSupply:(d.totalSupply||0)+amt,treasury:(d.treasury||0)+amt,circulating:d.circulating||0}); }); document.getElementById("mintAmt").value=""; alert("Minted "+amt); loadAdminStats(); }
+async function adminBurnTreasury(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const amt=Number(document.getElementById("burnTreasuryAmt").value); if(!amt||amt<=0) return alert("Enter amount > 0"); if(!confirm("Burn "+amt+" from Treasury?")) return; const ref=db.collection("pointSupply").doc("main"); let ok=false; await db.runTransaction(async tx=>{ const s=await tx.get(ref); const d=s.exists?s.data():{totalSupply:0,treasury:0,circulating:0}; if((d.treasury||0)<amt) return; tx.set(ref,{totalSupply:(d.totalSupply||0)-amt,treasury:(d.treasury||0)-amt,circulating:d.circulating||0}); ok=true; }); if(!ok) return alert("Not enough in Treasury"); document.getElementById("burnTreasuryAmt").value=""; alert("Burned "+amt); loadAdminStats(); }
+async function adminBurnAllPct(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const pct=Number(document.getElementById("burnPct").value); if(!pct||pct<=0||pct>100) return alert("Enter % 1 to 100"); if(!confirm("Burn "+pct+"% from ALL users? Cannot undo!")) return; const snap=await db.collection("users").get(); let total=0; for(const doc of snap.docs){ const bal=Number(doc.data().points_balance||0); const burn=Math.floor(bal*pct/100); if(burn<=0) continue; total+=burn; await db.collection("users").doc(doc.id).update({points_balance:bal-burn}); } alert("Burned total "+total); loadAdminStats(); }
+async function adminBurnAllFixed(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const totalToBurn=Number(document.getElementById("burnFixedAmt").value); if(!totalToBurn||totalToBurn<=0) return alert("Enter amount > 0"); if(!confirm("Burn total "+totalToBurn+" split across users?")) return; const snap=await db.collection("users").get(); let totalBal=0; snap.docs.forEach(d=>totalBal+=Number(d.data().points_balance||0)); if(totalBal<totalToBurn) return alert("Users only have "+totalBal); let burned=0; for(const doc of snap.docs){ const bal=Number(doc.data().points_balance||0); if(bal<=0) continue; let share=Math.floor(totalToBurn*bal/totalBal); if(share>bal) share=bal; if(share<=0) continue; burned+=share; await db.collection("users").doc(doc.id).update({points_balance:bal-share}); } alert("Burned "+burned); loadAdminStats(); }
+async function adminGiveUser(uid,email){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const amt=Number(prompt("Give how many points to "+email+"?")); if(!amt||amt<=0) return; const ref=db.collection("users").doc(uid); await db.runTransaction(async tx=>{ const s=await tx.get(ref); tx.update(ref,{points_balance:Number(s.data().points_balance||0)+amt}); }); alert("Gave "+amt); }
+async function adminBurnUser(uid,email){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const amt=Number(prompt("Burn how many points from "+email+"?")); if(!amt||amt<=0) return; if(!confirm("Burn "+amt+" from "+email+"?")) return; const ref=db.collection("users").doc(uid); let ok=false; await db.runTransaction(async tx=>{ const s=await tx.get(ref); if(Number(s.data().points_balance||0)<amt) return; tx.update(ref,{points_balance:Number(s.data().points_balance||0)-amt}); ok=true; }); if(!ok) return alert("Not enough points"); alert("Burned "+amt); }
+function renderAnnouncements(docs){ const c=document.getElementById("homeAnnouncements"); if(!docs.length){ c.innerHTML='<p class="text-slate-500">No announcements yet.</p>'; return; } c.innerHTML=docs.map(doc=>{ const item=doc.data()||{}; return `<article class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-xs font-bold uppercase text-green-700">Announcement</p><h3 class="font-extrabold text-lg mt-2">${safeText(item.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap">${safeText(item.message)}</p></article>`; }).join(""); }
+function renderMaterials(docs){ const c=document.getElementById("materialsGrid"); if(!docs.length){ c.innerHTML='<p class="text-slate-500">No learning materials yet.</p>'; return; } c.innerHTML=docs.map(doc=>{ const m=doc.data()||{}, free=m.is_free===true, unlocked=free||(userData&&userData.is_paid===true); const actions=unlocked?`${m.video_url?`<a class="btn btn-green text-center block" href="${safeUrl(m.video_url)}" target="_blank" rel="noopener">▶ Watch Video</a>`:""} ${m.pdf_url?`<a class="btn btn-light text-center block" href="${safeUrl(m.pdf_url)}" target="_blank" rel="noopener">↓ Download PDF</a>`:""}`:`<div class="locked rounded-xl p-4 text-center"><p class="font-bold">🔒 Upgrade to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`; return `<article class="bg-white rounded-2xl p-5 shadow-soft border flex flex-col"><div class="flex justify-between"><span class="pill bg-green-50 text-green-800">${safeText(m.category||"General")}</span><span class="pill ${free?"bg-yellow-100 text-yellow-800":"bg-slate-100 text-slate-700"}">${free?"FREE":"PAID"}</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(m.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(m.description)}</p><div class="grid gap-2 mt-5">${actions}</div></article>`; }).join(""); }
+function safeUrl(v){ try{ const u=new URL(String(v)); return ["https:","http:"].includes(u.protocol)?safeText(u.href):"#"; }catch(_){ return "#"; } }
+async function requestWithdrawal(event){ event.preventDefault(); clearNotice("withdrawMessage"); if(!currentUser||!userData) return showNotice("withdrawMessage","Please log in first."); const bank=document.getElementById("bankName").value.trim(); const account=document.getElementById("accountNumber").value.trim(); const amount=Number(document.getElementById("withdrawAmount").value); if(!bank||!/^\d{10}$/.test(account)) return showNotice("withdrawMessage","Enter bank name and 10-digit account number."); if(!amount||amount<MIN_WITHDRAWAL) return showNotice("withdrawMessage","Minimum withdrawal is ₦"+MIN_WITHDRAWAL.toLocaleString()+"."); if(Number(userData.balance||0)<amount) return showNotice("withdrawMessage","Not enough wallet balance."); try{ await db.collection("withdrawals").add({uid:currentUser.uid,email:cleanEmail(currentUser.email),full_name:userData.full_name||"",bank,account,amount,status:"pending",createdAt:serverTimestamp()}); await db.collection("users").doc(currentUser.uid).update({balance:Number(userData.balance||0)-amount}); showNotice("withdrawMessage","Withdrawal request submitted. Admin will review it.","success"); document.getElementById("withdrawForm").reset(); await loadCurrentProfile(currentUser); }catch(e){ showNotice("withdrawMessage",friendlyError(e)); } }
+async function postAnnouncement(event){ event.preventDefault(); if(!(userData&&userData.is_admin===true)) return showNotice("announcementMessageBox","Admin only"); const title=document.getElementById("announcementTitle").value.trim(); const message=document.getElementById("announcementMessage").value.trim(); if(!title||!message) return showNotice("announcementMessageBox","Enter title and message"); try{ await db.collection("announcements").add({title,message,createdAt:serverTimestamp(),createdBy:currentUser.uid}); document.getElementById("announcementForm").reset(); showNotice("announcementMessageBox","Announcement posted.","success"); }catch(e){ showNotice("announcementMessageBox",friendlyError(e)); } }
+async function postMaterial(event){ event.preventDefault(); if(!(userData&&userData.is_admin===true)) return showNotice("materialMessage","Admin only"); const title=document.getElementById("materialTitle").value.trim(); const category=document.getElementById("materialCategory").value; const description=document.getElementById("materialDescription").value.trim(); const video_url=document.getElementById("materialVideo").value.trim(); const pdf_url=document.getElementById("materialPdf").value.trim(); const is_free=document.getElementById("materialFree").checked; if(!title||!category||!description) return showNotice("materialMessage","Fill title, category and description"); try{ await db.collection("materials").add({title,category,description,video_url,pdf_url,is_free,createdAt:serverTimestamp(),createdBy:currentUser.uid}); document.getElementById("materialForm").reset(); showNotice("materialMessage","Material posted.","success"); }catch(e){ showNotice("materialMessage",friendlyError(e)); } }
+// ===== ADMIN - FIXED =====
+async function saveExchangeRate(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const nairaToPoints=Number(document.getElementById("exNairaToPoints").value); const pointsToNaira=Number(document.getElementById("exPointsToNaira").value); const feePct=Number(document.getElementById("exFee").value||0); const minNaira=Number(document.getElementById("exMinNaira").value||100); const minPoints=Number(document.getElementById("exMinPoints").value||100); if(!nairaToPoints||!pointsToNaira) return showNotice("exMsg","Enter both rates"); try{ await db.collection("settings").doc("exchange").set({nairaToPoints,pointsToNaira,feePct,minNaira,minPoints,updatedAt:serverTimestamp()}); showNotice("exMsg","Exchange rate saved!","success"); await loadExchangeRate(); }catch(e){ showNotice("exMsg",friendlyError(e)); } }
+async function previewMass(){ const amt=Number(document.getElementById("massAmount").value); const target=document.getElementById("massTarget").value; if(!amt) return alert("Enter amount"); try{ const snap=await db.collection("users").get(); let count=snap.docs.filter(d=> target==="all"||(target==="paid"&&d.data().is_paid===true)||(target==="free"&&d.data().is_paid!==true)).length; document.getElementById("massPreview").textContent=`Will send to ${count} users x ${amt} = ${count*amt} total`; }catch(e){ alert(friendlyError(e)); } }
+async function confirmMass(){ if(!(userData&&userData.is_admin===true)) return alert("Admin only"); const currency=document.getElementById("massCurrency").value; const amt=Number(document.getElementById("massAmount").value); const target=document.getElementById("massTarget").value; const reason=document.getElementById("massReason").value.trim()||"Mass transfer"; if(!amt||amt<=0) return alert("Enter amount"); if(!confirm(`Send ${amt} ${currency} to ${target} users?`)) return; try{ const snap=await db.collection("users").get(); let sent=0; for(const doc of snap.docs){ const d=doc.data(); if(target==="paid"&&d.is_paid!==true) continue; if(target==="free"&&d.is_paid===true) continue; if(currency==="points") await db.collection("users").doc(doc.id).update({points_balance:Number(d.points_balance||0)+amt}); else await db.collection("users").doc(doc.id).update({balance:Number(d.balance||0)+amt}); sent++; } showNotice("massMsg",`Sent to ${sent} users.`,"success"); }catch(e){ showNotice("massMsg",friendlyError(e)); } }
+async function loadAdminData(){ if(!(userData&&userData.is_admin===true)) return; loadAdminStats(); loadAdminPlans(); try{ const snap=await db.collection("settings").doc("exchange").get(); if(snap.exists){ const d=snap.data(); document.getElementById("exNairaToPoints").value=d.nairaToPoints||""; document.getElementById("exPointsToNaira").value=d.pointsToNaira||""; document.getElementById("exFee").value=d.feePct||""; document.getElementById("exMinNaira").value=d.minNaira||""; document.getElementById("exMinPoints").value=d.minPoints||""; } }catch(e){} // Users table
+  try{ const snap=await db.collection("users").get(); const tb=document.getElementById("usersTable"); if(tb){ if(snap.empty){ tb.innerHTML='<tr><td class="p-2" colspan="6">No users yet.</td></tr>'; } else { tb.innerHTML=snap.docs.map(d=>{ const u=d.data()||{}; return `<tr class="border-b"><td class="p-2">${safeText(u.full_name||"")}</td><td class="p-2">${safeText(u.email||"")}</td><td class="p-2">${money(u.balance)}</td><td class="p-2">${Number(u.points_balance||0).toLocaleString("en-NG")}</td><td class="p-2">${u.is_paid?"PAID":"FREE"}</td><td class="p-2"><button class="btn btn-light !py-1 !px-2 text-xs" onclick="adminGiveUser('${d.id}','${safeText(u.email||"")}')">+ Points</button> <button class="btn btn-light !py-1 !px-2 text-xs" onclick="adminBurnUser('${d.id}','${safeText(u.email||"")}')">- Points</button></td></tr>`; }).join(""); } } }catch(e){ const tb=document.getElementById("usersTable"); if(tb) tb.innerHTML='<tr><td class="p-2" colspan="6">Could not load users. Check Firestore rules.</td></tr>'; }
+  try{ const snap=await db.collection("withdrawals").orderBy("createdAt","desc").limit(50).get(); const tb=document.getElementById("withdrawalsTable"); if(tb){ if(snap.empty) tb.innerHTML='<tr><td class="p-2" colspan="5">No withdrawals yet.</td></tr>'; else tb.innerHTML=snap.docs.map(d=>{ const w=d.data()||{}; return `<tr class="border-b"><td class="p-2">${safeText(w.full_name||"")}</td><td class="p-2">${money(w.amount)}</td><td class="p-2">${safeText(w.bank||"")}</td><td class="p-2">${safeText(w.account||"")}</td><td class="p-2">${safeText(w.status||"pending")}</td></tr>`; }).join(""); } }catch(e){}
+  try{ const snap=await db.collection("materials").orderBy("createdAt","desc").get(); const box=document.getElementById("adminMaterials"); if(box){ if(snap.empty) box.innerHTML='<p class="text-slate-500 text-sm">No materials yet.</p>'; else box.innerHTML=snap.docs.map(d=>{ const m=d.data()||{}; return `<div class="border rounded-xl p-3 flex justify-between gap-3"><div><b>${safeText(m.title||"")}</b> <span class="text-xs text-slate-500">${safeText(m.category||"")}</span></div><button class="btn btn-light !py-1 !px-2 text-xs" onclick="deleteMaterial('${d.id}')">Delete</button></div>`; }).join(""); } }catch(e){}
+  try{ const snap=await db.collection("tasks").get(); const box=document.getElementById("adminTasks"); if(box){ if(snap.empty) box.innerHTML='<p class="text-slate-500 text-sm">No tasks yet.</p>'; else box.innerHTML=snap.docs.map(d=>{ const t=d.data()||{}; return `<div class="border rounded-xl p-3 flex justify-between gap-3"><div><b>${safeText(t.title||"")}</b> - ${Number(t.points||0)} pts - ${t.active?"Active":"Inactive"}</div><button class="btn btn-light !py-1 !px-2 text-xs" onclick="setTaskActive('${d.id}',${t.active?"false":"true"})">${t.active?"Disable":"Enable"}</button></div>`; }).join(""); } }catch(e){}
+  try{ const snap=await db.collection("task_submissions").where("status","==","pending").get(); const box=document.getElementById("taskSubmissionsAdmin"); if(box){ if(snap.empty) box.innerHTML='<p class="text-slate-500 text-sm">No pending submissions.</p>'; else box.innerHTML=snap.docs.map(d=>{ const s=d.data()||{}; return `<div class="border rounded-xl p-3"><b>${safeText(s.task_title||"Task")}</b><p class="text-xs text-slate-500">${safeText(s.full_name||"")} - ${Number(s.points||0)} pts</p><div class="flex gap-2 mt-2"><button class="btn btn-green !py-1 !px-3 text-xs" onclick="reviewTaskSubmission('${d.id}','approved')">Approve</button><button class="btn btn-light !py-1 !px-3 text-xs" onclick="reviewTaskSubmission('${d.id}','rejected')">Reject</button></div></div>`; }).join(""); } }catch(e){}
 }
-function openAuth(mode="login") { if (currentUser) { showPage("dashboard"); return; } switchAuth(mode); showPage("auth"); }
-function switchAuth(mode) {
-  const isLogin = mode === "login";
-  document.getElementById("loginForm").classList.toggle("hidden", !isLogin);
-  document.getElementById("signupForm").classList.toggle("hidden", isLogin);
-  document.getElementById("loginTab").className = "btn " + (isLogin ? "tab-active" : "tab-idle");
-  document.getElementById("signupTab").className = "btn " + (!isLogin ? "tab-active" : "tab-idle");
-  clearNotice("loginError"); clearNotice("signupError");
-}
-function updateNavigation() {
-  const signedIn = !!currentUser;
-  document.getElementById("navLogin").classList.toggle("hidden", signedIn);
-  document.getElementById("navLogout").classList.toggle("hidden", !signedIn);
-  document.getElementById("navDashboard").classList.toggle("hidden", !signedIn);
-  document.getElementById("navAdmin").classList.toggle("hidden", !(signedIn && userData && userData.is_admin === true));
-}
-function makeReferralCode(fullName) { const first = String(fullName || "member").trim().split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, "") || "member"; return first + Math.random().toString(36).slice(2, 7); }
-async function findReferrer(code) { if (!code) return null; const snap = await db.collection("users").where("ref_code", "==", code).limit(1).get(); if (snap.empty) return null; return snap.docs[0].id; }
-async function signup(event) {
-  event.preventDefault(); clearNotice("signupError");
-  const fullName = document.getElementById("signupName").value.trim();
-  const email = cleanEmail(document.getElementById("signupEmail").value);
-  const password = document.getElementById("signupPassword").value;
-  const referralCode = document.getElementById("signupReferral").value.trim();
-  if (!fullName) return showNotice("signupError", "Please enter your full name.");
-  if (password.length < 6) return showNotice("signupError", "Password must be at least 6 characters.");
-  setBusy("signupSubmit", true, "Creating account…");
-  try {
-    let referredBy = null;
-    if (referralCode) { referredBy = await findReferrer(referralCode); if (!referredBy) throw new Error("That referral code was not found. Check the code or leave the field blank."); }
-    const credential = await auth.createUserWithEmailAndPassword(email, password);
-    const refCode = makeReferralCode(fullName);
-    const profile = { full_name: fullName, email, ref_code: refCode, referred_by: referredBy, balance: 0, points_balance: 0, is_admin: false, is_paid: false, createdAt: serverTimestamp() };
-    await db.collection("users").doc(credential.user.uid).set(profile);
-    document.getElementById("signupForm").reset();
-    await loadCurrentProfile(credential.user);
-    showPage("dashboard");
-  } catch (error) { showNotice("signupError", friendlyError(error)); } finally { setBusy("signupSubmit", false); }
-}
-async function login(event) {
-  event.preventDefault(); clearNotice("loginError");
-  const email = cleanEmail(document.getElementById("loginEmail").value);
-  const password = document.getElementById("loginPassword").value;
-  setBusy("loginSubmit", true, "Signing in…");
-  try { await auth.signInWithEmailAndPassword(email, password); document.getElementById("loginForm").reset(); }
-  catch (error) { showNotice("loginError", friendlyError(error)); } finally { setBusy("loginSubmit", false); }
-}
-async function forgotPassword() {
-  clearNotice("forgotMessage");
-  const email = cleanEmail(document.getElementById("loginEmail").value);
-  if (!email) return showNotice("forgotMessage", "Enter your email above first, then tap Forgot password.");
-  try {
-    await auth.sendPasswordResetEmail(email);
-    showNotice("forgotMessage", "Reset link sent to " + email + ". Check your inbox / spam. Link expires in 1 hour.", "success");
-  } catch (error) { showNotice("forgotMessage", friendlyError(error)); }
-}
-  function togglePass(id, btn) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const show = el.type === "password";
-  el.type = show ? "text" : "password";
-  if (btn) btn.textContent = show ? "🙈" : "👁️";
-  }
-  async function fundWallet() {
-  clearNotice("fundWalletMsg");
-  if (!currentUser || !userData) return showNotice("fundWalletMsg", "Please log in first.");
-  const amountNaira = Number(document.getElementById("fundWalletAmt").value);
-  if (!amountNaira || amountNaira < 100) return showNotice("fundWalletMsg", "Minimum funding is ₦100.");
-  if (!window.PaystackPop) return showNotice("fundWalletMsg", "Payment service did not load. Refresh and try again.");
-  const amountKobo = Math.round(amountNaira * 100);
-  const reference = "WALLET_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
-  try {
-    await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: amountKobo, amountNaira: amountNaira, currency: "NGN", type: "wallet_funding", reference, status: "initiated", createdAt: serverTimestamp() });
-    const handler = PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: amountKobo, currency: "NGN", ref: reference,
-      callback: function(response) {
-        db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true }).then(async () => {
-          try {
-            const userRef = db.collection("users").doc(currentUser.uid);
-            const snap = await userRef.get();
-                        const oldBal = (snap.exists && snap.data().balance) || 0;
-            await userRef.update({ balance: oldBal + amountNaira });
-            await db.collection("payment_requests").doc(reference).set({ status: "verified", creditedAt: serverTimestamp() }, { merge: true });
-            showNotice("fundWalletMsg", "✅ ₦" + amountNaira.toLocaleString() + " added to your wallet!", "success");
-            document.getElementById("fundWalletAmt").value = "";
-            await loadCurrentProfile(currentUser);
-          } catch (e) { showNotice("fundWalletMsg", "Payment succeeded but credit failed: " + friendlyError(e)); }
-        }).catch((e) => { showNotice("fundWalletMsg", friendlyError(e)); });
-      },
-      onClose: function() {}
-    });
-    handler.openIframe();
-  } catch (error) { showNotice("fundWalletMsg", friendlyError(error)); }
-}
-
-  function friendlyError(error) {
-const code = error && error.code;
-  const messages = { "auth/invalid-email":"Please enter a valid email address.", "auth/user-not-found":"No account was found with that email.", "auth/wrong-password":"Incorrect email or password.", "auth/invalid-credential":"Incorrect email or password.", "auth/email-already-in-use":"An account already exists with this email. Please log in.", "auth/weak-password":"Choose a stronger password (at least 6 characters).", "auth/too-many-requests":"Too many attempts. Please wait and try again.", "permission-denied":"Permission denied by Firestore rules. Check your Firebase security rules.", "unavailable":"Service temporarily unavailable. Please try again." };
-  return messages[code] || (error && error.message) || "Something went wrong. Please try again.";
-}
-async function logout() { try { await auth.signOut(); } catch (error) { alert(friendlyError(error)); } }
-auth.onAuthStateChanged(async user => {
-  currentUser = user || null; userData = null; stopLiveListeners();
-  if (currentUser) {
-    try { await loadCurrentProfile(currentUser); updateNavigation(); const onAdmin = document.getElementById("admin").classList.contains("active"); if (!(onAdmin && userData && userData.is_admin === true)) showPage("dashboard"); }
-    catch (error) { console.error(error); updateNavigation(); showPage("dashboard"); if (error.code === "permission-denied") alert("Your account profile could not be read. Check your Firestore rules."); }
-  } else { updateNavigation(); if (!document.getElementById("home").classList.contains("active")) openAuth("login"); }
-});
-async function loadCurrentProfile(user) {
-  const ref = db.collection("users").doc(user.uid);
-  const snap = await ref.get();
-  if (!snap.exists) { const name = user.displayName || (user.email ? user.email.split("@")[0] : "Member"); const profile = {full_name:name,email:cleanEmail(user.email),ref_code:makeReferralCode(name),referred_by:null,balance:0,points_balance:0,is_admin:false,is_paid:false,createdAt:serverTimestamp()}; await ref.set(profile); userData = {...profile}; }
-  else userData = snap.data() || {};
-  renderDashboard(); startLiveListeners(); updateNavigation();
-}
-function renderDashboard() {
-  loadMembershipPlans();
-  if (!currentUser || !userData) return;
-  document.getElementById("memberGreeting").textContent = (userData.full_name || "Member") + " · " + (userData.email || currentUser.email || "");
-  document.getElementById("walletBalance").textContent = money(userData.balance);
-  document.getElementById("pointsBalance").textContent = Number(userData.points_balance || 0).toLocaleString("en-NG");
-  document.getElementById("myRefCode").textContent = userData.ref_code || "—";
-  document.getElementById("accountBadge").textContent = userData.is_paid === true ? "PAID MEMBER" : "FREE ACCOUNT";
-  document.getElementById("accountBadge").className = "pill " + (userData.is_paid === true ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-700");
-  document.getElementById("membershipText").textContent = userData.is_paid === true ? "Your one-time membership payment has been verified." : "You are using a free account. Upgrade once to unlock paid learning materials.";
-  document.getElementById("upgradeButton").classList.toggle("hidden", userData.is_paid === true);
-  const link = new URL(window.location.href); link.search = ""; link.hash = ""; link.searchParams.set("ref", userData.ref_code || ""); document.getElementById("referralLink").value = link.toString();
-}
-async function copyReferral() { const value = document.getElementById("referralLink").value; try { await navigator.clipboard.writeText(value); alert("Referral link copied."); } catch (_) { const input=document.getElementById("referralLink"); input.select(); document.execCommand("copy"); alert("Referral link copied."); } }
-function shareWhatsApp() { const link = document.getElementById("referralLink").value; const message = "Join me on NaijaRemoteHub. Learn remote skills and grow your opportunities: " + link; window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener"); }
-async function payMembership() {
-  async function payMembership(planId) {
-  if (!currentUser) { openAuth("login"); return; }
-  if (userData.is_paid === true) { alert("Your membership is already active."); return; }
-  const plan = membershipPlans.find(p => p.id === planId) || { name: "Membership", priceNaira: 30000 };
-  const priceNaira = Number(plan.priceNaira);
-  const priceKobo = Math.round(priceNaira * 100);
-  if (!window.PaystackPop) { alert("Payment service did not load. Refresh the page and try again."); return; }
-  const reference = "MEMBERSHIP_" + currentUser.uid.slice(0,10) + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
-  try {
-    await db.collection("payment_requests").doc(reference).set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), amount: priceKobo, amountNaira: priceNaira, currency: "NGN", type: "membership", planId: planId, planName: plan.name, reference, status: "initiated", createdAt: serverTimestamp() });
-    const handler = PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY, email: cleanEmail(currentUser.email), amount: priceKobo, currency: "NGN", ref: reference,
-      callback: function(response) {
-        db.collection("payment_requests").doc(reference).set({ status: "awaiting_server_verification", paystack_reference: response.reference, callbackAt: serverTimestamp() }, { merge: true }).then(async () => {
-          try {
-            await db.collection("users").doc(currentUser.uid).update({ is_paid: true, membershipPlanId: planId, membershipPlanName: plan.name, membershipPaidAt: serverTimestamp(), membershipReference: reference });
-            await db.collection("payment_requests").doc(reference).set({ status: "verified", creditedAt: serverTimestamp() }, { merge: true });
-            alert("✅ " + plan.name + " activated! You are now a PAID MEMBER.");
-            await loadCurrentProfile(currentUser);
-          } catch (e) { alert("Payment succeeded but activation failed: " + friendlyError(e)); }
-        });
-      },
-      onClose: function() {}
-    });
-    handler.openIframe();
-  } catch (error) { alert("Could not start payment: " + friendlyError(error)); }
-}
-  if (!currentUser) return;
-  if (referralsUnsubscribe) referralsUnsubscribe();
-  referralsUnsubscribe = db.collection("users").where("referred_by","==",currentUser.uid).onSnapshot(snapshot => { document.getElementById("referralCount").textContent = snapshot.size; }, error => console.warn("Referral count:",error));
-  if (materialsUnsubscribe) materialsUnsubscribe();
-  materialsUnsubscribe = db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot => { renderMaterials(snapshot.docs); }, error => { document.getElementById("materialsGrid").innerHTML = '<p class="text-red-600">Unable to load learning materials. Check Firestore rules and the materials index.</p>'; console.error(error); });
-  if (announcementsUnsubscribe) announcementsUnsubscribe();
-  announcementsUnsubscribe = db.collection("announcements").orderBy("createdAt","desc").limit(8).onSnapshot(snapshot => { renderAnnouncements(snapshot.docs); }, error => console.warn("Announcements:",error));
-  if (tasksUnsubscribe) tasksUnsubscribe();
-  tasksUnsubscribe = db.collecton("tasks").where("active","==",true).onSnapshot(snapshot => { renderTasks(snapshot.docs); }, error => { document.getElementById("tasksGrid").innerHTML = '<p class="text-red-600">Unable to load tasks. Check Firestore rules.</p>'; console.error("Tasks:", error); });
-  if (myTaskSubmissionsUnsubscribe) myTaskSubmissionsUnsubscribe();
-  myTaskSubmissionsUnsubscribe = db.collection("task_submissions").where("uid","==",currentUser.uid).onSnapshot(snapshot => { renderMyTaskSubmissions(snapshot.docs); }, error => console.warn("My task submissions:",error));
-  if (userData && userData.is_admin === true) loadAdminData();
-}
-function stopLiveListeners() { [referralsUnsubscribe,materialsUnsubscribe,announcementsUnsubscribe,tasksUnsubscribe,myTaskSubmissionsUnsubscribe,...adminUnsubscribers].forEach(fn=>{if(typeof fn==="function")fn();}); referralsUnsubscribe=null;materialsUnsubscribe=null;announcementsUnsubscribe=null;tasksUnsubscribe=null;myTaskSubmissionsUnsubscribe=null;adminUnsubscribers=[]; }
-function renderTasks(docs) {
-  const container = document.getElementById("tasksGrid");
-  if (!docs.length) { container.innerHTML = '<p class="text-slate-500">There are no active tasks at the moment. Please check back later.</p>'; return; }
-  container.innerHTML = docs.map(doc => { const task = doc.data() || {}; const reward = Math.max(0, Number(task.points || 0)); return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-100 text-green-800">Available task</span><span class="pill bg-amber-100 text-amber-900">${reward.toLocaleString("en-NG")} points</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(task.title || "Task")}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(task.description || "")}</p>${task.proof_hint ? `<p class="text-xs text-slate-500 mt-3"><b>Submission:</b> ${safeText(task.proof_hint)}</p>` : ""}<button class="btn btn-green w-full mt-4" onclick="submitTask('${doc.id}')">Submit completed task</button></article>`; }).join("");
-}
-function renderMyTaskSubmissions(docs) {
-  const container = document.getElementById("myTaskSubmissions");
-  if (!docs.length) { container.innerHTML = '<p class="text-slate-500 text-sm">You have not submitted any tasks yet.</p>'; return; }
-  const ordered = docs.slice().sort((a,b) => { const av = a.data().createdAt && a.data().createdAt.toMillis ? a.data().createdAt.toMillis() : 0; const bv = b.data().createdAt && b.data().createdAt.toMillis ? b.data().createdAt.toMillis() : 0; return bv-av; });
-  container.innerHTML = ordered.map(doc => { const item = doc.data() || {}; const status = String(item.status || "pending").toLowerCase(); const color = status === "approved" ? "bg-green-100 text-green-800" : status === "rejected" ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-900"; return `<div class="border border-slate-200 rounded-xl p-4 flex flex-wrap justify-between gap-3"><div><b>${safeText(item.task_title || "Task submission")}</b><p class="text-xs text-slate-500 mt-1">${Number(item.points || 0).toLocaleString("en-NG")} points · ${item.createdAt && item.createdAt.toDate ? item.createdAt.toDate().toLocaleString() : "Just submitted"}</p></div><span class="pill ${color}">${safeText(status.toUpperCase())}</span></div>`; }).join("");
-}
-async function submitTask(taskId) {
-  if (!currentUser) return openAuth("login");
-  if (!userData || userData.is_paid !== true) { alert("Please activate your membership before submitting tasks."); return; }
-  const taskRef = db.collection("tasks").doc(taskId);
-  const submissionRef = db.collection("task_submissions").doc(currentUser.uid + "_" + taskId);
-  try {
-    const taskSnap = await taskRef.get();
-    if (!taskSnap.exists || taskSnap.data().active !== true) throw new Error("This task is no longer available.");
-    const existing = await submissionRef.get();
-    if (existing.exists) { const previousStatus = String(existing.data().status || "pending"); throw new Error(previousStatus === "rejected" ? "You have already submitted this task and it was rejected. Contact an administrator if you need a review." : "You have already submitted this task. Check your submission status below."); }
-    const task = taskSnap.data() || {};
-    await submissionRef.set({ uid: currentUser.uid, email: cleanEmail(currentUser.email), full_name: userData.full_name || "", task_id: taskId, task_title: String(task.title || "Task"), points: Math.max(0, Number(task.points || 0)), status: "pending", createdAt: serverTimestamp() });
-    alert("Task submitted successfully. Your points will be credited after admin approval.");
-  } catch (error) { alert(friendlyError(error)); }
-}
-async function createTask(event) {
-  event.preventDefault(); if (!(userData && userData.is_admin === true)) return showNotice("taskMessage", "Admin access required."); clearNotice("taskMessage");
-  const title = document.getElementById("taskTitle").value.trim(); const description = document.getElementById("taskDescription").value.trim(); const points = Number(document.getElementById("taskReward").value); const proofHint = document.getElementById("taskProofHint").value.trim(); const active = document.getElementById("taskActive").checked;
-  if (!title || !description || !Number.isSafeInteger(points) || points < 1) { return showNotice("taskMessage", "Enter a task title, instructions and a valid points reward."); }
-  setBusy("taskSubmit", true, "Creating…");
-  try { await db.collection("tasks").add({ title, description, points, proof_hint: proofHint, active, createdAt: serverTimestamp(), createdBy: currentUser.uid }); document.getElementById("taskForm").reset(); document.getElementById("taskActive").checked = true; showNotice("taskMessage", "Task created successfully.", "success"); }
-  catch (error) { showNotice("taskMessage", friendlyError(error)); } finally { setBusy("taskSubmit", false); }
-}
-async function setTaskActive(taskId, active) { if (!(userData && userData.is_admin === true)) return alert("Admin access required."); try { await db.collection("tasks").doc(taskId).update({active: !!active}); } catch (error) { alert("Could not update task: " + friendlyError(error)); } }
-async function reviewTaskSubmission(submissionId, decision) {
-  if (!(userData && userData.is_admin === true)) return alert("Admin access required."); if (!["approved","rejected"].includes(decision)) return;
-  const submissionRef = db.collection("task_submissions").doc(submissionId);
-  try {
-    await db.runTransaction(async tx => {
-      const submissionSnap = await tx.get(submissionRef); if (!submissionSnap.exists) throw new Error("Submission not found."); const submission = submissionSnap.data() || {}; if (submission.status !== "pending") throw new Error("This submission has already been reviewed.");
-      const memberRef = db.collection("users").doc(submission.uid); const memberSnap = await tx.get(memberRef); if (!memberSnap.exists) throw new Error("Member account not found.");
-      if (decision === "approved") { const currentPoints = Number(memberSnap.data().points_balance || 0); const reward = Number(submission.points || 0); if (!Number.isSafeInteger(reward) || reward < 1) throw new Error("Invalid task reward."); tx.update(memberRef, {points_balance: currentPoints + reward}); }
-      tx.update(submissionRef, { status: decision, reviewedAt: serverTimestamp(), reviewedBy: currentUser.uid });
-    });
-    alert(decision === "approved" ? "Submission approved and points credited." : "Submission rejected. No points were credited.");
-  } catch (error) { alert("Review failed: " + friendlyError(error)); }
-}
-
-// ===== MINT & BURN - ADMIN ONLY - FIRESTORE =====
-async function loadAdminStats(){
-  try {
-    const snap = await db.collection("pointSupply").doc("main").get();
-    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
-    const el1 = document.getElementById("statSupply"); if(el1) el1.textContent = Number(s.totalSupply||0).toLocaleString("en-NG");
-    const el2 = document.getElementById("statTreasury"); if(el2) el2.textContent = Number(s.treasury||0).toLocaleString("en-NG");
-    const el3 = document.getElementById("statCirculating"); if(el3) el3.textContent = Number(s.circulating||0).toLocaleString("en-NG");
-  } catch(e){ console.warn("pointSupply:", e); }
-}
-async function adminMint(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const amt = Number(document.getElementById("mintAmt").value);
-  if(!amt || amt<=0) return alert("Enter amount > 0");
-  if(!confirm("Mint " + amt + " points to Treasury?")) return;
-  const ref = db.collection("pointSupply").doc("main");
-  await db.runTransaction(async tx=>{
-    const snap = await tx.get(ref);
-    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
-    tx.set(ref, {totalSupply:(s.totalSupply||0)+amt, treasury:(s.treasury||0)+amt, circulating:s.circulating||0});
-  });
-  document.getElementById("mintAmt").value = "";
-  alert("Minted " + amt + " to Treasury"); loadAdminStats();
-}
-async function adminBurnTreasury(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const amt = Number(document.getElementById("burnTreasuryAmt").value);
-  if(!amt || amt<=0) return alert("Enter amount > 0");
-  if(!confirm("Burn " + amt + " from Treasury forever?")) return;
-  const ref = db.collection("pointSupply").doc("main");
-  let ok=false;
-  await db.runTransaction(async tx=>{
-    const snap = await tx.get(ref);
-    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
-    if((s.treasury||0) < amt) return;
-    tx.set(ref, {totalSupply:(s.totalSupply||0)-amt, treasury:(s.treasury||0)-amt, circulating:s.circulating||0});
-    ok=true;
-  });
-  if(!ok) return alert("Not enough in Treasury");
-  document.getElementById("burnTreasuryAmt").value = "";
-  alert("Burned " + amt + " from Treasury"); loadAdminStats();
-}
-async function adminBurnAllPct(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const pct = Number(document.getElementById("burnPct").value);
-  if(!pct || pct<=0 || pct>100) return alert("Enter % 1 to 100");
-  if(!confirm("Burn " + pct + "% from ALL users? Cannot undo!")) return;
-  const snap = await db.collection("users").get();
-  let totalBurned=0;
-  for(const doc of snap.docs){
-    const bal = Number(doc.data().points_balance||0);
-    const burn = Math.floor(bal * pct / 100);
-    if(burn<=0) continue;
-    totalBurned+=burn;
-    await db.collection("users").doc(doc.id).update({points_balance: bal - burn});
-  }
-  const ref = db.collection("pointSupply").doc("main");
-  await db.runTransaction(async tx=>{
-    const sSnap = await tx.get(ref);
-    const s = sSnap.exists ? sSnap.data() : {totalSupply:0, treasury:0, circulating:0};
-    tx.set(ref, {totalSupply:Math.max(0,(s.totalSupply||0)-totalBurned), treasury:s.treasury||0, circulating:Math.max(0,(s.circulating||0)-totalBurned)});
-  });
-  document.getElementById("burnPct").value = "";
-  alert("Burned total " + totalBurned + " points from all users"); loadAdminStats();
-}
-async function adminBurnAllFixed(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const totalToBurn = Number(document.getElementById("burnFixedAmt").value);
-  if(!totalToBurn || totalToBurn<=0) return alert("Enter amount > 0");
-  if(!confirm("Burn total " + totalToBurn + " split across all users?")) return;
-  const snap = await db.collection("users").get();
-  let totalBal=0;
-  snap.docs.forEach(d=> totalBal += Number(d.data().points_balance||0));
-  if(totalBal < totalToBurn) return alert("Users only have " + totalBal + " total. Cannot burn " + totalToBurn);
-  let burnedSoFar=0;
-  for(const doc of snap.docs){
-    const bal = Number(doc.data().points_balance||0);
-    if(bal<=0) continue;
-    let share = Math.floor(totalToBurn * bal / totalBal);
-    if(share>bal) share=bal;
-    if(share<=0) continue;
-    burnedSoFar+=share;
-    await db.collection("users").doc(doc.id).update({points_balance: bal - share});
-  }
-  const ref = db.collection("pointSupply").doc("main");
-  await db.runTransaction(async tx=>{
-    const sSnap = await tx.get(ref);
-    const s = sSnap.exists ? sSnap.data() : {totalSupply:0, treasury:0, circulating:0};
-    tx.set(ref, {totalSupply:Math.max(0,(s.totalSupply||0)-burnedSoFar), treasury:s.treasury||0, circulating:Math.max(0,(s.circulating||0)-burnedSoFar)});
-  });
-  document.getElementById("burnFixedAmt").value = "";
-  alert("Burned " + burnedSoFar + " total"); loadAdminStats();
-}
-async function adminGiveUser(uid, email){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const amt = Number(prompt("Give how many points to " + email + "?"));
-  if(!amt || amt<=0) return;
-  const userRef = db.collection("users").doc(uid);
-  await db.runTransaction(async tx=>{
-    const snap = await tx.get(userRef);
-    const cur = snap.exists ? Number(snap.data().points_balance||0) : 0;
-    tx.update(userRef, {points_balance: cur + amt});
-  });
-  const ref = db.collection("pointSupply").doc("main");
-  await db.runTransaction(async tx=>{
-    const snap = await tx.get(ref);
-    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
-    tx.set(ref, {totalSupply:(s.totalSupply||0)+amt, treasury:s.treasury||0, circulating:(s.circulating||0)+amt});
-  });
-  alert("Gave " + amt + " to " + email); loadAdminStats();
-}
-async function adminBurnUser(uid, email){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const amt = Number(prompt("Burn how many points from " + email + "?"));
-  if(!amt || amt<=0) return;
-  if(!confirm("Burn " + amt + " from " + email + "?")) return;
-  const userRef = db.collection("users").doc(uid);
-  let ok=false;
-  await db.runTransaction(async tx=>{
-    const snap = await tx.get(userRef);
-    const cur = snap.exists ? Number(snap.data().points_balance||0) : 0;
-    if(cur < amt) return;
-    tx.update(userRef, {points_balance: cur - amt});
-    ok=true;
-  });
-  if(!ok) return alert("User does not have that many points");
-  const ref = db.collection("pointSupply").doc("main");
-  await db.runTransaction(async tx=>{
-    const snap = await tx.get(ref);
-    const s = snap.exists ? snap.data() : {totalSupply:0, treasury:0, circulating:0};
-    tx.set(ref, {totalSupply:Math.max(0,(s.totalSupply||0)-amt), treasury:s.treasury||0, circulating:Math.max(0,(s.circulating||0)-amt)});
-  });
-  alert("Burned " + amt + " from " + email); loadAdminStats();
-}
-
-function renderAnnouncements(docs) {
-  const container = document.getElementById("homeAnnouncements");
-  if (!docs.length) { container.innerHTML='<p class="text-slate-500">No announcements yet. Please check back soon.</p>'; return; }
-  container.innerHTML = docs.map(doc => { const item=doc.data()||{}; return `<article class="bg-white rounded-2xl p-5 shadow-soft"><p class="text-xs font-bold uppercase tracking-wider text-green-700">Announcement</p><h3 class="font-extrabold text-lg mt-2">${safeText(item.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap">${safeText(item.message)}</p></article>`; }).join("");
-}
-function renderMaterials(docs) {
-  const container=document.getElementById("materialsGrid");
-  if (!docs.length) {container.innerHTML='<p class="text-slate-500">No learning materials have been published yet.</p>';return;}
-  container.innerHTML=docs.map(doc=>{ const m=doc.data()||{}, free=m.is_free===true, unlocked=free||(userData&&userData.is_paid===true); const actions=unlocked ? `${m.video_url?`<a class="btn btn-green text-center block" href="${safeUrl(m.video_url)}" target="_blank" rel="noopener noreferrer">▶ Watch Video</a>`:""} ${m.pdf_url?`<a class="btn btn-light text-center block" href="${safeUrl(m.pdf_url)}" target="_blank" rel="noopener noreferrer">↓ Download PDF</a>`:""}` : `<div class="locked rounded-xl p-4 text-center"><p class="font-bold text-slate-700">🔒 Upgrade to ₦30,000 to unlock</p><button class="btn btn-green w-full mt-3" onclick="pay()">Upgrade Now</button></div>`; return `<article class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100 flex flex-col"><div class="flex justify-between items-start gap-2"><span class="pill bg-green-50 text-green-800">${safeText(m.category||"General")}</span><span class="pill ${free?"bg-yellow-100 text-yellow-800":"bg-slate-100 text-slate-700"}">${free?"FREE":"PAID"}</span></div><h3 class="font-extrabold text-lg mt-3">${safeText(m.title)}</h3><p class="text-sm text-slate-600 mt-2 whitespace-pre-wrap flex-1">${safeText(m.description)}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5">${actions}</div></article>`; }).join("");
-}
-function safeUrl(value) { try { const u=new URL(String(value)); return ["https:","http:"].includes(u.protocol)?safeText(u.href):"#"; } catch(_){return "#";} }
-async function requestWithdrawal(event) {
-  event.preventDefault(); const messageId="withdrawMessage";clearNotice(messageId);
-  if (!currentUser || !userData) return showNotice(messageId,"Please log in first.");
-  const bank=document.getElementById("bankName").value.trim(); const account=document.getElementById("accountNumber").value.trim(); const amount=Number(document.getElementById("withdrawAmount").value); const balance=Number(userData.balance||0);
-  if (!bank || !/^\d{10}$/.test(account)) return showNotice(messageId,"Enter a bank name and a valid 10-digit account number.");
-  if (!Number.isSafeInteger(amount) || amount<MIN_WITHDRAWAL) return showNotice(messageId,"Minimum withdrawal is ₦5,000.");
-  if (amount>balance) return showNotice(messageId,"Insufficient wallet balance.");
-  setBusy("withdrawSubmit",true,"Submitting…");
-  try {
-    const userRef=db.collection("users").doc(currentUser.uid); const withdrawalRef=db.collection("withdrawals").doc();
-    await db.runTransaction(async tx=>{ const snap=await tx.get(userRef); if(!snap.exists)throw new Error("Member profile not found."); const latest=Number((snap.data()||{}).balance||0); if(amount>latest)throw new Error("Insufficient wallet balance."); tx.update(userRef,{balance:latest-amount}); tx.set(withdrawalRef,{ uid:currentUser.uid,name:userData.full_name||"",email:currentUser.email||"", amount,bank,account,status:"pending",createdAt:serverTimestamp() }); });
-    document.getElementById("withdrawForm").reset(); showNotice(messageId,"Withdrawal request submitted. Your wallet has been debited and the request is pending review.","success"); await loadCurrentProfile(currentUser);
-  } catch(error) { showNotice(messageId,friendlyError(error)); } finally { setBusy("withdrawSubmit",false); }
-}
-async function postAnnouncement(event) {
-  event.preventDefault();clearNotice("announcementMessageBox");
-  try { await db.collection("announcements").add({ title:document.getElementById("announcementTitle").value.trim(), message:document.getElementById("announcementMessage").value.trim(), createdAt:serverTimestamp(),createdBy:currentUser.uid }); document.getElementById("announcementForm").reset(); showNotice("announcementMessageBox","Announcement published successfully.","success"); }
-  catch(error) { showNotice("announcementMessageBox",friendlyError(error)); }
-}
-async function postMaterial(event) {
-  event.preventDefault();clearNotice("materialMessage");
-  const video=document.getElementById("materialVideo").value.trim(); const pdf=document.getElementById("materialPdf").value.trim();
-  if ((video && !isHttpUrl(video)) || (pdf && !isHttpUrl(pdf))) return showNotice("materialMessage","Please enter valid http or https links.");
-  setBusy("materialSubmit",true,"Publishing…");
-  try { await db.collection("materials").add({ title:document.getElementById("materialTitle").value.trim(), category:document.getElementById("materialCategory").value, description:document.getElementById("materialDescription").value.trim(), video_url:video,pdf_url:pdf,is_free:document.getElementById("materialFree").checked, createdAt:serverTimestamp(),createdBy:currentUser.uid }); document.getElementById("materialForm").reset(); showNotice("materialMessage","Educational material published successfully.","success"); }
-  catch(error) { showNotice("materialMessage",friendlyError(error)); } finally { setBusy("materialSubmit",false); }
-}
-function isHttpUrl(value) { try { return ["http:","https:"].includes(new URL(value).protocol); } catch(_){return false;} }
-function loadAdminData() {
-  if (!(userData && userData.is_admin===true)) return;
-  loadAdminStats();
-  adminUnsubscribers.forEach(fn=>fn());adminUnsubscribers=[];
-  const usersSub=db.collection("users").orderBy("createdAt","desc").limit(500).onSnapshot(snapshot=>{
-    const body=document.getElementById("usersTable");
-    if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="6">No users found.</td></tr>';return;}
-    body.innerHTML=snapshot.docs.map(doc=>{
-      const u=doc.data()||{};
-      const escEmail = safeText(u.email||"");
-      return `<tr class="border-b"><td class="p-2">${safeText(u.full_name)}</td><td class="p-2">${escEmail}</td><td class="p-2">${money(u.balance)}</td><td class="p-2 font-bold">${Number(u.points_balance||0).toLocaleString("en-NG")}</td><td class="p-2">${u.is_paid===true?"PAID":"FREE"}</td><td class="p-2"><div class="flex gap-1"><button class="btn btn-green !py-1 !px-2 text-xs" onclick="adminGiveUser('${doc.id}','${escEmail}')">Give</button><button class="btn !py-1 !px-2 text-xs bg-red-50 text-red-700" onclick="adminBurnUser('${doc.id}','${escEmail}')">Burn</button></div></td></tr>`;
-    }).join("");
-  },err=>console.error(err));
-  const withdrawalSub=db.collection("withdrawals").orderBy("createdAt","desc").limit(300).onSnapshot(snapshot=>{
-    const body=document.getElementById("withdrawalsTable");
-    if(snapshot.empty){body.innerHTML='<tr><td class="p-2" colspan="5">No withdrawal requests.</td></tr>';return;}
-    body.innerHTML=snapshot.docs.map(doc=>{ const w=doc.data()||{}; return `<tr class="border-b"><td class="p-2">${safeText(w.name)}</td><td class="p-2">${money(w.amount)}</td><td class="p-2">${safeText(w.bank)}</td><td class="p-2">${safeText(w.account)}</td><td class="p-2"><span class="pill bg-yellow-100 text-yellow-800">${safeText(w.status||"pending")}</span></td></tr>`; }).join("");
-  },err=>console.error(err));
-  const materialSub=db.collection("materials").orderBy("createdAt","desc").onSnapshot(snapshot=>{
-    const container=document.getElementById("adminMaterials");
-    if(snapshot.empty){container.innerHTML='<p class="text-slate-500">No materials published.</p>';return;}
-    container.innerHTML=snapshot.docs.map(doc=>{ const m=doc.data()||{}; return `<div class="border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><b>${safeText(m.title)}</b><p class="text-sm text-slate-500">${safeText(m.category)} · ${m.is_free===true?"Free":"Paid"}</p></div><button class="btn bg-red-50 text-red-700" onclick="deleteMaterial('${doc.id}')">Delete</button></div>`; }).join("");
-  },err=>console.error(err));
-  const tasksSub=db.collection("tasks").orderBy("createdAt","desc").onSnapshot(snapshot=>{
-    const container=document.getElementById("adminTasks");
-    if(snapshot.empty){container.innerHTML='<p class="text-slate-500 text-sm">No tasks created yet.</p>';return;}
-    container.innerHTML=snapshot.docs.map(doc=>{ const t=doc.data()||{}, active=t.active===true; return `<div class="border rounded-xl p-3 flex flex-wrap items-center justify-between gap-2"><div><b>${safeText(t.title)}</b><p class="text-xs text-slate-500">${Number(t.points||0).toLocaleString("en-NG")} points · ${active?"Published":"Hidden"}</p></div><button class="btn ${active?"bg-red-50 text-red-700":"btn-green"}" onclick="setTaskActive('${doc.id}',${!active})">${active?"Unpublish":"Publish"}</button></div>`; }).join("");
-  },err=>console.error("Admin tasks:",err));
-  const submissionsSub=db.collection("task_submissions").where("status","==","pending").onSnapshot(snapshot=>{
-    const container=document.getElementById("taskSubmissionsAdmin");
-    if(snapshot.empty){container.innerHTML='<p class="text-slate-500 text-sm">No pending task submissions.</p>';return;}
-    container.innerHTML=snapshot.docs.map(doc=>{ const s=doc.data()||{}; return `<div class="border rounded-xl p-4"><div class="flex flex-wrap justify-between gap-2"><b>${safeText(s.task_title||"Task")}</b><span class="pill bg-amber-100 text-amber-900">${Number(s.points||0).toLocaleString("en-NG")} points</span></div><p class="text-sm mt-2">${safeText(s.full_name||"Member")} · ${safeText(s.email||"")}</p><p class="text-xs text-slate-500 mt-1">Submitted: ${s.createdAt&&s.createdAt.toDate?s.createdAt.toDate().toLocaleString():"—"}</p><div class="grid grid-cols-2 gap-2 mt-3"><button class="btn btn-green" onclick="reviewTaskSubmission('${doc.id}','approved')">Approve & credit</button><button class="btn bg-red-50 text-red-700" onclick="reviewTaskSubmission('${doc.id}','rejected')">Reject</button></div></div>`; }).join("");
-  },err=>console.error("Pending task submissions:",err));
-  adminUnsubscribers=[usersSub,withdrawalSub,materialSub,tasksSub,submissionsSub];
-}
-  // ===== EXCHANGE RATE + MASS TRANSFER + BUY/SEND - NEW =====
-let exchangeRate = { nairaToPoints: 10, pointsToNaira: 2, transferFeePercent: 0, minTransferNaira: 100, minTransferPoints: 100 };
-async function loadExchangeRate(){
-  try{
-    const snap = await db.collection("settings").doc("exchange").get();
-    if(snap.exists){ exchangeRate = {...exchangeRate, ...snap.data()};
-      const a=document.getElementById("exNairaToPoints"); if(a) a.value=exchangeRate.nairaToPoints;
-      const b=document.getElementById("exPointsToNaira"); if(b) b.value=exchangeRate.pointsToNaira;
-      const c=document.getElementById("exFee"); if(c) c.value=exchangeRate.transferFeePercent;
-      const d=document.getElementById("exMinNaira"); if(d) d.value=exchangeRate.minTransferNaira;
-      const e=document.getElementById("exMinPoints"); if(e) e.value=exchangeRate.minTransferPoints;
-      const f=document.getElementById("exLastUpdated"); if(f) f.textContent="Last updated by: "+(snap.data().updatedBy||"admin");
-      const g=document.getElementById("userRateText"); if(g) g.textContent="1 Naira = "+exchangeRate.nairaToPoints+" Points | 1 Point = ₦"+exchangeRate.pointsToNaira;
-    }
-  }catch(e){ console.warn("Rate:",e); }
-}
-async function saveExchangeRate(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const data={ nairaToPoints:Number(document.getElementById("exNairaToPoints").value), pointsToNaira:Number(document.getElementById("exPointsToNaira").value), transferFeePercent:Number(document.getElementById("exFee").value||0), minTransferNaira:Number(document.getElementById("exMinNaira").value||100), minTransferPoints:Number(document.getElementById("exMinPoints").value||100), updatedBy: currentUser.email, updatedAt: serverTimestamp() };
-  if(!data.nairaToPoints || !data.pointsToNaira) return alert("Enter valid rates");
-  await db.collection("settings").doc("exchange").set(data,{merge:true});
-  exchangeRate=data; showNotice("exMsg","Exchange rate updated! Live for all users now.","success");
-}
-async function previewMass(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const snap=await db.collection("users").get(); let users=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const t=document.getElementById("massTarget").value; if(t==="paid") users=users.filter(u=>u.is_paid===true); if(t==="free") users=users.filter(u=>u.is_paid!==true);
-  const amt=Number(document.getElementById("massAmount").value||0); const cur=document.getElementById("massCurrency").value;
-  document.getElementById("massPreview").textContent="Will send to "+users.length+" users - Total: "+(amt*users.length).toLocaleString()+" "+cur;
-}
-async function confirmMass(){
-  if(!(userData && userData.is_admin===true)) return alert("Admin only");
-  const cur=document.getElementById("massCurrency").value; const amt=Number(document.getElementById("massAmount").value); const reason=document.getElementById("massReason").value||"Mass Transfer"; const target=document.getElementById("massTarget").value;
-  if(!amt||amt<=0) return alert("Enter amount > 0");
-  if(!confirm("Send "+amt+" "+cur+" to selected users? Cannot undo!")) return;
-  const snap=await db.collection("users").get(); let users=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(target==="paid") users=users.filter(u=>u.is_paid===true); if(target==="free") users=users.filter(u=>u.is_paid!==true);
-  for(let i=0;i<users.length;i+=50){ const batch=db.batch(); const chunk=users.slice(i,i+50);
-    chunk.forEach(u=>{ const ref=db.collection("users").doc(u.id); const field=cur==="points"?"points_balance":"balance"; batch.update(ref,{[field]: Number(u[field]||0)+amt}); const tx=db.collection("transactions").doc(); batch.set(tx,{to_user:u.id,to_email:u.email||"",type:"mass_transfer",amount:amt,currency:cur,reason,admin:currentUser.email,createdAt:serverTimestamp()}); });
-    await batch.commit();
-  }
-  showNotice("massMsg","Done! Sent to "+users.length+" users.","success"); loadAdminStats();
-}
-// --- USER: BUY / SEND / SWAP ---
-async function buyPointsWithNaira(){
-  await loadExchangeRate(); const naira=Number(document.getElementById("buyPointsAmt").value);
-  if(!naira||naira<=0) return alert("Enter Naira amount"); if(naira>Number(userData.balance||0)) return alert("Not enough Naira balance");
-  const points=Math.floor(naira*Number(exchangeRate.nairaToPoints));
-  if(!confirm("Buy "+points+" Points with ₦"+naira+"?")) return;
-  const ref=db.collection("users").doc(currentUser.uid);
-  await db.runTransaction(async tx=>{ const s=await tx.get(ref); const d=s.data(); if(Number(d.balance||0)<naira) throw new Error("Insufficient balance"); tx.update(ref,{balance:Number(d.balance)-naira, points_balance:Number(d.points_balance||0)+points}); });
-  await db.collection("transactions").add({from_user:currentUser.uid,to_user:currentUser.uid,type:"buy_points",amount:points,currency:"points",naira_spent:naira,rate_used:exchangeRate.nairaToPoints,createdAt:serverTimestamp()});
-  alert("Bought "+points+" Points!"); await loadCurrentProfile(currentUser);
-}
-async function sendPoints(){
-  await loadExchangeRate(); const toEmail=cleanEmail(document.getElementById("sendPointsTo").value); const amt=Number(document.getElementById("sendPointsAmt").value);
-  if(!toEmail) return alert("Enter recipient email"); if(!amt||amt<Number(exchangeRate.minTransferPoints)) return alert("Min is "+exchangeRate.minTransferPoints+" Points");
-  if(amt>Number(userData.points_balance||0)) return alert("Not enough Points");
-  const q=await db.collection("users").where("email","==",toEmail).limit(1).get(); if(q.empty) return alert("User not found"); const rec=q.docs[0]; if(rec.id===currentUser.uid) return alert("Cannot send to yourself");
-  if(!confirm("Send "+amt+" Points to "+toEmail+"?")) return;
-  const fee=Math.floor(amt*Number(exchangeRate.transferFeePercent||0)/100); const net=amt-fee;
-  await db.runTransaction(async tx=>{ const sRef=db.collection("users").doc(currentUser.uid); const rRef=db.collection("users").doc(rec.id); const s=await tx.get(sRef); const r=await tx.get(rRef); if(Number(s.data().points_balance||0)<amt) throw new Error("Insufficient"); tx.update(sRef,{points_balance:Number(s.data().points_balance)-amt}); tx.update(rRef,{points_balance:Number(r.data().points_balance||0)+net}); });
-  await db.collection("transactions").add({from_user:currentUser.uid,from_email:currentUser.email,to_user:rec.id,to_email:toEmail,type:"send_points",amount:net,fee,currency:"points",createdAt:serverTimestamp()});
-  alert("Sent "+net+" Points to "+toEmail); await loadCurrentProfile(currentUser);
-}
-async function sendNaira(){
-  await loadExchangeRate(); const toEmail=cleanEmail(document.getElementById("sendNairaTo").value); const amt=Number(document.getElementById("sendNairaAmt").value);
-  if(!toEmail) return alert("Enter recipient email"); if(!amt||amt<Number(exchangeRate.minTransferNaira)) return alert("Min is ₦"+exchangeRate.minTransferNaira);
-  if(amt>Number(userData.balance||0)) return alert("Not enough Naira");
-  const q=await db.collection("users").where("email","==",toEmail).limit(1).get(); if(q.empty) return alert("User not found"); const rec=q.docs[0]; if(rec.id===currentUser.uid) return alert("Cannot send to yourself");
-  if(!confirm("Send ₦"+amt+" to "+toEmail+"?")) return;
-  const fee=Math.floor(amt*Number(exchangeRate.transferFeePercent||0)/100); const net=amt-fee;
-  await db.runTransaction(async tx=>{ const sRef=db.collection("users").doc(currentUser.uid); const rRef=db.collection("users").doc(rec.id); const s=await tx.get(sRef); const r=await tx.get(rRef); if(Number(s.data().balance||0)<amt) throw new Error("Insufficient"); tx.update(sRef,{balance:Number(s.data().balance)-amt}); tx.update(rRef,{balance:Number(r.data().balance||0)+net}); });
-  await db.collection("transactions").add({from_user:currentUser.uid,from_email:currentUser.email,to_user:rec.id,to_email:toEmail,type:"send_naira",amount:net,fee,currency:"naira",createdAt:serverTimestamp()});
-  alert("Sent ₦"+net+" to "+toEmail); await loadCurrentProfile(currentUser);
-}
-async function swapPointsToNaira(){
-  await loadExchangeRate(); const pts=Number(document.getElementById("swapPointsAmt").value);
-  if(!pts||pts<=0) return alert("Enter points"); if(pts>Number(userData.points_balance||0)) return alert("Not enough Points");
-  const naira=pts*Number(exchangeRate.pointsToNaira);
-  if(!confirm("Swap "+pts+" Points to ₦"+naira+"?")) return;
-  const ref=db.collection("users").doc(currentUser.uid);
-  await db.runTransaction(async tx=>{ const s=await tx.get(ref); const d=s.data(); if(Number(d.points_balance||0)<pts) throw new Error("Insufficient"); tx.update(ref,{points_balance:Number(d.points_balance)-pts, balance:Number(d.balance||0)+naira}); });
-  await db.collection("transactions").add({from_user:currentUser.uid,to_user:currentUser.uid,type:"swap_points_to_naira",amount:naira,currency:"naira",points_spent:pts,rate_used:exchangeRate.pointsToNaira,createdAt:serverTimestamp()});
-  alert("Swapped to ₦"+naira); await loadCurrentProfile(currentUser);
-}
-async function deleteMaterial(id) { if (!(userData && userData.is_admin===true)) return alert("Admin access required."); if (!confirm("Delete this learning material permanently?")) return; try { await db.collection("materials").doc(id).delete(); } catch(error) { alert("Could not delete material: "+friendlyError(error)); } }
+async function deleteMaterial(id){ if(!confirm("Delete this material?")) return; await db.collection("materials").doc(id).delete(); loadAdminData(); }
 </script>
 </body>
 </html>
