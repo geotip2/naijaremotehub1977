@@ -114,7 +114,7 @@
         <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl mt-6"><button id="loginTab" class="btn tab-active" onclick="switchAuth('login')">Login</button><button id="signupTab" class="btn tab-idle" onclick="switchAuth('signup')">Sign Up</button></div>
         <form id="loginForm" class="mt-6 space-y-4" onsubmit="login(event)">
           <div><label class="block text-sm font-bold mb-1" for="loginEmail">Email</label><input id="loginEmail" class="field" type="email" autocomplete="email" required></div>
-          <div><label class="block text-sm font-bold mb-1" for="loginPassword">Password</label><input id="loginPassword" class="field" type="password" autocomplete="current-password" required></div>
+          <div><label class="block text-sm font-bold mb-1" for="loginPassword">Password</label><div class="relative"><input id="loginPassword" class="field pr-12" type="password" autocomplete="current-password" required><button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-lg" onclick="togglePass('loginPassword', this)">👁️</button></div></div>
           <button id="loginSubmit" class="btn btn-green w-full" type="submit">Login</button><div id="loginError" class="notice error"></div>
         </form>
         <div class="text-right"><button type="button" class="text-sm font-bold text-green-700" onclick="forgotPassword()">Forgot password?</button></div>
@@ -122,7 +122,7 @@
         <form id="signupForm" class="mt-6 space-y-4 hidden" onsubmit="signup(event)">
           <div><label class="block text-sm font-bold mb-1" for="signupName">Full Name</label><input id="signupName" class="field" autocomplete="name" required maxlength="100"></div>
           <div><label class="block text-sm font-bold mb-1" for="signupEmail">Email</label><input id="signupEmail" class="field" type="email" autocomplete="email" required></div>
-          <div><label class="block text-sm font-bold mb-1" for="signupPassword">Password</label><input id="signupPassword" class="field" type="password" autocomplete="new-password" minlength="6" required><p class="text-xs text-slate-500 mt-1">At least 6 characters.</p></div>
+          <div><label class="block text-sm font-bold mb-1" for="signupPassword">Password</label><div class="relative"><input id="signupPassword" class="field pr-12" type="password" autocomplete="new-password" minlength="6" required><button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-lg" onclick="togglePass('signupPassword', this)">👁️</button></div>
           <div><label class="block text-sm font-bold mb-1" for="signupReferral">Referral Code (optional)</label><input id="signupReferral" class="field" autocomplete="off" placeholder="Enter referral code"></div>
           <button id="signupSubmit" class="btn btn-green w-full" type="submit">Create Free Account</button><div id="signupError" class="notice error"></div>
         </form>
@@ -417,6 +417,13 @@ async function forgotPassword() {
     await auth.sendPasswordResetEmail(email);
     showNotice("forgotMessage", "Reset link sent to " + email + ". Check your inbox / spam. Link expires in 1 hour.", "success");
   } catch (error) { showNotice("forgotMessage", friendlyError(error)); }
+}
+  function togglePass(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const show = el.type === "password";
+  el.type = show ? "text" : "password";
+  if (btn) btn.textContent = show ? "🙈" : "👁️";
 }
   function friendlyError(error) {
 const code = error && error.code;
